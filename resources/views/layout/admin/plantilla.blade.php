@@ -59,6 +59,60 @@
                 </ul>
             </li>
 
+             <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
+                <a
+                    class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
+                    <i class="ri-instance-line mr-3 text-lg"></i>
+                    <span class="text-sm">Gestionar Cursos</span>
+                    <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
+                </a>
+                <ul class="pl-7 mt-2 hidden group-[.selected]:block">
+                    <li class="mb-4">
+                        <a href=""
+                            class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('person') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                            Lista de Cursos
+                        </a>
+                    </li>
+                    <li class="mb-4">
+                        <a href=""
+                            class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                            Registrar Curso
+                        </a>
+                    </li>                
+                </ul>
+            </li>
+
+             <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
+                <a
+                    class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
+                    <i class="ri-instance-line mr-3 text-lg"></i>
+                    <span class="text-sm">Gestionar Grados</span>
+                    <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
+                </a>
+                <ul class="pl-7 mt-2 hidden group-[.selected]:block">
+                    <li class="mb-4">
+                        <a href=""
+                            class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('person') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                            Lista de Grados
+                        </a>
+                    </li>
+                    <li class="mb-4">
+                        <a href=""
+                            class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                            Registrar Grado
+                        </a>
+                    </li>                
+                </ul>
+            </li>
+
             <li class="mb-1 group cursor-pointer">
                 <a href=""
                     class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md {{ request()->routeIs('user.edit_user') ? 'bg-[#98C560]' : 'bg-transparent' }}">
@@ -68,48 +122,23 @@
             </li>
 
 
-            <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Pestañas</h4>
+            <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Secretaria</h4>
 
             <li class="mb-1 group cursor-pointer">
                 <a href=""
                     class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md {{ request()->routeIs('admin-homeSlider') ? 'bg-[#98C560]' : 'bg-transparent' }}">
                     <i class="ri-instance-line mr-3 text-lg"></i>
-                    <span class="text-sm">Home Slider</span>
+                    <span class="text-sm">Principal</span>
                 </a>
             </li>
 
-            <li
-                class="mb-1 group cursor-pointer {{ request()->routeIs(['h-slider.create', 'h-sliders-panel', 'h-slider.edit']) ? 'active' : '' }}">
-                <a
-                    class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
-                    <i class="ri-instance-line mr-3 text-lg"></i>
-                    <span class="text-sm">Nosotros</span>
-                    <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
-                </a>
-                <ul class="pl-7 mt-2 hidden group-[.selected]:block">
-                    <li class="mb-4">
-                        <a href=""
-                            class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                            <span
-                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs(['h-sliders-panel', 'h-slider.edit']) ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                            Panel Historia Slider</a>
-                    </li>
-                    <li class="mb-4">
-                        <a href=""
-                            class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                            <span
-                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('h-slider.create') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                            Crear Historia Slider</a>
-                    </li>
-                </ul>
-            </li>
-
+          
             <li
                 class="mb-1 group cursor-pointer {{ request()->routeIs(['papers.create', 'papers.index', 'papers.edit']) ? 'active' : '' }}">
                 <a
                     class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
                     <i class="ri-instance-line mr-3 text-lg"></i>
-                    <span class="text-sm">Papers</span>
+                    <span class="text-sm">Gestionar Matricula</span>
                     <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                 </a>
                 <ul class="pl-7 mt-2 hidden group-[.selected]:block">
@@ -118,51 +147,37 @@
                             class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                             <span
                                 class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs(['papers.index', 'papers.edit']) ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                            Lista de Papers</a>
+                            Lista de Matricula</a>
                     </li>
                     <li class="mb-4">
                         <a href=""
                             class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                             <span
                                 class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('papers.create') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                            Crear Paper</a>
+                            Validar Matricula</a>
                     </li>
                 </ul>
             </li>
 
-            <li
-                class="mb-1 group cursor-pointer {{ request()->routeIs(['areas-panel', 'areas.edit', 'topic-panel', 'topics.edit']) ? 'active' : '' }}">
-                <a
-                    class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
-                    <i class="ri-instance-line mr-3 text-lg"></i>
-                    <span class="text-sm">Investigación</span>
-                    <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
-                </a>
-                <ul class="pl-7 mt-2 hidden group-[.selected]:block">
-                    <li class="mb-4">
-                        <a href=""
-                            class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                            <span
-                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs(['areas-panel', 'areas.edit']) ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>Áreas
-                            de Investigación</a>
-                    </li>
-                    <li class="mb-4">
-                        <a href=""
-                            class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                            <span
-                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs(['topic-panel', 'topics.edit']) ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>Tópicos
-                            Paper</a>
 
-                    </li>
-                </ul>
-            </li>
 
             <li
                 class="mb-1 group cursor-pointer {{ request()->routeIs(['areas_proyectos_admin', 'proyect', 'topic-panel', 'topics.edit']) ? 'active' : '' }}">
                 <a
                     class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
                     <i class="ri-instance-line mr-3 text-lg"></i>
-                    <span class="text-sm">Proyectos</span>
+                    <span class="text-sm">Gestionar Usuarios</span>
+                  
+                </a>
+
+            </li>
+
+            <li
+                class="mb-1 group cursor-pointer {{ request()->routeIs(['capital_index', 'direccion_index']) ? 'active' : '' }}">
+                <a
+                    class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
+                    <i class="ri-instance-line mr-3 text-lg"></i>
+                    <span class="text-sm">Registro de información</span>
                     <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                 </a>
                 <ul class="pl-7 mt-2 hidden group-[.selected]:block">
@@ -170,15 +185,60 @@
                         <a href=""
                             class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                             <span
-                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs(['areas_proyectos_admin']) ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>Áreas
-                            de Proyectos</a>
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('capital_index') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                            Estudiantes
+                        </a>
                     </li>
                     <li class="mb-4">
                         <a href=""
                             class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                             <span
-                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('proyect') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                            Lista de Proyectos</a>
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('direccion_index') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                            Pendientes
+                        </a>
+                    </li>
+                </ul>
+            </li>
+             <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Docente</h4>
+
+            <li class="mb-1 group cursor-pointer">
+                <a href=""
+                    class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md {{ request()->routeIs('admin-homeSlider') ? 'bg-[#98C560]' : 'bg-transparent' }}">
+                    <i class="ri-instance-line mr-3 text-lg"></i>
+                    <span class="text-sm">Principal</span>
+                </a>
+            </li>
+
+          
+            <li
+                class="mb-1 group cursor-pointer {{ request()->routeIs(['papers.create', 'papers.index', 'papers.edit']) ? 'active' : '' }}">
+                <a
+                    class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
+                    <i class="ri-instance-line mr-3 text-lg"></i>
+                    <span class="text-sm">Gestionar Asignaturas</span>
+                    <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
+                </a>
+                <ul class="pl-7 mt-2 hidden group-[.selected]:block">
+                    <li class="mb-4">
+                        <a href=""
+                            class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs(['papers.index', 'papers.edit']) ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                            Lista de Calificaciones</a>
+                    </li>
+                    <li class="mb-4">
+                        <a href=""
+                            class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('papers.create') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                            Lista de Estudiantes</a>
+                    </li>
+                    <li class="mb-4">
+                        <a href=""
+                            class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('papers.create') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                            Lista de Asignaturas</a>
                     </li>
                 </ul>
             </li>
@@ -188,7 +248,7 @@
                 <a
                     class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
                     <i class="ri-instance-line mr-3 text-lg"></i>
-                    <span class="text-sm">Organización</span>
+                    <span class="text-sm">Registro de información</span>
                     <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                 </a>
                 <ul class="pl-7 mt-2 hidden group-[.selected]:block">
@@ -197,7 +257,7 @@
                             class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                             <span
                                 class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('capital_index') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                            Capital Humano
+                            Estudiantes
                         </a>
                     </li>
                     <li class="mb-4">
@@ -205,16 +265,29 @@
                             class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                             <span
                                 class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('direccion_index') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                            Dirección
+                            Pendientes
                         </a>
                     </li>
                 </ul>
             </li>
-            <li class="mb-1 group cursor-pointer {{ request()->routeIs(['notici', 'event']) ? 'active' : '' }}">
+
+            <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Usuario</h4>
+
+            <li class="mb-1 group cursor-pointer">
+                <a href=""
+                    class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md {{ request()->routeIs('admin-homeSlider') ? 'bg-[#98C560]' : 'bg-transparent' }}">
+                    <i class="ri-instance-line mr-3 text-lg"></i>
+                    <span class="text-sm">Principal</span>
+                </a>
+            </li>
+
+          
+            <li
+                class="mb-1 group cursor-pointer {{ request()->routeIs(['papers.create', 'papers.index', 'papers.edit']) ? 'active' : '' }}">
                 <a
                     class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
                     <i class="ri-instance-line mr-3 text-lg"></i>
-                    <span class="text-sm">Novedades</span>
+                    <span class="text-sm">Calificaciones</span>
                     <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                 </a>
                 <ul class="pl-7 mt-2 hidden group-[.selected]:block">
@@ -222,32 +295,75 @@
                         <a href=""
                             class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                             <span
-                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('notici') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                            Noticias</a>
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs(['papers.index', 'papers.edit']) ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                           Visualizar Calificaciones</a>
                     </li>
                     <li class="mb-4">
                         <a href=""
                             class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                             <span
-                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('event') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                            Eventos</a>
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('papers.create') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                            Lista de Asignaturas</a>
                     </li>
                 </ul>
             </li>
-            <li class="mb-1 group cursor-pointer">
-                <a href=""
-                    class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md {{ request()->routeIs('contactos') ? 'bg-[#98C560]' : 'bg-transparent' }}">
+
+                   <li
+                class="mb-1 group cursor-pointer {{ request()->routeIs(['capital_index', 'direccion_index']) ? 'active' : '' }}">
+                <a
+                    class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
                     <i class="ri-instance-line mr-3 text-lg"></i>
-                    <span class="text-sm">Contacto</span>
+                    <span class="text-sm">Matriculas</span>
+                    <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                 </a>
+                <ul class="pl-7 mt-2 hidden group-[.selected]:block">
+                    <li class="mb-4">
+                        <a href=""
+                            class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('capital_index') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                            Registrar Matricula
+                        </a>
+                    </li>
+                    <li class="mb-4">
+                        <a href=""
+                            class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('direccion_index') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                            Mis Matriculas
+                        </a>
+                    </li>
+                </ul>
             </li>
-            <li class="mb-1 group cursor-pointer">
-                <a href=""
-                class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md {{ request()->routeIs('tutorials.index') ? 'bg-[#98C560]' : 'bg-transparent' }}">
-                <i class="ri-instance-line mr-3 text-lg"></i>
-                <span class="text-sm">Tutoriales</span>
-            </a>
+
+            <li
+                class="mb-1 group cursor-pointer {{ request()->routeIs(['capital_index', 'direccion_index']) ? 'active' : '' }}">
+                <a
+                    class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
+                    <i class="ri-instance-line mr-3 text-lg"></i>
+                    <span class="text-sm">Información Personal</span>
+                    <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
+                </a>
+                <ul class="pl-7 mt-2 hidden group-[.selected]:block">
+                    <li class="mb-4">
+                        <a href=""
+                            class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('capital_index') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                            Datos
+                        </a>
+                    </li>
+                    <li class="mb-4">
+                        <a href=""
+                            class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('direccion_index') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                            Mis Matriculas
+                        </a>
+                    </li>
+                </ul>
             </li>
+
 
 
         </ul>
