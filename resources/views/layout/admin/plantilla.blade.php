@@ -19,7 +19,7 @@
     <aside
         class="fixed left-0 top-0 w-[300px] h-full bg-[#0f1657] p-4 z-50 sidebar-menu transition-transform overflow-y-auto shadow-2xl">
         <a href="" class="flex items-center py-8 border-b border-b-[#98C560]">
-            <img src="/user/template/images/logoLabCam.png" alt="logo_labcam" class="max-w-full">
+            <img src="/images/logo-bruning2.png" alt="logo_labcam" class="max-w-full">
         </a>
         <ul class="mt-8">
             @auth
