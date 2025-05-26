@@ -17,11 +17,13 @@
 <body class="text-gray-800 font-inter">
     <!-- start: Sidebar -->
     <aside
-        class="fixed left-0 top-0 w-[300px] h-full bg-[#4e4e4e] p-4 z-50 sidebar-menu transition-transform overflow-y-auto shadow-2xl">
+        class="fixed left-0 top-0 w-[300px] h-full bg-[#0f1657] p-4 z-50 sidebar-menu transition-transform overflow-y-auto shadow-2xl">
         <a href="" class="flex items-center py-8 border-b border-b-[#98C560]">
             <img src="/user/template/images/logoLabCam.png" alt="logo_labcam" class="max-w-full">
         </a>
         <ul class="mt-8">
+            @auth
+          @if(auth()->user()->isAdmin())
             <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3">Administración general</h4>
 
             <li class="mb-1 group cursor-pointer">
@@ -49,7 +51,7 @@
                         </a>
                     </li>
                     <li class="mb-4">
-                        <a href=""
+                        <a href="{{route('users.buscar')}}"
                             class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                             <span
                                 class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
@@ -120,7 +122,7 @@
                     <span class="text-sm">Mi Cuenta</span>
                 </a>
             </li>
-
+             @elseif(auth()->user()->isSecretaria())
 
             <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Secretaria</h4>
 
@@ -199,6 +201,7 @@
                     </li>
                 </ul>
             </li>
+              @elseif(auth()->user()->isDocente())
              <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Docente</h4>
 
             <li class="mb-1 group cursor-pointer">
@@ -270,7 +273,7 @@
                     </li>
                 </ul>
             </li>
-
+              @elseif(auth()->user()->isEstudiante())
             <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Usuario</h4>
 
             <li class="mb-1 group cursor-pointer">
@@ -365,7 +368,8 @@
             </li>
 
 
-
+             @endif
+             @endauth
         </ul>
         <div class="fixed top-0 left-[300px] w-full h-full z-40 md:hidden sidebar-overlay backdrop-blur-sm"></div>
     </aside>
@@ -383,18 +387,34 @@
                         class="dropdown-toggle flex items-center gap-x-2 hover:text-[#98C560] group">
                         <div
                             class="relative inline-block bg-white p-[2.5px] rounded-full border-[1px] border-black group-hover:border-[#98C560]">
-                           
+                             @if (Auth::check() && Auth::user()->photo)
+                                <img src="" alt="Foto de perfil"
+                                    class="w-12 h-12 rounded-full block object-cover">
+                            @elseif(Auth::check())
+                                <div
+                                    class="w-12 h-12 bg-gray-300 text-gray-700 flex items-center justify-center rounded-full text-xl font-bold uppercase">
+                                    {{ substr(Auth::user()->name, 0, 1) }}
+                                </div>
+                            @endif
+                        </div>
+                        @if (Auth::check())
+                            <div>
+                                <h4 class="text-[14.5px] font-medium">{{ Auth::user()->name }}
+                                    {{ Auth::user()->lastname }}</h4>
+                                <h4 class="text-[12.5px] font-normal uppercase">{{ Auth::user()->rol }}</h4>
+                            </div>
+                        @endif
                         </div>
                       
                     </button>
                     <ul
                         class="dropdown-menu shadow-md shadow-black/5 z-30 hidden py-2 rounded-md bg-white border border-gray-100 w-[140px] text-black text-[15px]">
                         <li>
-                            <a href=""
+                            <a href="#"
                                 class="flex items-center py-1.5 px-4 hover:text-[#98C560]">Mi Perfil</a>
                         </li>
                         <li>
-                            <a href="#" onclick="confirmLogout()"
+                            <a href="" onclick="confirmLogout()"
                                 class="flex items-center py-1.5 px-4 hover:text-[#98C560]">Cerrar
                                 Sesión</a>
                         </li>
@@ -423,7 +443,7 @@
                 cancelButtonText: "Cancelar"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = "";
+                    window.location.href = "{{route('logout')}}";
                 }
             });
         }
