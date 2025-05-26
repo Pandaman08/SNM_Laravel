@@ -414,7 +414,7 @@
                                 class="flex items-center py-1.5 px-4 hover:text-[#98C560]">Mi Perfil</a>
                         </li>
                         <li>
-                            <a href="" onclick="confirmLogout()"
+                            <a href="#" onclick="confirmLogout()"
                                 class="flex items-center py-1.5 px-4 hover:text-[#98C560]">Cerrar
                                 Sesión</a>
                         </li>
