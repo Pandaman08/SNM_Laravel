@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,9 +15,33 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        \App\Models\User::factory()
+            ->admin()
+            ->create([
+                'name' => 'Admin',
+                'email' => 'admin@school.com',
+                'estado' => true
+            ]);
+
+        // Create 5 secretaries
+        \App\Models\User::factory()
+            ->secretaria()
+            ->has(\App\Models\Secretaria::factory()->count(1))
+            ->count(5)
+            ->create();
+
+        // Create 10 teachers
+        \App\Models\User::factory()
+            ->docente()
+            ->has(\App\Models\Docente::factory()->count(1))
+            ->count(10)
+            ->create();
+
+        // Create 50 students
+        \App\Models\User::factory()
+            ->estudiante()
+            ->has(\App\Models\Estudiante::factory()->count(1))
+            ->count(20)
+            ->create();
     }
 }

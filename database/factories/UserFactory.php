@@ -5,7 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-
+use App\Enums\UserRole;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
  */
@@ -24,20 +24,55 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
+            'name' => $this->faker->firstName(),
+            'lastname' => $this->faker->lastName(),
+            'dni' => Str::random(8),
+            'sexo' => 'M',
+            'email' => $this->faker->unique()->safeEmail(),
+            'rol' => $this->faker->randomElement(UserRole::values()),
+            'estado' => $this->faker->boolean(100),
             'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'photo' => $this->faker->optional()->imageUrl(200, 200, 'people'),
+            'address' => $this->faker->address(),
+            'fecha_nacimiento' => $this->faker->dateTimeBetween('-50 years', '-18 years')->format('Y-m-d'),
+            'created_at' => $this->faker->dateTimeBetween('-2 years', 'now'),
+            'updated_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
         ];
     }
 
+    public function admin()
+    {
+        return $this->state([
+            'rol' => UserRole::ADMIN->value,
+        ]);
+    }
+
+    public function secretaria()
+    {
+        return $this->state([
+            'rol' => UserRole::SECRETARIA->value,
+        ]);
+    }
+
+    public function docente()
+    {
+        return $this->state([
+            'rol' => UserRole::DOCENTE->value,
+        ]);
+    }
+
+    public function estudiante()
+    {
+        return $this->state([
+            'rol' => UserRole::ESTUDIANTE->value,
+        ]);
+    }
     /**
      * Indicate that the model's email address should be unverified.
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }
