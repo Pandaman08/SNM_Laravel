@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Enums\UserRole;
+
 return new class extends Migration
 {
     /**
@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('secretarias', function (Blueprint $table) {
-            $table->id('codigo_secretaria');
-            $table->string('area_responsabilidad', 100);
-            $table->date('fecha_contratacion');
-            $table->float('jornada_laboral');
+        Schema::create('tutores', function (Blueprint $table) {
+            $table->id('id_tutor');
             $table->unsignedBigInteger('user_id');
+            $table->string('direccion', 45)->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('user_id')->on('users');
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('secretarias');
+        Schema::dropIfExists('tutores');
     }
 };
