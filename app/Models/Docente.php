@@ -7,23 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 
 class Docente extends Model
 {
-    /** @use HasFactory<\Database\Factories\DocenteFactory> */
     use HasFactory;
-     protected $primaryKey = 'codigo_docente';
+    protected $primaryKey = 'codigo_docente';
     protected $table = 'docentes';
 
     protected $fillable = [
         'user_id',
         'especialidad',
+        'jornada_laboral',
         'fecha_contratacion',
+        'departamento_estudios',
     ];
 
-    protected $casts = [
-        'fecha_contratacion' => 'date',
-    ];
+    protected $dates = ['fecha_contratacion'];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
+    }
+
+    public function asignaturas()
+    {
+        return $this->belongsToMany(Asignatura::class, 'asignaturas_docentes', 'codigo_docente', 'codigo_asignatura')
+                    ->withPivot('fecha');
     }
 }

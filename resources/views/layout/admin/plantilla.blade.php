@@ -273,7 +273,7 @@
                     </li>
                 </ul>
             </li>
-              @elseif(auth()->user()->isEstudiante())
+              @elseif(auth()->user()->isTutor())
             <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Usuario</h4>
 
             <li class="mb-1 group cursor-pointer">

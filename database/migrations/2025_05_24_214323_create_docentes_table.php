@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('docentes', function (Blueprint $table) {
             $table->id('codigo_docente');
-            $table->unsignedBigInteger('user_id')->unique();
-        $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
-            $table->string('especialidad', 100);
-              $table->date('fecha_contratacion');
+            $table->unsignedBigInteger('user_id');
+            $table->string('especialidad', 100)->nullable();
+            $table->float('jornada_laboral')->nullable();
+            $table->date('fecha_contratacion')->nullable();
+            $table->string('departamento_estudios', 100)->nullable();
             $table->timestamps();
+            $table->foreign('user_id')->references('user_id')->on('users');
         });
     }
 

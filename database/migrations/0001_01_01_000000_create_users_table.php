@@ -16,7 +16,9 @@ return new class extends Migration {
             $table->string('name', 45);
             $table->string('lastname', 150);
             $table->char('dni',8);
+            $table->char('phone',9);
             $table->enum('sexo',['M', 'F'])->default('M');
+            $table->enum('estado_civil',['S', 'C','D','V'])->default('S');
             $table->string('email', 60)->unique();
             $table->enum('rol', UserRole::values());
             $table->boolean('estado')->default(true);

@@ -20,7 +20,7 @@ class SecretariaFactory extends Factory
             'user_id' => \App\Models\User::factory()->secretaria(),
             'fecha_contratacion' => $this->faker->dateTimeBetween('-5 years', 'now')->format('Y-m-d'),
             'area_responsabilidad' => $this->faker->randomElement(['matriculas', 'academico', 'financiero', 'general']),
-            'jornada_laboral' => $this->faker->randomElement(['completa', 'parcial', 'turno_mañana', 'turno_tarde']),
+            'jornada_laboral' => $this->faker->randomElement(['4343', '444', '45456', '123']),
         ];
     }
 }

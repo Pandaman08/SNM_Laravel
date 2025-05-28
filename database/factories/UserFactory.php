@@ -26,8 +26,10 @@ class UserFactory extends Factory
         return [
             'name' => $this->faker->firstName(),
             'lastname' => $this->faker->lastName(),
-            'dni' => Str::random(8),
+            'dni' =>$this->faker->numberBetween(0, 99999999),
+            'phone' => $this->faker->numberBetween(0, 999999999),
             'sexo' => 'M',
+            'estado_civil' => 'C',
             'email' => $this->faker->unique()->safeEmail(),
             'rol' => $this->faker->randomElement(UserRole::values()),
             'estado' => $this->faker->boolean(100),
@@ -65,6 +67,12 @@ class UserFactory extends Factory
     {
         return $this->state([
             'rol' => UserRole::ESTUDIANTE->value,
+        ]);
+    }
+     public function tutor()
+    {
+        return $this->state([
+            'rol' => UserRole::TUTOR->value,
         ]);
     }
     /**

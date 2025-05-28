@@ -37,10 +37,10 @@ class DatabaseSeeder extends Seeder
             ->count(10)
             ->create();
 
-        // Create 50 students
+        // Create 20 students
         \App\Models\User::factory()
-            ->estudiante()
-            ->has(\App\Models\Estudiante::factory()->count(1))
+            ->tutor()
+            ->has(\App\Models\Tutor::factory()->count(1))
             ->count(20)
             ->create();
     }
