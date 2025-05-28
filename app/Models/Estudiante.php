@@ -10,19 +10,32 @@ class Estudiante extends Model
     /** @use HasFactory<\Database\Factories\EstudianteFactory> */
     use HasFactory;
 
-        protected $primaryKey = 'codigo_estudiante';
+    protected $primaryKey = 'codigo_estudiante';
     protected $table = 'estudiantes';
 
     protected $fillable = [
-        'user_id',
+        'pais',
+        'provincia',
+        'distrito',
+        'departamento',
+        'lengua_materna',
+        'religion',
+        'estado_civil'
     ];
 
-    protected $casts = [
-        
-    ];
-
-    public function user()
+    public function matriculas()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->hasMany(Matricula::class, 'codigo_estudiante', 'codigo_estudiante');
+    }
+
+    public function asistencias()
+    {
+        return $this->hasMany(Asistencia::class, 'codigo_estudiante', 'codigo_estudiante');
+    }
+
+    public function tutores()
+    {
+        return $this->belongsToMany(Tutor::class, 'estudiantes_tutores', 'codigo_estudiante', 'id_tutor')
+                    ->withPivot('tipo_relacion');
     }
 }
