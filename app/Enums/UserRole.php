@@ -9,6 +9,8 @@ enum UserRole: string
     case DOCENTE = 'docente';
     case ESTUDIANTE = 'estudiante';
 
+    case TUTOR = 'tutor';
+
     public static function values(): array
     {
         return array_column(self::cases(), 'value');

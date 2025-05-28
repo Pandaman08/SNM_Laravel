@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('tutores', function (Blueprint $table) {
             $table->id('id_tutor');
             $table->unsignedBigInteger('user_id');
-            $table->string('direccion', 45)->nullable();
+            $table->string('parentesco', 75)->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('user_id')->on('users');

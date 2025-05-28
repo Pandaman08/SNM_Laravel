@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id('id_tipo_matricula');
             $table->string('nombre', 45);
             $table->mediumText('descripcion');
-            $table->timestamps();
         });
     }
 

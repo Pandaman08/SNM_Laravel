@@ -15,13 +15,11 @@ class Docente extends Model
         'user_id',
         'especialidad',
         'jornada_laboral',
-        'fecha_inicio',
+        'fecha_contratacion',
         'departamento_estudios',
-        'estado_civil',
-        'fecha_fin'
     ];
 
-    protected $dates = ['fecha_inicio', 'fecha_fin'];
+    protected $dates = ['fecha_contratacion'];
 
     public function user()
     {

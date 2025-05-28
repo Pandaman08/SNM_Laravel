@@ -30,7 +30,8 @@ class User extends Authenticatable
         'password',
         'photo',
         'address',
-        'fecha_nacimiento'
+        'fecha_nacimiento',
+        'estado_civil'
     ];
 
     /**
@@ -82,6 +83,10 @@ class User extends Authenticatable
         return $this->rol === UserRole::ESTUDIANTE;
     }
 
+        public function isTutor(): bool
+    {
+        return $this->rol === UserRole::TUTOR;
+    }
     public function estudiante()
     {
         return $this->hasOne(Estudiante::class, 'user_id');
