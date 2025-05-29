@@ -19,7 +19,7 @@
         </h2>
 
         <p class="mt-4 text-gray-1000  text-1xl text-center">
-            ¡Gracias por administrar!
+            ¡Gracias por Ingresar!
         </p>
 
         <div class="flex justify-center mt-6">

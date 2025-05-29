@@ -6,7 +6,7 @@
         <!-- Sección de bienvenida -->
         <div class="flex flex-col justify-center">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6 text-center">
-                ¡Bienvenido al Panel de Matriculas!
+                ¡Bienvenido al Panel del sistema!
             </h1>
             <p class="text-lg text-gray-600 leading-relaxed text-justify">
                 Este panel te permite gestionar y mantener actualizada toda la información de la pagina. En la sección
@@ -27,7 +27,7 @@
             <a href="" class=" bg-blue-500 hover:bg-blue-600 transition-all ease-out p-4 text-center rounded-md my-3 text-lg text-white cursor-pointer">Ver Tutoriales</a>
         </div>
         <div class="w-full h-full">
-            <img class="w-full h-full rounded-lg" src="/images/labcam_dash_01.png" alt="logo_dashboard">
+            <img class="w-full h-full rounded-lg" src="/images/logo-bruning3.png" alt="logo_dashboard">
         </div>
     </div>
 @endsection

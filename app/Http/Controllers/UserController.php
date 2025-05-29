@@ -10,7 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 class UserController extends Controller
 {
-        public function index()
+    public function index()
     {
         return view('auth.login');
     }
@@ -30,130 +30,215 @@ class UserController extends Controller
         if (Auth::attempt($request->only('email', 'password'))) {
             // return redirect()->route('dashboard')->with('success', 'Sesión iniciada correctamente')
             // $user = Auth::user();
-            
+
             return redirect()->route('home')->with('success', 'Sesión iniciada correctamente');
         }
 
         return back()->withErrors(['email' => 'Las credenciales no coinciden'])->withInput();
     }
 
-     public function logout()
+    public function logout()
     {
         Auth::logout();
-    
+
         return view('auth.logout');
     }
 
     public function showUser(Request $request)
-{
-        $query = $request->input('search'); 
+    {
+        $query = $request->input('search');
 
-        $users = User::where('estado', true) 
-        ->when($query, function ($queryBuilder) use ($query) {
-            $queryBuilder->where(function ($q) use ($query) {
-                $q->where('name', 'like', '%' . $query . '%')
-                  ->orWhere('lastname', 'like', '%' . $query . '%')
-                  ->orWhere('email', 'like', '%' . $query . '%');
-            });
-        })
-        ->paginate(10);
-        
+        $users = User::where('estado', true)
+            ->when($query, function ($queryBuilder) use ($query) {
+                $queryBuilder->where(function ($q) use ($query) {
+                    $q->where('name', 'like', '%' . $query . '%')
+                        ->orWhere('lastname', 'like', '%' . $query . '%')
+                        ->orWhere('email', 'like', '%' . $query . '%');
+                });
+            })
+            ->paginate(10);
 
-         return view('pages.admin.show', compact('users'));
-}
 
-public function store(Request $request)
-{
-    
-    $request->validate([
-        'name' => 'required|string|max:100',
-        'lastname' => 'required|string|max:100',
-        'phone' => 'required|string|max:15',
-        'address' => 'required|string|max:200',
-        'email' => 'required|email|unique:users',
-        'password' => 'required|min:6|regex:/[A-Z]/|regex:/[a-z]/',
-        'photo' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
-    ]);
-
-   
-    $rutaImagen = null;
-    if ($request->hasFile('photo')) {
-        $photo = $request->file('photo');
-        $rutaImagen = $photo->store('photos', 'public'); 
+        return view('pages.admin.show', compact('users'));
     }
 
-    
-    $user = User::create([
-        'name' => $request->input('firstname'),
-        'lastname' => $request->input('lastname'),
-        'phone' => $request->input('phone'),
-        'address' => $request->input('address'),
-        'email' => $request->input('email'),
-        'password' => Hash::make($request->input('password')),
-        'photo' => $rutaImagen,
-    ]);
+    public function store(Request $request)
+    {
 
-    $user->is_approved = true;
-    $user->save();
-
-   
-    return redirect()->route('users')->with('success', 'Usuario creado exitosamente.');
-}
-
-public function edit($id)
-{
-
-    $users = User::findOrFail($id);
-    return view('pages.admin.show', compact('users'));
-}
-
-public function update(Request $request, $user_id)
-{
-    $user = User::findOrFail($user_id);
-
-    $request->validate([
-        'name' => 'required|string|max:100',
-        'lastname' => 'required|string|max:100',
-        'email' => 'required|email|unique:users,email,' . $user->user_id,
-        'phone' => 'required|string|max:15',
-        'address' => 'required|string|max:200',
-        'password' => 'nullable|min:6|same:password_confirmation',
-        'photo' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
-    ]);
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'lastname' => 'required|string|max:100',
+            'phone' => 'required|string|max:15',
+            'address' => 'required|string|max:200',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6|regex:/[A-Z]/|regex:/[a-z]/',
+            'photo' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
+        ]);
 
 
-    if ($request->hasFile('photo')) {
-        $path = $request->file('photo')->store('photos', 'public');
-        $user->photo = $path;
+        $rutaImagen = null;
+        if ($request->hasFile('photo')) {
+            $photo = $request->file('photo');
+            $rutaImagen = $photo->store('photos', 'public');
+        }
+
+
+        $user = User::create([
+            'name' => $request->input('firstname'),
+            'lastname' => $request->input('lastname'),
+            'phone' => $request->input('phone'),
+            'address' => $request->input('address'),
+            'email' => $request->input('email'),
+            'password' => Hash::make($request->input('password')),
+            'photo' => $rutaImagen,
+        ]);
+
+        $user->is_approved = true;
+        $user->save();
+
+
+        return redirect()->route('users')->with('success', 'Usuario creado exitosamente.');
     }
 
-    $user->update([
-        'name' => $request->firstname,
-        'lastname' => $request->lastname,
-        'email' => $request->email,
-        'phone' => $request->phone,
-        'address' => $request->address,
-    ]);
+    public function edit($id)
+    {
 
-
-    return redirect()->route('users')->with('success-update', 'Usuario actualizada con éxito');
-
-}
-
-
-public function destroy($user_id)
-{
- 
-    $user = User::findOrFail($user_id);
-
-    if ($user->photo && Storage::disk('public')->exists($user->photo)) {
-        Storage::disk('public')->delete($user->photo);
+        $users = User::findOrFail($id);
+        return view('pages.admin.show', compact('users'));
     }
 
-    $user->delete();
+    public function update(Request $request, $user_id)
+    {
+        $user = User::findOrFail($user_id);
 
-    return redirect()->route('users')->with('success-destroy', 'Usuario eliminado exitosamente.');
-}
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'lastname' => 'required|string|max:100',
+            'email' => 'required|email|unique:users,email,' . $user->user_id,
+            'phone' => 'required|string|max:15',
+            'address' => 'required|string|max:200',
+            'password' => 'nullable|min:6|same:password_confirmation',
+            'photo' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+        ]);
+
+
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('photos', 'public');
+            $user->photo = $path;
+        }
+
+        $user->update([
+            'name' => $request->firstname,
+            'lastname' => $request->lastname,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'address' => $request->address,
+        ]);
+
+
+        return redirect()->route('users')->with('success-update', 'Usuario actualizada con éxito');
+
+    }
+
+
+    public function destroy($user_id)
+    {
+
+        $user = User::findOrFail($user_id);
+
+        if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+            Storage::disk('public')->delete($user->photo);
+        }
+
+        $user->delete();
+
+        return redirect()->route('users')->with('success-destroy', 'Usuario eliminado exitosamente.');
+    }
+
+    public function edit_user()
+    {
+        $user = Auth::user();
+        return view('pages.admin.users.profile', compact('user'));
+    }
+
+
+
+    public function update_user(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'lastname' => 'required|string|max:100',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => 'required|string|max:15',
+            'address' => 'required|string|max:200',
+            'dni' => 'required|string|max:8',
+            'password' => 'nullable|min:6|same:password_confirmation',
+            'photo' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+        ]);
+
+
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('photos', 'public');
+            $user->photo = $path;
+        }
+
+        $user->update([
+            'name' => $request->firstname,
+            'lastname' => $request->lastname,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'dni' => $request->dni,
+        ]);
+
+        return redirect()->back()->with('success-user', 'Datos actualizado con éxito');
+
+    }
+
+
+
+    public function update_photo(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        if ($request->hasFile('photo')) {
+
+            if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+                Storage::disk('public')->delete($user->photo);
+            }
+
+
+            $photoPath = $request->file('photo')->store('profile_photos', 'public');
+
+
+            $user->update(['photo' => $photoPath]);
+        }
+
+        return redirect()->back()->with('success-photo', 'Perfil actualizado correctamente');
+    }
+
+
+    public function update_password(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+
+        $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user->update([
+            'password' => bcrypt($request->input('password')),
+        ]);
+
+        return redirect()->back()->with('success-password', 'Contraseña actualizada correctamente');
+    }
 
 
 }
