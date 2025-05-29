@@ -10,33 +10,33 @@
             <div class="space-y-4">
                 <div>
                     <h3 class="text-sm text-gray-700 font-medium">FOTO</h3>
-                    @if(Auth::user()->photo)
-                      <img src="{{ Storage::url('' . Auth::user()->photo) }}" alt="Foto de perfil" class="w-50 h-30 object-cover">
+                    @if(Auth::user()->persona->photo)
+                      <img src="{{ Storage::url('' . Auth::user()->persona->photo) }}" alt="Foto de perfil" class="w-50 h-30 object-cover">
                     @else
                       <div class="w-20 h-20 bg-gray-300 text-gray-700 flex items-center justify-center rounded-full text-xl font-bold uppercase">
-                          {{ substr(Auth::user()->name, 0, 1) }}
+                          {{ substr(Auth::user()->persona->name, 0, 1) }}
                       </div>
                     @endif
                 </div>
                 <div>
                     <h3 class="text-sm text-gray-700 font-medium">NOMBRES Y APELLIDOS</h3>
-                    <p class="text-gray-500">{{ Auth::user()->name }} {{ Auth::user()->lastname }}</p>
+                    <p class="text-gray-500">{{ Auth::user()->persona->name }} {{ Auth::user()->persona->lastname }}</p>
                 </div>
                 <div>
                     <h3 class="text-sm text-gray-700 font-medium">CORREO</h3>
-                    <p class="text-gray-500">{{ Auth::user()->email }}</p>
+                    <p class="text-gray-500">{{ Auth::user()->persona->email }}</p>
                 </div>
                 <div>
                     <h3 class="text-sm text-gray-700 font-medium">DNI</h3>
-                    <p class="text-gray-500">{{ Auth::user()->dni }}</p>
+                    <p class="text-gray-500">{{ Auth::user()->persona->dni }}</p>
                 </div>
                 <div>
                     <h3 class="text-sm text-gray-700 font-medium">CONTACTO</h3>
-                    <p class="text-gray-500">{{ Auth::user()->phone }}</p>
+                    <p class="text-gray-500">{{ Auth::user()->persona->phone }}</p>
                 </div>
                 <div>
                     <h3 class="text-sm text-gray-700 font-medium">DIRECCIÓN</h3>
-                    <p class="text-gray-500">{{ Auth::user()->address }}</p>
+                    <p class="text-gray-500">{{ Auth::user()->persona->address }}</p>
                 </div>
             </div>
             <p class="text-sm text-gray-400 mt-4">Datos personales del Administrador</p>
@@ -69,32 +69,32 @@
                     <div class="grid grid-cols-1 gap-6">
                         <div>
                             <label for="firstname" class="block text-sm font-medium text-gray-700">Nombres</label>
-                            <input type="text" id="firstname" name="firstname" value="{{ old('name', Auth::user()->name) }}"
+                            <input type="text" id="firstname" name="firstname" value="{{ old('name', Auth::user()->persona->name) }}"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
                         <div>
                             <label for="lastname" class="block text-sm font-medium text-gray-700">Apellidos</label>
-                            <input type="text" id="lastname" name="lastname" value="{{ old('lastname', Auth::user()->lastname) }}"
+                            <input type="text" id="lastname" name="lastname" value="{{ old('lastname', Auth::user()->persona->lastname) }}"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
-                            <input type="email" id="email" name="email" value="{{ old('email', Auth::user()->email) }}"
+                            <input type="email" id="email" name="email" value="{{ old('email', Auth::user()->persona->email) }}"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-700">Teléfono</label>
-                            <input type="text" id="phone" name="phone" value="{{ old('phone', Auth::user()->phone) }}"
+                            <input type="text" id="phone" name="phone" value="{{ old('phone', Auth::user()->persona->phone) }}"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
                         <div>
                             <label for="address" class="block text-sm font-medium text-gray-700">Dirección</label>
-                            <input type="text" id="address" name="address" value="{{ old('address', Auth::user()->address) }}"
+                            <input type="text" id="address" name="address" value="{{ old('address', Auth::user()->persona->address) }}"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
                         <div>
                             <label for="career" class="block text-sm font-medium text-gray-700">Dni</label>
-                            <input type="text" id="career" name="career" value="{{ old('dni', Auth::user()->dni) }}"
+                            <input type="text" id="career" name="career" value="{{ old('dni', Auth::user()->persona->dni) }}"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
                     </div>
