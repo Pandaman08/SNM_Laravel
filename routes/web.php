@@ -1,8 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\AdminController;
+use app\Http\Controllers\{
+    UserController,
+    AdminController,
+    TutorController,
+    EstudianteController,
+    AsistenciaController
+};
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
 Route::post('/', [UserController::class, 'login'])->name('login');
@@ -22,3 +27,9 @@ Route::get('/users/me', [UserController::class, 'edit_user'])->name('users.edit_
 Route::put('/users/me/{id}', [UserController::class, 'update_user'])->name('users.update_user');
 Route::put('/users/{id}/photo', [UserController::class, 'update_photo'])->name('users.update_photo');
 Route::put('users/{id}/password', [UserController::class, 'update_password'])->name('users.update_password');
+
+//------------------------tutores--------------------------------------
+Route::get('tutores', [TutorController::class, 'indexTutores'])->name('tutores.index');
+
+//------------------------ estudiantes ---------------------------------
+Route::get('estudiantes',[EstudianteController::class,'index'])->name('estudiantes.index');
