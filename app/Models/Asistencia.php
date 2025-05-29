@@ -20,4 +20,8 @@ class Asistencia extends Model
         'observacion',
     ];
 
+    protected $casts = [
+        'fecha' => 'date',
+        'estado' => AsistenciaEstado::class,
+    ];
 }
