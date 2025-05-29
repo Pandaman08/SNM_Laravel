@@ -14,6 +14,7 @@ class Estudiante extends Model
     protected $table = 'estudiantes';
 
     protected $fillable = [
+        'persona_id',
         'pais',
         'provincia',
         'distrito',
@@ -22,6 +23,8 @@ class Estudiante extends Model
         'religion',
         'estado_civil'
     ];
+
+    
 
     public function matriculas()
     {

@@ -13,14 +13,18 @@ return new class extends Migration
     {
         Schema::create('estudiantes', function (Blueprint $table) {
             $table->id('codigo_estudiante');
+            $table->unsignedBigInteger('persona_id');
             $table->string('pais', 150);
             $table->string('provincia', 150);
             $table->string('distrito', 45);
             $table->string('departamento', 45);
             $table->string('lengua_materna', 45);
             $table->string('religion', 45);
-            $table->char('estado_civil', 1);
             $table->timestamps();
+              $table->foreign('persona_id')
+          ->references('persona_id')
+          ->on('personas')
+          ->onDelete('cascade'); 
         });
     }
 

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('monto', 10, 2)->nullable();
             $table->string('fecha_pago', 45);
             $table->longText('comprobante_img')->nullable();
-            $table->enum('estado', ['Pagado', 'Pendiente', 'Finalizado'])->nullable();
+            $table->enum('estado', [ 'Pendiente', 'Finalizado'])->nullable();
             $table->timestamps();
 
             $table->foreign('codigo_matricula')->references('codigo_matricula')->on('matriculas');

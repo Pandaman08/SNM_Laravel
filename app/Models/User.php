@@ -19,19 +19,11 @@ class User extends Authenticatable
      */
     protected $primaryKey = 'user_id';
     protected $fillable = [
-        'name',
-        'lastname',
-        'dni',
+        'persona_id',
         'email',
-        'phone',
-        'sexo',
         'rol',
         'estado',
         'password',
-        'photo',
-        'address',
-        'fecha_nacimiento',
-        'estado_civil'
     ];
 
     /**
@@ -78,19 +70,13 @@ class User extends Authenticatable
         return $this->rol === UserRole::DOCENTE;
     }
 
-    public function isEstudiante(): bool
-    {
-        return $this->rol === UserRole::ESTUDIANTE;
-    }
 
-        public function isTutor(): bool
+
+    public function isTutor(): bool
     {
         return $this->rol === UserRole::TUTOR;
     }
-    public function estudiante()
-    {
-        return $this->hasOne(Estudiante::class, 'user_id');
-    }
+
 
     public function secretaria()
     {
@@ -101,8 +87,13 @@ class User extends Authenticatable
     {
         return $this->hasOne(Docente::class, 'user_id');
     }
-      public function tutor()
+    public function tutor()
     {
         return $this->hasOne(Tutor::class, 'user_id', 'user_id');
+    }
+
+    public function persona()
+    {
+        return $this->belongsTo(Persona::class, 'persona_id', 'persona_id');
     }
 }

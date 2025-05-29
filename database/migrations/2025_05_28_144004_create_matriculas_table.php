@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_anio_escolar');
             $table->unsignedBigInteger('id_tipo_matricula');
             $table->dateTime('fecha');
+            $table->boolean('estado_validacion')->default(false);
             $table->timestamps();
 
             $table->foreign('codigo_estudiante')->references('codigo_estudiante')->on('estudiantes');

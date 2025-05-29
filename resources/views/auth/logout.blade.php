@@ -9,10 +9,10 @@
 </head>
 
 <body
-    class="flex items-center justify-center min-h-screen bg-cover bg-center bg-[url('images/laboratorio-mecanica.png')]">
+    class="flex items-center justify-center min-h-screen bg-cover bg-center bg-[url('https://www.arquimaster.com.ar/web/wp-content/uploads/2022/12/salones_colegio_cimort_8.jpg')]">
     <div class="bg-white p-8 rounded-lg shadow-lg w-96 relative">
         <div class="absolute -top-16 left-1/2 transform -translate-x-1/2">
-            <img src="images/labcam_dash_01.png" alt="Ilustración"
+            <img src="images/logo-bruning1.png" alt="Ilustración"
                 class="rounded-full h-32 w-32 border-4 border-white shadow-lg">
         </div>
         <h2 class="text-2xl font-bold text-black-600 text-center mb-6 mt-14">¡Confirmación de cierre de sesión exitosa!

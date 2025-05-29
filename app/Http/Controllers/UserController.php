@@ -174,6 +174,7 @@ class UserController extends Controller
             'phone' => 'required|string|max:15',
             'address' => 'required|string|max:200',
             'dni' => 'required|string|max:8',
+            'estado_civil' => 'required|string|max:1',
             'password' => 'nullable|min:6|same:password_confirmation',
             'photo' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
         ]);

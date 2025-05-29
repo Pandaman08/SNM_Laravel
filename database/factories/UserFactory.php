@@ -24,19 +24,11 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->firstName(),
-            'lastname' => $this->faker->lastName(),
-            'dni' =>$this->faker->numberBetween(0, 99999999),
-            'phone' => $this->faker->numberBetween(0, 999999999),
-            'sexo' => 'M',
-            'estado_civil' => 'C',
+            'persona_id' => \App\Models\Persona::factory(),
             'email' => $this->faker->unique()->safeEmail(),
             'rol' => $this->faker->randomElement(UserRole::values()),
             'estado' => $this->faker->boolean(100),
             'password' => static::$password ??= Hash::make('password'),
-            'photo' => $this->faker->optional()->imageUrl(200, 200, 'people'),
-            'address' => $this->faker->address(),
-            'fecha_nacimiento' => $this->faker->dateTimeBetween('-50 years', '-18 years')->format('Y-m-d'),
             'created_at' => $this->faker->dateTimeBetween('-2 years', 'now'),
             'updated_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
         ];

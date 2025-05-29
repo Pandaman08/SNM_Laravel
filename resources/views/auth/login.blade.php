@@ -8,7 +8,7 @@
         <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-cover bg-center bg-[url('https://www.arquimaster.com.ar/web/wp-content/uploads/2022/12/salones_colegio_cimort_8.jpg')]">
+<body class="bg-cover bg-center bg-[url('/images/fachada-bruning2.jpg')]">
     <div class="flex items-center justify-center min-h-screen">
         <div class="bg-white p-8 rounded-lg shadow-lg w-96 relative">
             <div class="absolute -top-16 left-1/2 transform -translate-x-1/2">

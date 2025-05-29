@@ -367,20 +367,20 @@
                         class="dropdown-toggle flex items-center gap-x-2 hover:text-[#98C560] group">
                         <div
                             class="relative inline-block bg-white p-[2.5px] rounded-full border-[1px] border-black group-hover:border-[#98C560]">
-                            @if (Auth::check() && Auth::user()->photo)
+                            @if (Auth::check() && Auth::user()->persona->photo)
                                 <img src="" alt="Foto de perfil"
                                     class="w-12 h-12 rounded-full block object-cover">
                             @elseif(Auth::check())
                                 <div
                                     class="w-12 h-12 bg-gray-300 text-gray-700 flex items-center justify-center rounded-full text-xl font-bold uppercase">
-                                    {{ substr(Auth::user()->name, 0, 1) }}
+                                    {{ substr(Auth::user()->persona->name, 0, 1) }}
                                 </div>
                             @endif
                         </div>
                         @if (Auth::check())
                             <div>
-                                <h4 class="text-[14.5px] font-medium">{{ Auth::user()->name }}
-                                    {{ Auth::user()->lastname }}</h4>
+                                <h4 class="text-[14.5px] font-medium">{{ Auth::user()->persona->name }}
+                                    {{ Auth::user()->persona->lastname }}</h4>
                                 <h4 class="text-[12.5px] font-normal uppercase">{{ Auth::user()->rol }}</h4>
                             </div>
                         @endif

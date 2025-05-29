@@ -1,7 +1,9 @@
 <?php
 
 namespace Database\Seeders;
+use Illuminate\Support\Facades\Hash;
 
+use App\Enums\UserRole;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,33 +17,43 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        \App\Models\User::factory()
-            ->admin()
-            ->create([
-                'name' => 'Admin',
-                'email' => 'admin@school.com',
-                'estado' => true
-            ]);
+        $adminPersona = \App\Models\Persona::factory()->create([
+            'name' => 'Admin',
+            'lastname' => 'System',
+            'dni' => '00000001',
+            'phone' => '924996999',
+            'sexo' => 'M',
+            'estado_civil' => 'C'
+        ]);
 
-        // Create 5 secretaries
+        \App\Models\User::create([
+            'persona_id' => $adminPersona->persona_id,
+            'email' => 'admin@school.com',
+            'rol' => UserRole::ADMIN->value,
+            'estado' => true,
+            'password' => Hash::make('password')
+        ]);
+
+        // Secretarias (5)
         \App\Models\User::factory()
             ->secretaria()
-            ->has(\App\Models\Secretaria::factory()->count(1))
+            ->has(\App\Models\Secretaria::factory())
             ->count(5)
             ->create();
 
-        // Create 10 teachers
+        // Docentes (10)
         \App\Models\User::factory()
             ->docente()
-            ->has(\App\Models\Docente::factory()->count(1))
+            ->has(\App\Models\Docente::factory())
             ->count(10)
             ->create();
 
-        // Create 20 students
+        // Tutores (20)
         \App\Models\User::factory()
             ->tutor()
-            ->has(\App\Models\Tutor::factory()->count(1))
+            ->has(\App\Models\Tutor::factory())
             ->count(20)
             ->create();
+    
     }
 }

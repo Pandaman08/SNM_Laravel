@@ -13,20 +13,13 @@ return new class extends Migration {
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id('user_id');
-            $table->string('name', 45);
-            $table->string('lastname', 150);
-            $table->char('dni',8);
-            $table->char('phone',9);
-            $table->enum('sexo',['M', 'F'])->default('M');
-            $table->enum('estado_civil',['S', 'C','D','V'])->default('S');
+            $table->unsignedBigInteger('persona_id');
             $table->string('email', 60)->unique();
             $table->enum('rol', UserRole::values());
             $table->boolean('estado')->default(true);
             $table->string('password', 70);
-            $table->string('photo', 255)->nullable();
-            $table->string('address', 70)->nullable();
-            $table->date('fecha_nacimiento');
             $table->timestamps();
+            $table->foreign('persona_id')->references('persona_id')->on('personas');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
