@@ -1,13 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use app\Http\Controllers\{
-    UserController,
-    AdminController,
-    TutorController,
-    EstudianteController,
-    AsistenciaController
-};
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
+
+use app\Http\Controllers\TutorController;
+use app\Http\Controllers\EstudianteController;
+use app\Http\Controllers\AsistenciaController;
+
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
 Route::post('/', [UserController::class, 'login'])->name('login');
