@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use app\Http\Controllers\{
-    UserController,
-    AdminController,
+use app\Http\Controllers\UseController;
+use app\Http\Controllers\AdminController;
+use app\Http\Controllers{
     TutorController,
     EstudianteController,
     AsistenciaController
