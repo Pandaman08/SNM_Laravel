@@ -1,12 +1,12 @@
 @extends('layout.admin.plantilla')
 
-@section('title', 'Gestión de Usuarios')
+@section('titulo', 'Gestión de Docentes')
 
 @section('contenido')
     <div class="max-w-screen-2xl mx-auto my-8 px-4">
 
         <div class="text-center mb-6">
-            <h1 class="text-2xl font-bold text-[#2e5382]">Usuarios</h1>
+            <h1 class="text-2xl font-bold text-[#2e5382]">Docentes</h1>
             <div class="w-1/4 mx-auto h-0.5 bg-[#64d423]"></div>
         </div>
 
@@ -16,7 +16,7 @@
                     oninput="buscarUsuarios(this.value)">
             </div>
             <button class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-700" onclick="openCreateModal()">
-                Crear Usuario
+                Registrar Docente
             </button>
         </div>
 
@@ -30,7 +30,9 @@
                         <th class="px-4 py-3">Email</th>
                         <th class="px-4 py-3">Teléfono</th>
                         <th class="px-4 py-3">Dirección</th>
-
+                        <th class="px-4 py-3">Especialidad</th>
+                        <th class="px-4 py-3">Jornada laboral</th>
+                        <th class="px-4 py-3">Departamento de Estudio</th>
                         <th class="px-4 py-3">Foto</th>
                         <th class="px-4 py-3">Acciones</th>
                     </tr>
@@ -44,6 +46,9 @@
                             <td class="px-4 py-3">{{ $usuario->email }}</td>
                             <td class="px-4 py-3">{{ $usuario->persona->phone }}</td>
                             <td class="px-4 py-3">{{ $usuario->persona->address }}</td>
+                            <td class="px-4 py-3">{{ $usuario->docente->especialidad }}</td>
+                            <td class="px-4 py-3">{{ $usuario->docente->jornada_laboral }}</td>
+                            <td class="px-4 py-3">{{ $usuario->docente->departamento_estudios }}</td>
                             <td class="px-4 py-3">
                                 @if ($usuario->persona->photo)
                                     <div class="px-8 py-0.1 text-center">
@@ -66,6 +71,12 @@
                             </td>
                             <td class="px-4 py-3 flex items-center justify-center space-x-4">
 
+                                 <button type="button" onclick="openAsignaturasModal(this)"
+                                    cursos-docente='@json($usuario->docente)'
+                                    class="text-yellow-500 hover:text-yellow-700 flex items-center justify-center mt-2">
+                                    <svg class="h-6 w-6" fill="#036ffc" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg" stroke="#036ffc"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M1750.21 0v1468.235h-225.882v338.824h169.412V1920H451.387c-82.447 0-161.506-36.141-214.701-99.388-43.934-51.953-67.652-116.33-67.652-182.965V282.353C169.034 126.494 295.528 0 451.387 0H1750.21Zm-338.823 1468.235H463.81c-89.223 0-166.136 59.86-179.576 140.047-1.242 9.036-2.259 18.07-2.259 27.106v2.26c0 40.658 13.553 77.928 40.659 109.552 32.753 38.4 79.059 59.859 128.753 59.859h960v-112.941H409.599v-112.942h1001.788v-112.94Zm225.882-1355.294H451.387c-92.725 0-169.412 75.67-169.412 169.412v1132.8c50.824-37.27 113.958-59.859 181.835-59.859h1173.46V112.941ZM1354.882 903.53v112.942H564.294V903.529h790.588Zm56.47-564.705v451.764H507.825V338.824h903.529Zm-112.94 112.94H620.765v225.883h677.647V451.765Z" fill-rule="evenodd"></path> </g></svg>
+                                </button>
+
                                 <button type="button" onclick="openEditModal(this)"
                                     data-user='@json($usuario->load('persona'))'
                                     class="text-yellow-500 hover:text-yellow-700 flex items-center justify-center mt-2">
@@ -76,7 +87,8 @@
                                 </button>
 
 
-                                <button onclick="openDeleteModal({{ $usuario->user_id }}, '{{ $usuario->persona->name }}')"
+                                <button
+                                    onclick="openDeleteModal({{ $usuario->user_id }}, '{{ $usuario->persona->name }}')"
                                     class="text-red-500 hover:text-red-700 flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2">
@@ -106,86 +118,47 @@
             <h2 class="text-xl font-bold mb-2">Crear Usuario</h2>
             <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-4">
-                        <div class="mb-4">
-                            <label for="name" class="block">Nombre</label>
-                            <input type="text" id="name" name="name" class="w-full px-4 py-2 border rounded"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="lastname" class="block">Apellido</label>
-                            <input type="text" id="lastname" name="lastname" class="w-full px-4 py-2 border rounded"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="lastname" class="block">DNI</label>
-                            <input type="text" id="dni" name="dni" class="w-full px-4 py-2 border rounded"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="email" class="block">Email</label>
-                            <input type="email" id="email" name="email" class="w-full px-4 py-2 border rounded"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="password" class="block">Contraseña</label>
-                            <div class="relative">
-                                <input type="password" id="password" name="password"
-                                    class="w-full px-4 py-2 border rounded" oninput="validatePassword()" required>
-                                <button type="button" class="absolute inset-y-0 right-0 px-3 text-gray-600"
-                                    onclick="togglePasswordVisibility('password')">
-                                    👁️
-                                </button>
-                            </div>
-                            <div id="password-strength" class="text-sm mt-2"></div>
-
-                        </div>
+                <div class="mb-4">
+                    <label for="name" class="block">Nombre</label>
+                    <input type="text" id="name" name="name" class="w-full px-4 py-2 border rounded" required>
+                </div>
+                <div class="mb-4">
+                    <label for="lastname" class="block">Apellido</label>
+                    <input type="text" id="lastname" name="lastname" class="w-full px-4 py-2 border rounded" required>
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block">Email</label>
+                    <input type="email" id="email" name="email" class="w-full px-4 py-2 border rounded"
+                        required>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="block">Contraseña</label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" class="w-full px-4 py-2 border rounded"
+                            oninput="validatePassword()" required>
+                        <button type="button" class="absolute inset-y-0 right-0 px-3 text-gray-600"
+                            onclick="togglePasswordVisibility('password')">
+                            👁️
+                        </button>
                     </div>
+                    <div id="password-strength" class="text-sm mt-2"></div>
+                </div>
 
-                    <div class="space-y-4">
-                        <div class="mb-4">
-                            <label for="phone" class="block">Teléfono</label>
-                            <input type="text" id="phone" name="phone" class="w-full px-4 py-2 border rounded"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="address" class="block">Dirección</label>
-                            <input type="text" id="address" name="address" class="w-full px-4 py-2 border rounded"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="esexo" class="block text-gray-700">Sexo:</label>
-                            <select id="sexo" name="sexo" class="w-full px-4 py-2 border rounded">
-                                <option value="M">Masculino</option>
-                                <option value="F">Femenino</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="estado_civil" class="block text-gray-700">Estado Civil:</label>
-                            <select id="estado_civil" name="estado_civil"
-                                class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="S">Soltero/a</option>
-                                <option value="C">Casado/a</option>
-                                <option value="D">Divorciado/a</option>
-                                <option value="V">Viudo/a</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="fecha_nacimiento" class="block text-gray-700">Fecha Nacimiento:</label>
-                            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento"
-                                class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required>
-                        </div>
 
-                        <div class="mb-4">
-                            <label for="photo" class="block">Foto</label>
-                            <input type="file" id="photo" name="photo" class="w-full px-2 py-1 border rounded"
-                                accept="image/jpeg,image/png">
-                        </div>
-                    </div>
+                <div class="mb-4">
+                    <label for="phone" class="block">Teléfono</label>
+                    <input type="text" id="phone" name="phone" class="w-full px-4 py-2 border rounded"
+                        required>
+                </div>
+                <div class="mb-4">
+                    <label for="address" class="block">Dirección</label>
+                    <input type="text" id="address" name="address" class="w-full px-4 py-2 border rounded"
+                        required>
+                </div>
+                <div class="mb-4">
+                    <label for="photo" class="block">Foto</label>
+                    <input type="file" id="photo" name="photo" class="w-full px-2 py-1 border rounded"
+                        accept="image/jpeg,image/png">
                 </div>
                 <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-700">Guardar</button>
             </form>
@@ -282,7 +255,6 @@
                                 </select>
                             </div>
 
-
                             <!-- Estado Civil -->
                             <div>
                                 <label for="edit_estado_civil" class="block text-gray-700">Estado Civil:</label>
@@ -345,9 +317,9 @@
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 7l-.867 12.142A2 2 0
-                                                                                                                 0116.138 21H7.862a2 2 0
-                                                                                                                 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2
-                                                                                                                 0 00-2-2H9a2 2 0 00-2 2v2m3 0h4" />
+                                                                                                         0116.138 21H7.862a2 2 0
+                                                                                                         01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2
+                                                                                                         0 00-2-2H9a2 2 0 00-2 2v2m3 0h4" />
                                 </svg>
                             </button>
                             <input type="file" id="edit_photo" name="photo" class="hidden"
@@ -369,6 +341,76 @@
             </div>
         </div>
     </div>
+
+    
+    <div id="asignaturasModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 w-full h-full">
+        <div class="flex items-center justify-center w-full h-full">
+            <div class="bg-white px-8 py-6 rounded-lg shadow-xl max-w-4xl w-full relative max-h-screen overflow-y-auto">
+                <!-- Título centrado -->
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-semibold text-blue-800">Asignar Asignaturas</h2>
+                    <div class="mx-auto mt-2 w-1/5 h-1 bg-green-400"></div>
+                </div>
+
+                <!-- Formulario -->
+                <form id="asignaturasForm" action="" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    @csrf
+                    @method('PUT')
+
+                    <!-- Grid principal: 2 columnas en md+ -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        <!-- Columna Izquierda -->
+                        <div class="space-y-4">
+                              <div>
+                                <label for="edit_fecha_nacimiento" class="block text-gray-700">Fecha:</label>
+                                <input type="date" id="edit_fecha_nacimiento" name="fecha_nacimiento"
+                                    class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required>
+                            </div>
+                        </div>
+
+                        <!-- Columna Derecha -->
+                        <div class="space-y-4">
+
+                          
+                            <!-- Estado Civil -->
+                            <div>
+                                <label for="edit_estado_civil" class="block text-gray-700">Estado Civil:</label>
+                                <select id="edit_estado_civil" name="estado_civil"
+                                    class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="S">Soltero/a</option>
+                                    <option value="C">Casado/a</option>
+                                    <option value="D">Divorciado/a</option>
+                                    <option value="V">Viudo/a</option>
+                                </select>
+                            </div>
+
+                          
+                            <!-- Fecha Nacimiento -->
+                          
+                        </div>
+                    </div>
+
+    
+
+                    <!-- Botones de acción -->
+                    <div class="flex justify-center gap-4 mt-6">
+                        <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-700">
+                            Actualizar
+                        </button>
+                        <button type="button" onclick="closeAsignaturaModal()"
+                            class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-700">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 
     <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 w-full h-full">
         <div class="flex items-center justify-center w-full h-full">
@@ -409,17 +451,6 @@
                 }
             });
         </script>
-    @elseif (session('success'))
-        <script>
-            Swal.fire({
-                title: "Registrado!",
-                text: "{{ session('success') }}",
-                icon: "success",
-                customClass: {
-                    confirmButton: 'bg-green-500 text-white hover:bg-green-600 focus:ring-2 focus:ring-green-300 rounded-lg py-2 px-4'
-                }
-            });
-        </script>
     @elseif (session('success-destroy'))
         <script>
             Swal.fire({
@@ -428,19 +459,6 @@
                 icon: "success",
                 customClass: {
                     confirmButton: 'bg-green-500 text-white hover:bg-green-600 focus:ring-2 focus:ring-green-300 rounded-lg py-2 px-4'
-                }
-            });
-        </script>
-    @elseif (session('error'))
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: '¡Hubo un error!',
-                html: "{!! session('error') !!}",
-                showConfirmButton: true,
-                confirmButtonText: 'Aceptar',
-                customClass: {
-                    confirmButton: 'bg-red-500 text-white hover:bg-red-600 focus:ring-2 focus:ring-red-300 rounded-lg py-2 px-4'
                 }
             });
         </script>
@@ -501,6 +519,24 @@
             document.getElementById('editForm').reset();
             removeImageEdit();
         }
+
+        function openAsignaturasModal(button) {
+            const user = JSON.parse(button.getAttribute('docente-cursos'));
+
+         
+
+         
+
+            // Mostrar el modal
+            document.getElementById('asignaturasModal').classList.remove('hidden');
+        }
+
+        function closeAsignaturaModal() {
+            document.getElementById('asignaturasModal').classList.add('hidden');
+            document.getElementById('asignaturasForm').reset();
+            removeImageEdit();
+        }
+
 
         function previewImageEdit(event) {
             const input = event.target;
@@ -569,7 +605,7 @@
         }
 
         function buscarUsuarios(query) {
-            fetch(`/users/buscar?search=${query}`, {
+            fetch(`/docentes/buscar?search=${query}`, {
                     method: 'GET',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
