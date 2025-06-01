@@ -147,6 +147,94 @@
                         </ul>
                     </li>
 
+
+                @php
+    $gradoActivo = request()->routeIs('grados.index') || request()->routeIs('grados.create') || request()->routeIs('grados.edit');
+@endphp
+
+<li class="mb-1 group cursor-pointer {{ $gradoActivo ? 'selected' : '' }}">
+    <a class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.selected]:bg-[#98C560] sidebar-dropdown-toggle">
+        <i class="ri-graduation-cap-line mr-3 text-lg"></i>
+        <span class="text-sm">Gestionar Grados</span>
+        <i class="ri-arrow-right-s-line ml-auto transform transition-transform group-[.selected]:rotate-90"></i>
+    </a>
+    <ul class="pl-7 mt-2 {{ $gradoActivo ? 'block' : 'hidden' }} group-[.selected]:block">
+        <li class="mb-2">
+            <a href="{{ route('grados.index') }}"
+                class="text-sm flex items-center py-2 px-4 rounded-md text-white hover:bg-[#98C560] {{ request()->routeIs('grados.index') ? 'bg-[#98C560]' : '' }}">
+                <span class="w-2 h-2 rounded-full mr-3 {{ request()->routeIs('grados.index') ? 'bg-[#98C560]' : 'bg-gray-400' }}"></span>
+                Lista de Grados
+            </a>
+        </li>
+        <li class="mb-2">
+            <a href="{{ route('grados.create') }}"
+                class="text-sm flex items-center py-2 px-4 rounded-md text-white hover:bg-[#98C560] {{ request()->routeIs('grados.create') ? 'bg-[#98C560]' : '' }}">
+                <span class="w-2 h-2 rounded-full mr-3 {{ request()->routeIs('grados.create') ? 'bg-[#98C560]' : 'bg-gray-400' }}"></span>
+                Registrar Grado
+            </a>
+        </li>
+    </ul>
+</li>
+
+   @php
+    $seccionActivo = request()->routeIs('secciones.index') || request()->routeIs('secciones.create') || request()->routeIs('secciones.edit');
+@endphp
+
+<li class="mb-1 group cursor-pointer {{ $seccionActivo ? 'selected' : '' }}">
+    <a class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.selected]:bg-[#98C560] sidebar-dropdown-toggle">
+        <i class="ri-layout-grid-line mr-3 text-lg"></i>
+        <span class="text-sm">Gestionar Secciones</span>
+        <i class="ri-arrow-right-s-line ml-auto transform transition-transform group-[.selected]:rotate-90"></i>
+    </a>
+    <ul class="pl-7 mt-2 {{ $seccionActivo ? 'block' : 'hidden' }} group-[.selected]:block">
+        <li class="mb-2">
+            <a href="{{ route('secciones.index') }}"
+                class="text-sm flex items-center py-2 px-4 rounded-md text-white hover:bg-[#98C560] {{ request()->routeIs('secciones.index') ? 'bg-[#98C560]' : '' }}">
+                <span class="w-2 h-2 rounded-full mr-3 {{ request()->routeIs('secciones.index') ? 'bg-[#98C560]' : 'bg-gray-400' }}"></span>
+                Lista de Secciones
+            </a>
+        </li>
+        <li class="mb-2">
+            <a href="{{ route('secciones.create') }}"
+                class="text-sm flex items-center py-2 px-4 rounded-md text-white hover:bg-[#98C560] {{ request()->routeIs('secciones.create') ? 'bg-[#98C560]' : '' }}">
+                <span class="w-2 h-2 rounded-full mr-3 {{ request()->routeIs('secciones.create') ? 'bg-[#98C560]' : 'bg-gray-400' }}"></span>
+                Registrar Sección
+            </a>
+        </li>
+    </ul>
+</li>
+   
+
+@php
+    $asignaturaActivo = request()->routeIs('asignaturas.index') || request()->routeIs('asignaturas.create') || request()->routeIs('asignaturas.edit');
+@endphp
+
+<li class="mb-1 group cursor-pointer {{ $asignaturaActivo ? 'selected' : '' }}">
+    <a class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.selected]:bg-[#98C560] sidebar-dropdown-toggle">
+        <i class="ri-book-2-line mr-3 text-lg"></i>
+        <span class="text-sm">Gestionar Asignaturas</span>
+        <i class="ri-arrow-right-s-line ml-auto transform transition-transform group-[.selected]:rotate-90"></i>
+    </a>
+    <ul class="pl-7 mt-2 {{ $asignaturaActivo ? 'block' : 'hidden' }} group-[.selected]:block">
+        <li class="mb-2">
+            <a href="{{ route('asignaturas.index') }}"
+                class="text-sm flex items-center py-2 px-4 rounded-md text-white hover:bg-[#98C560] {{ request()->routeIs('asignaturas.index') ? 'bg-[#98C560]' : '' }}">
+                <span class="w-2 h-2 rounded-full mr-3 {{ request()->routeIs('asignaturas.index') ? 'bg-[#98C560]' : 'bg-gray-400' }}"></span>
+                Lista de Asignaturas
+            </a>
+        </li>
+        <li class="mb-2">
+            <a href="{{ route('asignaturas.create') }}"
+                class="text-sm flex items-center py-2 px-4 rounded-md text-white hover:bg-[#98C560] {{ request()->routeIs('asignaturas.create') ? 'bg-[#98C560]' : '' }}">
+                <span class="w-2 h-2 rounded-full mr-3 {{ request()->routeIs('asignaturas.create') ? 'bg-[#98C560]' : 'bg-gray-400' }}"></span>
+                Registrar Asignatura
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+
                     <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
                         <a
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
@@ -223,6 +311,7 @@
                             </li>
                         </ul>
                     </li>
+
                 @elseif(auth()->user()->isSecretaria())
                     <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Secretaria</h4>
 
@@ -234,6 +323,7 @@
                         </a>
                     </li>
 
+                    
 
                     <li
                         class="mb-1 group cursor-pointer {{ request()->routeIs(['papers.create', 'papers.index', 'papers.edit']) ? 'active' : '' }}">
@@ -459,6 +549,7 @@
     <!-- end: Sidebar -->
 
     <!-- start: Main -->
+
     <main class="w-full md:w-[calc(100%-300px)] md:ml-[300px] bg-gray-50 min-h-screen transition-all main">
         <section class="py-5 px-6 bg-white flex items-center shadow-md shadow-black/5 sticky top-0 left-0 z-30">
             <button type="button" class="text-2xl text-gray-600 sidebar-toggle">
@@ -507,7 +598,51 @@
         <section class="d-flex px-6 py-9">
             @yield('contenido')
         </section>
+
     </main>
+
+
+    <li class="dropdown ml-3">
+    <button type="button"
+        class="dropdown-toggle flex items-center gap-x-2 hover:text-[#98C560] group">
+        <div
+            class="relative inline-block bg-white p-[2.5px] rounded-full border-[1px] border-black group-hover:border-[#98C560]">
+            @if (Auth::check() && optional(Auth::user()->persona)->photo)
+                <img src="{{ asset('storage/' . Auth::user()->persona->photo) }}" alt="Foto de perfil"
+                    class="w-12 h-12 rounded-full block object-cover">
+            @elseif(Auth::check() && optional(Auth::user()->persona)->name)
+                <div
+                    class="w-12 h-12 bg-gray-300 text-gray-700 flex items-center justify-center rounded-full text-xl font-bold uppercase">
+                    {{ substr(Auth::user()->persona->name, 0, 1) }}
+                </div>
+            @else
+                <div
+                    class="w-12 h-12 bg-gray-300 text-gray-700 flex items-center justify-center rounded-full text-xl font-bold uppercase">
+                    ?
+                </div>
+            @endif
+        </div>
+        @if (Auth::check() && Auth::user()->persona)
+            <div>
+                <h4 class="text-[14.5px] font-medium">
+                    {{ Auth::user()->persona->name }} {{ Auth::user()->persona->lastname }}
+                </h4>
+                <h4 class="text-[12.5px] font-normal uppercase">{{ Auth::user()->rol }}</h4>
+            </div>
+        @endif
+    </button>
+    <ul
+        class="dropdown-menu shadow-md shadow-black/5 z-30 hidden py-2 rounded-md bg-white border border-gray-100 w-[140px] text-black text-[15px]">
+        <li>
+            <a href="#" class="flex items-center py-1.5 px-4 hover:text-[#98C560]">Mi Perfil</a>
+        </li>
+        <li>
+            <a href="#" onclick="confirmLogout()"
+                class="flex items-center py-1.5 px-4 hover:text-[#98C560]">Cerrar Sesión</a>
+        </li>
+    </ul>
+</li>
+
     <!-- end: Main -->
 
     <script src="https://unpkg.com/@popperjs/core@2"></script>

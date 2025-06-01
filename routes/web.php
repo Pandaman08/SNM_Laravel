@@ -3,11 +3,20 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
+
+
+use App\Http\Controllers\GradoController;
+use App\Http\Controllers\SeccionController;
+use App\Http\Controllers\AsignaturaController;
+
+
+
 use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\TutorController;
 use App\Http\Controllers\PeriodoController;
 use App\Http\Controllers\AnioEscolarController;
+
 
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
@@ -28,6 +37,11 @@ Route::get('/users/me', [UserController::class, 'edit_user'])->name('users.edit_
 Route::put('/users/me/{id}', [UserController::class, 'update_user'])->name('users.update_user');
 Route::put('/users/{id}/photo', [UserController::class, 'update_photo'])->name('users.update_photo');
 Route::put('users/{id}/password', [UserController::class, 'update_password'])->name('users.update_password');
+
+
+Route::resource('grados', GradoController::class);
+Route::resource('secciones', SeccionController::class);
+Route::resource('asignaturas', AsignaturaController::class);
 
 //------------------------tutores--------------------------------------
 // Route::get('tutores', [TutorController::class, 'indexTutores'])->name('tutores.index');
