@@ -4,9 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 
-use app\Http\Controllers\TutorController;
-use app\Http\Controllers\EstudianteController;
-use app\Http\Controllers\AsistenciaController;
+use App\Http\Controllers\TutorController;
+use App\Http\Controllers\EstudianteController;
+use App\Http\Controllers\AsistenciaController;
 
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
@@ -29,7 +29,8 @@ Route::put('/users/{id}/photo', [UserController::class, 'update_photo'])->name('
 Route::put('users/{id}/password', [UserController::class, 'update_password'])->name('users.update_password');
 
 //------------------------tutores--------------------------------------
-Route::get('tutores', [TutorController::class, 'indexTutores'])->name('tutores.index');
+Route::get('/tutor/register', [TutorController::class, 'create'])->name('tutor.register');
+Route::post('/tutor/register', [TutorController::class, 'store'])->name('tutor.store');
 
 //------------------------ estudiantes ---------------------------------
 Route::get('estudiantes',[EstudianteController::class,'index'])->name('estudiantes.index');
