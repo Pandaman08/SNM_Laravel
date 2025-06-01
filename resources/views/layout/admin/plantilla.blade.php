@@ -28,7 +28,22 @@
                 <li class="mb-1 group cursor-pointer">
                     <a href="{{ route('users.edit_user') }}"
                         class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md {{ request()->routeIs('user.edit_user') ? 'bg-[#98C560]' : 'bg-transparent' }}">
-                        <i class="ri-instance-line mr-3 text-lg"></i>
+                        <svg class="mr-3 h-6 w-6 " fill="#ffffff" viewBox="0 0 128 128" id="Layer_1" version="1.1"
+                            xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" stroke="#ffffff">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <g>
+                                    <path
+                                        d="M30,49c0,18.7,15.3,34,34,34s34-15.3,34-34S82.7,15,64,15S30,30.3,30,49z M90,49c0,14.3-11.7,26-26,26S38,63.3,38,49 s11.7-26,26-26S90,34.7,90,49z">
+                                    </path>
+                                    <path
+                                        d="M24.4,119.4C35,108.8,49,103,64,103s29,5.8,39.6,16.4l5.7-5.7C97.2,101.7,81.1,95,64,95s-33.2,6.7-45.3,18.7L24.4,119.4z">
+                                    </path>
+                                </g>
+                            </g>
+                        </svg>
                         <span class="text-sm">Mi Cuenta</span>
                     </a>
                 </li>
@@ -48,7 +63,26 @@
                     <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
                         <a
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
-                            <i class="ri-instance-line mr-3 text-lg"></i>
+                            <svg class="h-8 w-8 mr-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                                stroke="#ffffff">
+                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                <g id="SVGRepo_iconCarrier">
+                                    <path opacity="0.1"
+                                        d="M13 9.5C13 11.433 11.433 13 9.5 13C7.567 13 6 11.433 6 9.5C6 7.567 7.567 6 9.5 6C11.433 6 13 7.567 13 9.5Z"
+                                        fill="#ffffff"></path>
+                                    <path
+                                        d="M15.6309 7.15517C15.9015 7.05482 16.1943 7 16.4999 7C17.8806 7 18.9999 8.11929 18.9999 9.5C18.9999 10.8807 17.8806 12 16.4999 12C16.1943 12 15.9015 11.9452 15.6309 11.8448"
+                                        stroke="#ffffff" stroke-width="2" stroke-linecap="round"></path>
+                                    <path d="M3 19C3.69137 16.6928 5.46998 16 9.5 16C13.53 16 15.3086 16.6928 16 19"
+                                        stroke="#ffffff" stroke-width="2" stroke-linecap="round"></path>
+                                    <path d="M17 15C19.403 15.095 20.5292 15.6383 21 17" stroke="#ffffff" stroke-width="2"
+                                        stroke-linecap="round"></path>
+                                    <path
+                                        d="M13 9.5C13 11.433 11.433 13 9.5 13C7.567 13 6 11.433 6 9.5C6 7.567 7.567 6 9.5 6C11.433 6 13 7.567 13 9.5Z"
+                                        stroke="#ffffff" stroke-width="2"></path>
+                                </g>
+                            </svg>
                             <span class="text-sm">Usuarios</span>
                             <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                         </a>
@@ -58,6 +92,23 @@
                                     <span
                                         class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('person') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
                                     Lista de Usuarios
+                                </a>
+                            </li>
+                            <li class="mb-4">
+                                <a href="{{ route('docentes.buscar') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Panel Docentes
+                                </a>
+                            </li>
+
+                            <li class="mb-4">
+                                <a href="{{ route('tutores.panel-aprobar') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('person') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Aprobar tutores
                                 </a>
                             </li>
                             <li class="mb-4">
@@ -116,6 +167,58 @@
                                     <span
                                         class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
                                     Registrar Grado
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
+                        <a
+                            class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
+                            <i class="ri-instance-line mr-3 text-lg"></i>
+                            <span class="text-sm">Gestionar Periodos</span>
+                            <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
+                        </a>
+                        <ul class="pl-7 mt-2 hidden group-[.selected]:block">
+                            <li class="mb-4">
+                                <a href="{{ route('periodos.index') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('person') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Lista de Periodos
+                                </a>
+                            </li>
+                            <li class="mb-4">
+                                <a href="{{ route('periodos.create') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Registrar Periodo
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                     <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
+                        <a
+                            class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
+                            <i class="ri-instance-line mr-3 text-lg"></i>
+                            <span class="text-sm">Gestionar Años Escolares</span>
+                            <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
+                        </a>
+                        <ul class="pl-7 mt-2 hidden group-[.selected]:block">
+                            <li class="mb-4">
+                                <a href="{{ route('anios-escolares.index') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('person') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Lista de Años Escolares
+                                </a>
+                            </li>
+                            <li class="mb-4">
+                                <a href="{{ route('anios-escolares.create') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Registrar Año escolar
                                 </a>
                             </li>
                         </ul>
@@ -368,7 +471,7 @@
                         <div
                             class="relative inline-block bg-white p-[2.5px] rounded-full border-[1px] border-black group-hover:border-[#98C560]">
                             @if (Auth::check() && Auth::user()->persona->photo)
-                                <img src="" alt="Foto de perfil"
+                                <img src="{{ Storage::url('' . Auth::user()->persona->photo) }}" alt="Foto de perfil"
                                     class="w-12 h-12 rounded-full block object-cover">
                             @elseif(Auth::check())
                                 <div
