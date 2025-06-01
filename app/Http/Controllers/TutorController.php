@@ -63,15 +63,14 @@ class TutorController extends Controller
                 'photo' => $fotoPath
             ]);
 
-            \Log::info('Persona creada:', ['persona_id' => $persona->persona_id]);
             $user = User::create([
                 'name' => $request->nombre . ' ' . $request->apellidos,
                 'email' => $request->correo,
                 'password' => Hash::make($request->password),
                 'rol' => 'tutor',
+                'estado' => false,
                 'persona_id' => $persona->persona_id
             ]);
-            \Log::info('User creado:', ['user_id' => $user->id, 'primary_key' => $user->getKeyName()]);
 
             Tutor::create([
                 'user_id' => $user->user_id,
