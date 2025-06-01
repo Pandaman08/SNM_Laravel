@@ -9,10 +9,6 @@ use App\Http\Controllers\TutorController;
 use App\Http\Controllers\PeriodoController;
 use App\Http\Controllers\AnioEscolarController;
 
-use App\Http\Controllers\TutorController;
-use App\Http\Controllers\EstudianteController;
-use App\Http\Controllers\AsistenciaController;
-
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
 Route::post('/', [UserController::class, 'login'])->name('login');
