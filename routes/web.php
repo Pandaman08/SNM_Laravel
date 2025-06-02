@@ -39,9 +39,6 @@ Route::get('/matriculas', [MatriculaController::class, 'index'])->name('matricul
 Route::get('/matriculas/crear', [MatriculaController::class, 'create'])->name('matriculas.create');
 Route::post('/matriculas', [MatriculaController::class, 'store'])->name('matriculas.store');
 Route::get('/matriculas/{codigo_matricula}', [MatriculaController::class, 'show'])->name('matriculas.show');
-Route::get('/matriculas/{codigo_matricula}/editar', [MatriculaController::class, 'edit'])->name('matriculas.edit');
-Route::put('/matriculas/{codigo_matricula}', [MatriculaController::class, 'update'])->name('matriculas.update');
-Route::delete('/matriculas/{codigo_matricula}', [MatriculaController::class, 'destroy'])->name('matriculas.destroy');
 
 // Rutas para tutores
 Route::get('/mis-matriculas', [MatriculaController::class, 'misMatriculas'])->name('matriculas.mis-matriculas');

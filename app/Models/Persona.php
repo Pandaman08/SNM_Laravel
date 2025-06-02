@@ -27,8 +27,14 @@ class Persona extends Model
         'fecha_nacimiento' => 'date'
     ];
 
-    /*  public function user()
+    public function user()
     {
         return $this->hasOne(User::class, 'persona_id', 'persona_id'); 
-    } */
+    }
+
+   public function persona()
+    {
+        return $this->belongsTo(Persona::class, 'persona_id', 'persona_id');
+    }
+
 }

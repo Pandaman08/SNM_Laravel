@@ -250,6 +250,15 @@
                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
 
+                        <!-- Dirección -->
+                            <div>
+                                <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Dirección *</label>
+                                <input type="text" name="address" id="address"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    value="{{ old('address') }}"
+                                    required>
+                            </div>
+                            
                         <!-- Lengua Materna -->
                         <div>
                             <label for="lengua_materna" class="block text-sm font-medium text-gray-700 mb-2">Lengua Materna *</label>
@@ -299,7 +308,7 @@
                             <label for="nivel_educativo_id" class="block text-sm font-medium text-gray-700 mb-2">Nivel Educativo *</label>
                             <select name="nivel_educativo_id" id="nivel_educativo_id" 
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                                    required onchange="cargarGradosAdmin()">
+                                    required onchange="cargarGrados()">
                                 <option value="" disabled selected>Seleccione el nivel</option>
                                 @foreach($nivelesEducativos as $nivel)
                                     <option value="{{ $nivel->id_nivel_educativo }}">
@@ -314,7 +323,7 @@
                             <label for="grado_id" class="block text-sm font-medium text-gray-700 mb-2">Grado *</label>
                             <select name="grado_id" id="grado_id" 
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                                    required disabled>
+                                    required disabled onchange="cargarSecciones()">
                                 <option value="" disabled selected>Primero seleccione el nivel</option>
                             </select>
                         </div>
@@ -324,13 +333,8 @@
                             <label for="seccion_id" class="block text-sm font-medium text-gray-700 mb-2">Sección *</label>
                             <select name="seccion_id" id="seccion_id" 
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                                    required>
-                                <option value="" disabled selected>Seleccione la sección</option>
-                                @foreach($secciones as $seccion)
-                                    <option value="{{ $seccion->id_seccion }}">
-                                        Sección {{ $seccion->nombre }}
-                                    </option>
-                                @endforeach
+                                    required disabled>
+                                <option value="" disabled selected>Primero seleccione el grado</option>
                             </select>
                         </div>
 
@@ -566,7 +570,98 @@
             }
         });
     }
-    
+    function cargarGrados() {
+        const nivelSelect = document.getElementById('nivel_educativo_id');
+        const gradoSelect = document.getElementById('grado_id');
+        const seccionSelect = document.getElementById('seccion_id');
+        
+        const nivelId = nivelSelect.value;
+        console.log('📊 Cargando grados para nivel:', nivelId);
+        
+        // Limpiar grados y secciones
+        gradoSelect.innerHTML = '<option value="" disabled selected>Cargando grados...</option>';
+        gradoSelect.disabled = true;
+        seccionSelect.innerHTML = '<option value="" disabled selected>Primero seleccione el grado</option>';
+        seccionSelect.disabled = true;
+        
+        if (nivelId) {
+            fetch(`/obtener-grados?nivel_id=${nivelId}`)
+                .then(response => response.json())
+                .then(data => {
+                    gradoSelect.innerHTML = '<option value="" disabled selected>Seleccione el grado</option>';
+                    
+                    if (data.grados && data.grados.length > 0) {
+                        data.grados.forEach(grado => {
+                            const option = document.createElement('option');
+                            option.value = grado.id_grado;
+                            option.textContent = `${grado.grado}° Grado`;
+                            gradoSelect.appendChild(option);
+                        });
+                        gradoSelect.disabled = false;
+                        console.log('✅ Grados cargados:', data.grados.length);
+                    } else {
+                        gradoSelect.innerHTML = '<option value="" disabled selected>No hay grados disponibles</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Error al cargar grados:', error);
+                    gradoSelect.innerHTML = '<option value="" disabled selected>Error al cargar grados</option>';
+                });
+        }
+    }
+
+    function cargarSecciones() {
+        const gradoSelect = document.getElementById('grado_id');
+        const seccionSelect = document.getElementById('seccion_id');
+        
+        const gradoId = gradoSelect.value;
+        console.log('📊 Cargando secciones para grado:', gradoId);
+        
+        // Limpiar secciones
+        seccionSelect.innerHTML = '<option value="" disabled selected>Cargando secciones...</option>';
+        seccionSelect.disabled = true;
+        
+        if (gradoId) {
+            fetch(`/obtener-secciones?grado_id=${gradoId}`)
+                .then(response => {
+                    console.log('📡 Respuesta status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('📊 Datos recibidos:', data);
+                    
+                    seccionSelect.innerHTML = '<option value="" disabled selected>Seleccione la sección</option>';
+                    
+                    if (data.secciones && data.secciones.length > 0) {
+                        data.secciones.forEach(seccion => {
+                            const option = document.createElement('option');
+                            option.value = seccion.id_seccion;
+                            option.textContent = `Sección ${seccion.seccion}`;
+                            seccionSelect.appendChild(option);
+                        });
+                        seccionSelect.disabled = false;
+                        console.log('✅ Secciones cargadas:', data.secciones.length);
+                    } else {
+                        console.log('⚠️ No hay secciones para este grado');
+                        seccionSelect.innerHTML = '<option value="" disabled selected>No hay secciones disponibles</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Error al cargar secciones:', error);
+                    seccionSelect.innerHTML = '<option value="" disabled selected>Error al cargar secciones</option>';
+                    
+                    // Mostrar más detalles del error en consola
+                    console.error('Detalles del error:', {
+                        message: error.message,
+                        gradoId: gradoId,
+                        url: `/obtener-secciones?grado_id=${gradoId}`
+                    });
+                });
+        }
+    }
     function hacerCamposReadonly(readonly) {
         const campos = ['nombre', 'apellidos', 'dni', 'sexo', 'fecha_nacimiento', 'pais', 'provincia', 'distrito', 'departamento', 'lengua_materna', 'religion'];
         campos.forEach(campo => {

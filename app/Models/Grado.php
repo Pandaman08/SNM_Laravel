@@ -12,7 +12,7 @@ class Grado extends Model
     protected $primaryKey = 'id_grado';
 
     protected $fillable = [
-        'id_nivel_educativo', // FK a niveles_educativos
+        'nivel_educativo_id', // ✅ CORREGIDO: Este es el campo real en tu BD
         'grado'               // Número del grado según el nivel
     ];
 
@@ -23,7 +23,7 @@ class Grado extends Model
     // Relación: Grado pertenece a un nivel educativo
     public function nivelEducativo()
     {
-        return $this->belongsTo(NivelEducativo::class, 'id_nivel_educativo', 'id_nivel_educativo');
+        return $this->belongsTo(NivelEducativo::class, 'nivel_educativo_id', 'id_nivel_educativo');
     }
 
     // Relación: Un grado tiene muchas secciones
@@ -73,7 +73,7 @@ class Grado extends Model
     // Scope: Grados de un nivel específico
     public function scopeDeNivel($query, $nivelId)
     {
-        return $query->where('id_nivel_educativo', $nivelId);
+        return $query->where('nivel_educativo_id', $nivelId); // ✅ CORREGIDO
     }
 
     // Scope: Grados de inicial

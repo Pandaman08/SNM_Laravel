@@ -181,8 +181,8 @@
                                         class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         required>
                                     <option value="" disabled selected>Seleccione</option>
-                                    <option value="masculino">Masculino</option>
-                                    <option value="femenino">Femenino</option>
+                                    <option value="M">M</option>
+                                    <option value="F">F</option>
                                 </select>
                             </div>
 
@@ -226,6 +226,15 @@
                                        required>
                             </div>
 
+                            <!-- Dirección -->
+                            <div>
+                                <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Dirección *</label>
+                                <input type="text" name="address" id="address"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    value="{{ old('address') }}"
+                                    required>
+                            </div>
+                           
                             <!-- Lengua Materna -->
                             <div>
                                 <label for="lengua_materna" class="block text-sm font-medium text-gray-700 mb-2">Lengua Materna *</label>
@@ -262,7 +271,7 @@
                 </div>
             </div>
 
-            <!-- Sección 3: Información Académica -->
+            <!-- Información Académica -->
             <div id="seccion-info-academica" class="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h2 class="text-lg font-semibold text-gray-900 flex items-center">
@@ -274,8 +283,8 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <!-- Nivel Educativo -->
                         <div>
-                            <label for="id_nivel_educativo" class="block text-sm font-medium text-gray-700 mb-2">Nivel Educativo *</label>
-                            <select name="id_nivel_educativo" id="id_nivel_educativo" 
+                            <label for="nivel_educativo_id" class="block text-sm font-medium text-gray-700 mb-2">Nivel Educativo *</label>
+                            <select name="nivel_educativo_id" id="nivel_educativo_id" 
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                                     required onchange="cargarGrados()">
                                 <option value="" disabled selected>Seleccione el nivel</option>
@@ -287,10 +296,10 @@
                             </select>
                         </div>
 
-                        <!-- Grado -->
+                        <!-- Grado - CORREGIDO -->
                         <div>
-                            <label for="id_grado" class="block text-sm font-medium text-gray-700 mb-2">Grado *</label>
-                            <select name="id_grado" id="id_grado" 
+                            <label for="grado_id" class="block text-sm font-medium text-gray-700 mb-2">Grado *</label>
+                            <select name="grado_id" id="grado_id" 
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                                     required disabled onchange="cargarSecciones()">
                                 <option value="" disabled selected>Primero seleccione el nivel</option>
@@ -299,7 +308,7 @@
 
                         <!-- Sección -->
                         <div>
-                            <label for="seccion_id" class="block text-sm font-medium text-gray-700 mb-2">Sección *</label>
+                            <label for="id_seccion" class="block text-sm font-medium text-gray-700 mb-2">Sección *</label>
                             <select name="seccion_id" id="seccion_id" 
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                                     required disabled>
@@ -312,8 +321,8 @@
                     <div class="mt-6">
                         <label for="fecha" class="block text-sm font-medium text-gray-700 mb-2">Fecha de Solicitud</label>
                         <input type="datetime-local" name="fecha" id="fecha" 
-                               class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-gray-50 cursor-not-allowed" 
-                               required readonly>
+                            class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-gray-50 cursor-not-allowed" 
+                            required readonly>
                     </div>
                 </div>
             </div>
@@ -590,10 +599,14 @@
 
     // Función para cargar grados según el nivel educativo seleccionado
     function cargarGrados() {
-        const nivelSelect = document.getElementById('id_nivel_educativo');
-        const gradoSelect = document.getElementById('id_grado');
+        console.log('🚀 INICIANDO cargarGrados()');
+        const nivelSelect = document.getElementById('nivel_educativo_id'); // ✅ ID correcto
+        const gradoSelect = document.getElementById('grado_id'); // ✅ ID correcto
         const seccionSelect = document.getElementById('seccion_id');
         const nivelId = nivelSelect.value;
+        
+        
+        console.log('🔄 Cargando grados para nivel ID:', nivelId); // Debug
         
         // Limpiar opciones de grado y sección
         gradoSelect.innerHTML = '<option value="" disabled selected>Cargando grados...</option>';
@@ -604,29 +617,45 @@
         if (nivelId) {
             // Hacer petición AJAX para obtener grados
             fetch(`/obtener-grados?nivel_id=${nivelId}`)
-                .then(response => response.json())
+                .then(response => {
+                    console.log('📡 Respuesta recibida:', response.status); // Debug
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('📊 Datos recibidos:', data); // Debug
                     gradoSelect.innerHTML = '<option value="" disabled selected>Seleccione el grado</option>';
                     
-                    data.grados.forEach(grado => {
-                        const option = document.createElement('option');
-                        option.value = grado.id_grado;
-                        option.textContent = `${grado.grado}° Grado`;
-                        gradoSelect.appendChild(option);
-                    });
-                    
-                    gradoSelect.disabled = false;
+                    if (data.grados && data.grados.length > 0) {
+                        data.grados.forEach(grado => {
+                            const option = document.createElement('option');
+                            option.value = grado.id_grado;
+                            option.textContent = `${grado.grado}° Grado`;
+                            gradoSelect.appendChild(option);
+                        });
+                        
+                        gradoSelect.disabled = false;
+                        console.log('✅ Grados cargados correctamente'); // Debug
+                    } else {
+                        gradoSelect.innerHTML = '<option value="" disabled selected>No hay grados disponibles</option>';
+                        console.log('⚠️ No se encontraron grados'); // Debug
+                    }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    console.error('❌ Error al cargar grados:', error);
                     gradoSelect.innerHTML = '<option value="" disabled selected>Error al cargar grados</option>';
+                    
+                    // Mostrar mensaje de error al usuario
+                    alert('Error al cargar los grados. Por favor, intente nuevamente.');
                 });
         }
     }
     
     // Función para cargar secciones según el grado seleccionado
     function cargarSecciones() {
-        const gradoSelect = document.getElementById('id_grado');
+        const gradoSelect = document.getElementById('grado_id');
         const seccionSelect = document.getElementById('seccion_id');
         const gradoId = gradoSelect.value;
         
@@ -635,24 +664,36 @@
         seccionSelect.disabled = true;
         
         if (gradoId) {
-            // Hacer petición AJAX para obtener secciones
             fetch(`/obtener-secciones?grado_id=${gradoId}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     seccionSelect.innerHTML = '<option value="" disabled selected>Seleccione la sección</option>';
                     
-                    data.secciones.forEach(seccion => {
-                        const option = document.createElement('option');
-                        option.value = seccion.id_seccion;
-                        option.textContent = `Sección ${seccion.seccion}`;
-                        seccionSelect.appendChild(option);
-                    });
-                    
-                    seccionSelect.disabled = false;
+                    if (data.secciones && data.secciones.length > 0) {
+                        data.secciones.forEach(seccion => {
+                            const option = document.createElement('option');
+                            option.value = seccion.id_seccion;
+                            option.textContent = `Sección ${seccion.seccion}`;
+                            seccionSelect.appendChild(option);
+                        });
+                        
+                        seccionSelect.disabled = false;
+                    } else {
+                        seccionSelect.innerHTML = '<option value="" disabled selected>No hay secciones disponibles</option>';
+                        console.log('⚠️ No se encontraron secciones'); // Debug
+                    }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    console.error('❌ Error al cargar secciones:', error);
                     seccionSelect.innerHTML = '<option value="" disabled selected>Error al cargar secciones</option>';
+                    
+                    // Mostrar mensaje de error al usuario
+                    alert('Error al cargar las secciones. Por favor, intente nuevamente.');
                 });
         }
     }
@@ -694,7 +735,6 @@
     
     // Ejecutar cuando se carga la página
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Iniciando vista de tutor...');
         
         // Establecer fecha y hora actual para la solicitud
         const fechaMatricula = document.getElementById('fecha');
@@ -714,7 +754,6 @@
                 manejarTipoMatricula();
             });
         } else {
-            console.log('❌ Select de tipo matrícula NO encontrado');
         }
         
         // Agregar event listener al campo DNI de búsqueda
@@ -726,7 +765,6 @@
                     buscarEstudianteExistente();
                 }
             });
-            console.log('🎯 DNI búsqueda listener agregado');
         }
         
         // Agregar event listener al DNI para validación (solo para matrícula de ingreso)
@@ -737,7 +775,6 @@
                     validarDNI();
                 }
             });
-            console.log('🎯 DNI validación listener agregado');
         }
         
         // Ocultar secciones inicialmente
@@ -752,13 +789,10 @@
             const elemento = document.getElementById(id);
             if (elemento) {
                 elemento.style.display = 'none';
-                console.log('🙈 Ocultando:', id);
             } else {
-                console.log('❌ No se encontró elemento:', id);
+                alert(`⚠️ No se encontró el elemento con ID: ${id}`);
             }
         });
-        
-        console.log('✅ Vista de tutor inicializada correctamente');
     });
 </script>
 @endsection
