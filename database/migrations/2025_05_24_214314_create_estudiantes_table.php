@@ -21,10 +21,10 @@ return new class extends Migration
             $table->string('lengua_materna', 45);
             $table->string('religion', 45);
             $table->timestamps();
-              $table->foreign('persona_id')
-          ->references('persona_id')
-          ->on('personas')
-          ->onDelete('cascade'); 
+            $table->foreign('persona_id')
+                ->references('persona_id')
+                ->on('personas')
+                ->onDelete('cascade');
         });
     }
 
