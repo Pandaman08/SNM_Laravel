@@ -51,8 +51,8 @@
                         class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition">Iniciar
                         Sesión</button>
                 </div>
-                <p class="text-center text-sm">¿No tienes una cuenta? <a href=""
-                        class="text-blue-500 hover:underline">Registrarme</a></p>
+                <!-- <p class="text-center text-sm">¿No tienes una cuenta? <a href=""
+                        class="text-blue-500 hover:underline">Registrarme</a></p> -->
             </form>
         </div>
     </div>

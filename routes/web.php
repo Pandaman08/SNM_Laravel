@@ -3,10 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
-
-use app\Http\Controllers\TutorController;
-use app\Http\Controllers\EstudianteController;
-use app\Http\Controllers\AsistenciaController;
+use App\Http\Controllers\TutorController;
+use App\Http\Controllers\EstudianteController;
+use App\Http\Controllers\AsistenciaController;
+use App\Http\Controllers\DocenteController;
 
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
@@ -33,3 +33,7 @@ Route::get('tutores', [TutorController::class, 'indexTutores'])->name('tutores.i
 
 //------------------------ estudiantes ---------------------------------
 Route::get('estudiantes',[EstudianteController::class,'index'])->name('estudiantes.index');
+
+//------------------------ docentes ---------------------------------
+//Route::get('/docentes',[DocenteController::class, 'index'])->name('docente');
+//Route::get('/docentes/create',[DocenteController::class, 'create'])->name('docente.create');
