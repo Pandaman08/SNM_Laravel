@@ -15,6 +15,7 @@ class Matricula extends Model
         'codigo_estudiante',
         'id_anio_escolar',
         'id_tipo_matricula',
+        'seccion_id', // ← AGREGAR FK a secciones
         'fecha'
     ];
 
@@ -33,6 +34,12 @@ class Matricula extends Model
     public function tipoMatricula()
     {
         return $this->belongsTo(TipoMatricula::class, 'id_tipo_matricula', 'id_tipo_matricula');
+    }
+
+    // ← NUEVA RELACIÓN: Matricula pertenece a una Sección
+    public function seccion()
+    {
+        return $this->belongsTo(Seccion::class, 'seccion_id', 'id_seccion');
     }
 
     public function detallesAsignatura()
