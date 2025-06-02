@@ -9,7 +9,7 @@
             <div class="blue-line w-1/5 h-0.5 bg-[#64d423]"></div>
         </div>
 
-        <form class="p-10" action="{{ route('papers.store') }}" method="post" id="form" enctype="multipart/form-data">
+        <form class="p-10" action="{{ route('matriculas.store') }}" method="post" id="form" enctype="multipart/form-data">
             @csrf
 
             <!-- Contenedor principal en 2 columnas -->
@@ -20,52 +20,49 @@
                     <!-- TÍTULO -->
                     <div>
                         <label for="titulo" class="block mb-2 text-sm font-medium text-gray-900 align-baseline">
-                            Titulo
+                            Codigo estudiante
                         </label>
-                        <input type="text" name="titulo" id="titulo"
+                        <input type="text" name="codigo_estudiante" id="codE"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
                                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            placeholder="Titulo del paper" required />
+                            placeholder="codigo estudiante" disabled />
                     </div>
 
-                    <!-- AUTORES -->
-                    <div>
-                        <label for="autores" class="block mb-2 text-sm font-medium text-gray-900">Autores</label>
-                        <div id="authors-container" class="space-y-2">
-                            <input type="text" id="new-author"
-                                class="author-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                                       focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                placeholder="Nombre del autor" />
-                            <!-- Input oculto para enviar los autores ingresados -->
-                            <input type="hidden" name="autores" id="autores-json" />
-                        </div>
-                        <div id="dropdownSearch" class="z-20 hidden bg-white rounded-lg shadow w-60 absolute mt-8">
-                            <div class="p-3">
-                                <ul id="authors-list" class="h-auto px-3 pb-3 overflow-y-auto text-sm text-gray-700"
-                                    aria-labelledby="dropdownSearchButton">
-                                </ul>
-                                <button id="remove-authors-btn"
-                                    class="flex items-center p-3 px-10 text-sm font-medium text-red-600 border-t border-gray-200 rounded-b-lg bg-gray-50 hover:bg-gray-100">
-                                    <svg class="w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                        fill="currentColor" viewBox="0 0 20 18">
-                                        <path
-                                            d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Zm11-3h-6a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2Z" />
-                                    </svg>
-                                    Remover autor
-                                </button>
-                            </div>
-                        </div>
-                        <div class="flex justify-between">
-                            <button type="button" id="add-author-btn"
-                                class="mt-2 text-sm font-medium text-blue-500 hover:underline">
-                                + Añadir autor
-                            </button>
-                            <button type="button" id="show-authors-btn"
-                                class="mt-2 px-4 text-sm font-medium text-green-500 hover:underline">
-                                Mostrar Autores
-                            </button>
-                        </div>
+                    <!-- AÑO ESCOLAR -->
+                          <div>
+                        <label for="area_id" class="block mb-2 text-sm font-medium text-gray-900">Año escolar</label>
+                        <select name="anio_escolar_id" id="anio_escolar_id"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+                                   focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            required>
+                            <option value="" disabled selected>Selecciona un año escolar</option>
+                            @if (!$anios->isEmpty())
+                                @foreach ($anios as $anio)
+                                    <option value="{{ $anio->id_anio_escolar }}">{{ $anio->anio }}</option>
+                                @endforeach
+                            @else
+                                <option value="none">No hay años escolares</option>
+                            @endif
+                        </select>
                     </div>
+
+                             <div>
+                        <label for="anio_escolar_id" class="block mb-2 text-sm font-medium text-gray-900">Año escolar</label>
+                        <select name="anio_escolar_id" id="anio_escolar_id"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+                                   focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            required>
+                            <option value="" disabled selected>Selecciona un año escolar</option>
+                            @if (!$anios->isEmpty())
+                                @foreach ($anios as $anio)
+                                    <option value="{{ $anio->id_anio_escolar }}">{{ $anio->anio }}</option>
+                                @endforeach
+                            @else
+                                <option value="none">No hay años escolares</option>
+                            @endif
+                        </select>
+                    </div>
+
 
                     <!-- FECHA DE PUBLICACIÓN -->
                     <div>
@@ -78,51 +75,20 @@
                             required />
                     </div>
 
-                    <!-- TÓPICOS -->
-                    <div>
-                        <div class="relative">
-                            <label for="topicos" class="block mb-2 text-sm font-medium text-gray-900">Tópicos</label>
-                            <!-- Botón que activa el menú -->
-                            <button type="button" id="toggle-menu"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                                       focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-left">
-                                Selecciona Tópicos
-                            </button>
-                            <!-- Menú desplegable flotante -->
-                            <div id="topicos-menu"
-                                class="absolute z-10 w-full bg-white border border-gray-300 shadow-md rounded-lg hidden">
-                                <div class="max-h-48 overflow-y-auto p-2">
-                                    @if (!$topicos->isEmpty())
-                                        @foreach ($topicos as $topico)
-                                            <label class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md">
-                                                <input type="checkbox" value="{{ $topico->id }}" class="checkbox-topico">
-                                                <span>{{ $topico->nombre }}</span>
-                                            </label>
-                                        @endforeach
-                                    @else
-                                        <label class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md">
-                                            <span>No hay topicos registrados</span>
-                                        </label>
-                                    @endif
-                                </div>
-                            </div>
-                            <!-- Input oculto para enviar los IDs de los tópicos seleccionados -->
-                            <input type="hidden" name="topicos" id="topicos">
-                        </div>
-                    </div>
+                  
 
                     <!-- ABSTRACT -->
                     <div>
                         <label for="descripcion" class="block mb-2 text-sm font-medium text-gray-900">
-                            Abstract
-                            (<span class="text-sm text-green-500 border focus:outline-none p-2 mt-2" id="char-count">1000
+                            Concepto
+                            (<span class="text-sm text-green-500 border focus:outline-none p-2 mt-2" id="char-count">100
                                 caracteres restantes</span>)
                         </label>
                         <textarea
                             class="block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding
                                    border border-solid border-gray-300 rounded transition ease-in-out m-0
                                    focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                            id="descripcion" name="descripcion" rows="8" placeholder="Descripción" required></textarea>
+                            id="concepto" name="concepto" rows="8" placeholder="concepto" required></textarea>
                     </div>
                 </div>
 
