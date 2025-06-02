@@ -17,7 +17,7 @@ class AdminController extends Controller
         return view("pages.admin.index", compact('user'));
     } 
 
-     public function index_tutor(){
+    public function index_tutor(){
 
         $users = User::where('estado', false)->paginate(10);
 
