@@ -1,12 +1,12 @@
 @extends('layout.admin.plantilla')
 
-@section('titulo', 'Gestión de Docentes')
+@section('title', 'Gestión de Usuarios')
 
 @section('contenido')
     <div class="max-w-screen-2xl mx-auto my-8 px-4">
 
         <div class="text-center mb-6">
-            <h1 class="text-2xl font-bold text-[#2e5382]">Docentes</h1>
+            <h1 class="text-2xl font-bold text-[#2e5382]">Usuarios</h1>
             <div class="w-1/4 mx-auto h-0.5 bg-[#64d423]"></div>
         </div>
 
@@ -16,7 +16,7 @@
                     oninput="buscarUsuarios(this.value)">
             </div>
             <button class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-700" onclick="openCreateModal()">
-                Registrar Docente
+                Crear Usuario
             </button>
         </div>
 
@@ -30,9 +30,7 @@
                         <th class="px-4 py-3">Email</th>
                         <th class="px-4 py-3">Teléfono</th>
                         <th class="px-4 py-3">Dirección</th>
-                        <th class="px-4 py-3">Especialidad</th>
-                        <th class="px-4 py-3">Jornada laboral</th>
-                        <th class="px-4 py-3">Departamento de Estudio</th>
+
                         <th class="px-4 py-3">Foto</th>
                         <th class="px-4 py-3">Acciones</th>
                     </tr>
@@ -46,9 +44,6 @@
                             <td class="px-4 py-3">{{ $usuario->email }}</td>
                             <td class="px-4 py-3">{{ $usuario->persona->phone }}</td>
                             <td class="px-4 py-3">{{ $usuario->persona->address }}</td>
-                            <td class="px-4 py-3">{{ $usuario->docente->especialidad }}</td>
-                            <td class="px-4 py-3">{{ $usuario->docente->jornada_laboral }}</td>
-                            <td class="px-4 py-3">{{ $usuario->docente->departamento_estudios }}</td>
                             <td class="px-4 py-3">
                                 @if ($usuario->persona->photo)
                                     <div class="px-8 py-0.1 text-center">
@@ -71,12 +66,6 @@
                             </td>
                             <td class="px-4 py-3 flex items-center justify-center space-x-4">
 
-                                <button type="button" onclick="openAsignaturasModal(this)"
-                                    cursos-docente='@json($usuario->docente)'
-                                    class="text-yellow-500 hover:text-yellow-700 flex items-center justify-center mt-2">
-                                    <svg class="h-6 w-6" fill="#036ffc" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg" stroke="#036ffc"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M1750.21 0v1468.235h-225.882v338.824h169.412V1920H451.387c-82.447 0-161.506-36.141-214.701-99.388-43.934-51.953-67.652-116.33-67.652-182.965V282.353C169.034 126.494 295.528 0 451.387 0H1750.21Zm-338.823 1468.235H463.81c-89.223 0-166.136 59.86-179.576 140.047-1.242 9.036-2.259 18.07-2.259 27.106v2.26c0 40.658 13.553 77.928 40.659 109.552 32.753 38.4 79.059 59.859 128.753 59.859h960v-112.941H409.599v-112.942h1001.788v-112.94Zm225.882-1355.294H451.387c-92.725 0-169.412 75.67-169.412 169.412v1132.8c50.824-37.27 113.958-59.859 181.835-59.859h1173.46V112.941ZM1354.882 903.53v112.942H564.294V903.529h790.588Zm56.47-564.705v451.764H507.825V338.824h903.529Zm-112.94 112.94H620.765v225.883h677.647V451.765Z" fill-rule="evenodd"></path> </g></svg>
-                                </button>
-
                                 <button type="button" onclick="openEditModal(this)"
                                     data-user='@json($usuario->load('persona'))'
                                     class="text-yellow-500 hover:text-yellow-700 flex items-center justify-center mt-2">
@@ -87,8 +76,7 @@
                                 </button>
 
 
-                                <button
-                                    onclick="openDeleteModal({{ $usuario->user_id }}, '{{ $usuario->persona->name }}')"
+                                <button onclick="openDeleteModal({{ $usuario->user_id }}, '{{ $usuario->persona->name }}')"
                                     class="text-red-500 hover:text-red-700 flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2">
@@ -128,8 +116,7 @@
                 </div>
                 <div class="mb-4">
                     <label for="email" class="block">Email</label>
-                    <input type="email" id="email" name="email" class="w-full px-4 py-2 border rounded"
-                        required>
+                    <input type="email" id="email" name="email" class="w-full px-4 py-2 border rounded" required>
                 </div>
                 <div class="mb-4">
                     <label for="password" class="block">Contraseña</label>
@@ -189,7 +176,7 @@
                                 <label for="edit_name" class="block text-gray-700">Nombres:</label>
                                 <input type="text" id="edit_name" name="name"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
 
@@ -198,7 +185,7 @@
                                 <label for="edit_lastname" class="block text-gray-700">Apellidos:</label>
                                 <input type="text" id="edit_lastname" name="lastname"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
 
@@ -207,7 +194,7 @@
                                 <label for="edit_dni" class="block text-gray-700">DNI:</label>
                                 <input type="text" id="edit_dni" name="dni"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
 
@@ -216,7 +203,7 @@
                                 <label for="edit_phone" class="block text-gray-700">Teléfono:</label>
                                 <input type="text" id="edit_phone" name="phone"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
 
@@ -225,7 +212,7 @@
                                 <label for="edit_sexo" class="block text-gray-700">Sexo:</label>
                                 <select id="edit_sexo" name="sexo"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="M">Masculino</option>
                                     <option value="F">Femenino</option>
                                 </select>
@@ -239,7 +226,7 @@
                                 <label for="edit_email" class="block text-gray-700">Email:</label>
                                 <input type="email" id="edit_email" name="email"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
 
@@ -248,7 +235,7 @@
                                 <label for="edit_rol" class="block text-gray-700">Rol:</label>
                                 <select id="edit_rol" name="rol"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     @foreach ($roles as $role)
                                         <option value="{{ $role->value }}">{{ $role->name }}</option>
                                     @endforeach
@@ -260,7 +247,7 @@
                                 <label for="edit_estado_civil" class="block text-gray-700">Estado Civil:</label>
                                 <select id="edit_estado_civil" name="estado_civil"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="S">Soltero/a</option>
                                     <option value="C">Casado/a</option>
                                     <option value="D">Divorciado/a</option>
@@ -273,7 +260,7 @@
                                 <label for="edit_address" class="block text-gray-700">Dirección:</label>
                                 <input type="text" id="edit_address" name="address"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
 
@@ -282,7 +269,7 @@
                                 <label for="edit_fecha_nacimiento" class="block text-gray-700">Fecha Nacimiento:</label>
                                 <input type="date" id="edit_fecha_nacimiento" name="fecha_nacimiento"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
                         </div>
@@ -317,9 +304,9 @@
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 7l-.867 12.142A2 2 0
-                                                                                                         0116.138 21H7.862a2 2 0
-                                                                                                         01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2
-                                                                                                         0 00-2-2H9a2 2 0 00-2 2v2m3 0h4" />
+                                                                                                     0116.138 21H7.862a2 2 0
+                                                                                                     01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2
+                                                                                                     0 00-2-2H9a2 2 0 00-2 2v2m3 0h4" />
                                 </svg>
                             </button>
                             <input type="file" id="edit_photo" name="photo" class="hidden"
@@ -341,76 +328,6 @@
             </div>
         </div>
     </div>
-
-    
-    <div id="asignaturasModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 w-full h-full">
-        <div class="flex items-center justify-center w-full h-full">
-            <div class="bg-white px-8 py-6 rounded-lg shadow-xl max-w-4xl w-full relative max-h-screen overflow-y-auto">
-                <!-- Título centrado -->
-                <div class="text-center mb-8">
-                    <h2 class="text-2xl font-semibold text-blue-800">Asignar Asignaturas</h2>
-                    <div class="mx-auto mt-2 w-1/5 h-1 bg-green-400"></div>
-                </div>
-
-                <!-- Formulario -->
-                <form id="asignaturasForm" action="" method="POST" enctype="multipart/form-data" class="space-y-6">
-                    @csrf
-                    @method('PUT')
-
-                    <!-- Grid principal: 2 columnas en md+ -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                        <!-- Columna Izquierda -->
-                        <div class="space-y-4">
-                            <div>
-                                <label for="edit_fecha_nacimiento" class="block text-gray-700">Fecha:</label>
-                                <input type="date" id="edit_fecha_nacimiento" name="fecha_nacimiento"
-                                    class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required>
-                            </div>
-                        </div>
-
-                        <!-- Columna Derecha -->
-                        <div class="space-y-4">
-
-                        
-                            <!-- Estado Civil -->
-                            <div>
-                                <label for="edit_estado_civil" class="block text-gray-700">Estado Civil:</label>
-                                <select id="edit_estado_civil" name="estado_civil"
-                                    class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="S">Soltero/a</option>
-                                    <option value="C">Casado/a</option>
-                                    <option value="D">Divorciado/a</option>
-                                    <option value="V">Viudo/a</option>
-                                </select>
-                            </div>
-
-                          
-                            <!-- Fecha Nacimiento -->
-                          
-                        </div>
-                    </div>
-
-    
-
-                    <!-- Botones de acción -->
-                    <div class="flex justify-center gap-4 mt-6">
-                        <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-700">
-                            Actualizar
-                        </button>
-                        <button type="button" onclick="closeAsignaturaModal()"
-                            class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-700">
-                            Cancelar
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
 
     <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 w-full h-full">
         <div class="flex items-center justify-center w-full h-full">
@@ -485,7 +402,7 @@
             document.getElementById('edit_sexo').value = user.persona.sexo;
             document.getElementById('edit_estado_civil').value = user.persona.estado_civil;
             document.getElementById('edit_address').value = user.persona.address;
-            console.log("fecha nacimiento: ", user.persona.fecha_nacimiento)
+            console.log("fecha nacimiento: ",user.persona.fecha_nacimiento)
             document.getElementById('edit_fecha_nacimiento').value = user.persona.fecha_nacimiento;
             document.getElementById('edit_email').value = user.email;
             document.getElementById('edit_rol').value = user.rol;
@@ -519,24 +436,6 @@
             document.getElementById('editForm').reset();
             removeImageEdit();
         }
-
-        function openAsignaturasModal(button) {
-            const user = JSON.parse(button.getAttribute('docente-cursos'));
-
-        
-
-        
-
-            // Mostrar el modal
-            document.getElementById('asignaturasModal').classList.remove('hidden');
-        }
-
-        function closeAsignaturaModal() {
-            document.getElementById('asignaturasModal').classList.add('hidden');
-            document.getElementById('asignaturasForm').reset();
-            removeImageEdit();
-        }
-
 
         function previewImageEdit(event) {
             const input = event.target;
@@ -596,7 +495,7 @@
             document.getElementById('deleteModal').classList.remove('hidden');
             document.getElementById('usuarioNombre').innerText = firstname;
             const form = document.getElementById('deleteForm');
-
+           
 
         }
 
@@ -605,7 +504,7 @@
         }
 
         function buscarUsuarios(query) {
-            fetch(`/docentes/buscar?search=${query}`, {
+            fetch(`/tesoreros/buscar?search=${query}`, {
                     method: 'GET',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'

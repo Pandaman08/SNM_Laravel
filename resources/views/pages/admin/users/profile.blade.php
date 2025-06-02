@@ -69,7 +69,7 @@
                     <div class="grid grid-cols-1 gap-6">
                         <div>
                             <label for="firstname" class="block text-sm font-medium text-gray-700">Nombres</label>
-                            <input type="text" id="firstname" name="firstname" value="{{ old('name', Auth::user()->persona->name) }}"
+                            <input type="text" id="name" name="name" value="{{ old('name', Auth::user()->persona->name) }}"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
                         <div>
@@ -94,7 +94,7 @@
                         </div>
                         <div>
                             <label for="career" class="block text-sm font-medium text-gray-700">Dni</label>
-                            <input type="text" id="career" name="dni" value="{{ old('dni', Auth::user()->persona->dni) }}"
+                            <input type="text" id="dni" name="dni" value="{{ old('dni', Auth::user()->persona->dni) }}"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
                     </div>

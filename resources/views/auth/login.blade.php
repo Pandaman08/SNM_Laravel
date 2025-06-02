@@ -53,6 +53,10 @@
                 </div>
                 <!-- <p class="text-center text-sm">¿No tienes una cuenta? <a href=""
                         class="text-blue-500 hover:underline">Registrarme</a></p> -->
+                <!-- CAMBIO AQUÍ: Enlace al registro de tutor -->
+                <p class="text-center text-sm">¿No tienes una cuenta? 
+                    <a href="{{ route('tutor.register') }}" class="text-blue-500 hover:underline">Registrarme</a>
+                </p>
             </form>
         </div>
     </div>

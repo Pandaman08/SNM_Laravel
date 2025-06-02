@@ -26,4 +26,5 @@ class AnioEscolar extends Model
     {
         return $this->hasMany(Matricula::class, 'id_anio_escolar', 'id_anio_escolar');
     }
+   
 }

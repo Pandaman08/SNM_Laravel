@@ -318,20 +318,18 @@ class UserController extends Controller
 
 
 
-    public function update_user(Request $request, $id)
+    public function update_user(Request $request, $user_id)
     {
-        $user = User::with('persona')->findOrFail($id);
+        $user = User::with('persona')->where('user_id', $user_id)->firstOrFail();
+
 
         $request->validate([
             'name' => 'required|string|max:100',
             'lastname' => 'required|string|max:100',
             'dni' => 'required|string|size:8',
             'phone' => 'required|string|max:15',
-            'sexo' => 'required|in:M,F',
-            'estado_civil' => 'required|in:S,C,D,V',
             'address' => 'required|string|max:200',
-            'fecha_nacimiento' => 'required|date',
-            'email' => 'required|email|unique:users,email,' . $user->user_id,
+            'email' => 'required|email|unique:users,email,'.$user->user_id.',user_id',
             'photo' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
         ]);
 
@@ -340,10 +338,7 @@ class UserController extends Controller
             'lastname',
             'dni',
             'phone',
-            'sexo',
-            'estado_civil',
             'address',
-            'fecha_nacimiento'
         ]);
 
         if ($request->hasFile('photo')) {

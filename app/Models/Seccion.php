@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Grado; 
 
 class Seccion extends Model
 {
@@ -11,7 +13,14 @@ class Seccion extends Model
     
     protected $fillable = [
         'id_grado',
-        'nombre',
         'seccion'
     ];
+
+
+    public function grado()
+    {
+        return $this->belongsTo(Grado::class, 'id_grado', 'id_grado');
+    }
 }
+
+
