@@ -18,6 +18,7 @@ use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\PeriodoController;
 use App\Http\Controllers\AnioEscolarController;
 use App\Http\Controllers\TipoCalificacionController;
+use App\Http\Controllers\PagoController;
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
 Route::post('/', [UserController::class, 'login'])->name('login');
@@ -86,3 +87,5 @@ Route::resource('periodos', PeriodoController::class);
 Route::resource('anios-escolares', AnioEscolarController::class);
 
 Route::resource('tipos-calificacion', TipoCalificacionController::class)->except(['show']);
+
+Route::resource('pagos', PagoController::class)->except(['show']);
