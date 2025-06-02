@@ -4,112 +4,210 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pago;
+use App\Models\Matricula;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Exception;
 
 class PagoController extends Controller
 {
+    
+         public function index(Request $request)
+    {
+        $searchTerm = $request->input('buscarpor');
+        
+        $pagos = Pago::with('matricula.estudiante')
+            ->when($searchTerm, function($query) use ($searchTerm) {
+                $query->where('concepto', 'like', '%'.$searchTerm.'%')
+                      ->orWhereHas('matricula.estudiante', function($q) use ($searchTerm) {
+                          $q->where('nombre', 'like', '%'.$searchTerm.'%')
+                            ->orWhere('apellido', 'like', '%'.$searchTerm.'%');
+                      });
+            })
+            ->orderBy('fecha_pago', 'desc')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('pages.admin.pagos.index', [
+            'pagos' => $pagos,
+            'buscarpor' => $searchTerm
+        ]);
+    }
+
+    public function create()
+    {
+        $matriculas = Matricula::with('estudiante')->get();
+        return view('pages.admin.pagos.create', compact('matriculas'));
+    }
+
     public function store(Request $request)
     {
         try {
-            //
             $messages = [
-                'concepto.required' => 'El campo concepto es requerido.',
-                'concepto.string' => 'El campo concepto debe ser una cadena de texto.',
-                'concepto.max' => 'El campo concepto no debe exceder 100.',
-                'monto.required' => 'El campo monto es obligatorio.',
-                'fecha_pago.date' => 'El campo fecha debe ser una fecha válida.',
+                'codigo_matricula.required' => 'La matrícula es obligatoria.',
+                'codigo_matricula.exists' => 'La matrícula seleccionada no es válida.',
+                
+                'concepto.required' => 'El concepto es obligatorio.',
+                'concepto.string' => 'El concepto debe ser texto.',
+                'concepto.max' => 'El concepto no debe exceder 100 caracteres.',
+                
+                'monto.required' => 'El monto es obligatorio.',
+                'monto.numeric' => 'El monto debe ser un número.',
+                'monto.min' => 'El monto debe ser al menos 0.',
+                
+                'fecha_pago.required' => 'La fecha de pago es obligatoria.',
+                'fecha_pago.date' => 'La fecha debe ser válida.',
+                
                 'comprobante_img.image' => 'El archivo debe ser una imagen.',
-                'comprobante_img.max' => 'La imagen no debe exceder los 4MB.',
-                'comprobante_img.mimes' => 'La imagen debe ser de tipo JPG, PNG o JPEG.',
+                'comprobante_img.max' => 'La imagen no debe exceder 4MB.',
+                'comprobante_img.mimes' => 'La imagen debe ser JPG, PNG o JPEG.',
+                
+                'estado.required' => 'El estado es obligatorio.',
+                'estado.in' => 'Estado no válido.',
             ];
 
-            $request->validate([
+            $validatedData = $request->validate([
+                'codigo_matricula' => 'required|exists:matriculas,codigo_matricula',
                 'concepto' => 'required|string|max:100',
-                'monto' => 'required|float',
+                'monto' => 'required|numeric|min:0',
                 'fecha_pago' => 'required|date',
                 'comprobante_img' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
+                'estado' => 'required|in:Pendiente,Finalizado',
             ], $messages);
 
             $rutaImagen = null;
             if ($request->hasFile('comprobante_img')) {
-                $imagen = $request->file('comprobante_img');
-                $rutaImagen = $imagen->store('imagenes', 'public'); // Guardar imagen en el directorio public
+                $rutaImagen = $request->file('comprobante_img')->store('comprobantes', 'public');
             }
 
-
-            Pago::create([
-                'id_pago' => $request->titulo,
-                'codigo_matricula' => $request->subtitulo,
-                'concepto' => $request->contenido,
-                'monto' => $request->autor,
-                'fecha_pago' => $request->fecha,
+            $pago = Pago::create([
+                'codigo_matricula' => $validatedData['codigo_matricula'],
+                'concepto' => $validatedData['concepto'],
+                'monto' => $validatedData['monto'],
+                'fecha_pago' => $validatedData['fecha_pago'],
                 'comprobante_img' => $rutaImagen,
-                'estado' => $request->estado
+                'estado' => $validatedData['estado']
             ]);
+            
+            Log::info("Nuevo pago registrado", ['pago' => $pago]);
 
-            return redirect()->route('pago')->with('success', 'Noticia creada con éxito');
+            return redirect()->route('pagos.index')
+                ->with('success', 'Pago registrado con éxito');
+
         } catch (ValidationException $e) {
-            $errorMessage = implode('<br>', $e->validator->errors()->all());
             return redirect()->back()
                 ->withInput()
-                ->with('error', $errorMessage);
+                ->withErrors($e->validator);
+
         } catch (Exception $e) {
-
-            return redirect()->back()->with('error', 'Error: ' . 'Hubo un error. Porfavor, pruebe denuevo');
+            Log::error("Error al registrar pago", ['error' => $e->getMessage()]);
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error al registrar el pago: ' . $e->getMessage());
         }
     }
 
-    public function show($id)
-    {
-        //
-        $noticia = Pago::findOrFail($id);
-        return view('usuario.novedades.detalle-noticias', compact('noticia'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'edit_titulo' => 'required|string|max:255',
-            'edit_subtitulo' => 'required|string|max:1000',
-            'edit_contenido' => 'required',
-            'edit_autor' => 'required|string|max:255',
-            'edit_fecha' => 'required|date',
-            'edit_imagen' => 'nullable|image|mimes:jpg,png,jpeg',
-        ]);
-
-        $noticia = Pago::findOrFail($id);
-
-        // Actualizar la imagen si se sube una nueva
-        if ($request->hasFile('edit_imagen')) {
-            $imagenPath = $request->file('edit_imagen')->store('noticias', 'public');
-            $noticia->imagen = $imagenPath;
-        }
-
-        // Actualizar los demás campos
-        $noticia->update([
-            'titulo'    => $request->edit_titulo,
-            'subtitulo' => $request->edit_subtitulo,
-            'contenido' => $request->edit_contenido,
-            'autor'     => $request->edit_autor,
-            'fecha'     => $request->edit_fecha,
-        ]);
-
-        return redirect()->route('pagos.index')->with('edit', 'Noticia actualizada con éxito');
-    }
-
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
+    public function edit($id)
     {
         $pago = Pago::findOrFail($id);
-        $pago->delete();
+        $matriculas = Matricula::with('estudiante')->get();
+        
+        return view('pages.admin.pagos.edit', [
+            'pago' => $pago,
+            'matriculas' => $matriculas
+        ]);
+    }
 
-        return redirect()->route('pagos.index')->with('destroy', 'Noticia eliminada con éxito');
+    public function update(Request $request, $id)
+    {
+        try {
+            $pago = Pago::findOrFail($id);
+
+            $messages = [
+                'codigo_matricula.required' => 'La matrícula es obligatoria.',
+                'codigo_matricula.exists' => 'La matrícula seleccionada no es válida.',
+                
+                'concepto.required' => 'El concepto es obligatorio.',
+                'concepto.string' => 'El concepto debe ser texto.',
+                'concepto.max' => 'El concepto no debe exceder 100 caracteres.',
+                
+                'monto.required' => 'El monto es obligatorio.',
+                'monto.numeric' => 'El monto debe ser un número.',
+                'monto.min' => 'El monto debe ser al menos 0.',
+                
+                'fecha_pago.required' => 'La fecha de pago es obligatoria.',
+                'fecha_pago.date' => 'La fecha debe ser válida.',
+                
+                'comprobante_img.image' => 'El archivo debe ser una imagen.',
+                'comprobante_img.max' => 'La imagen no debe exceder 4MB.',
+                'comprobante_img.mimes' => 'La imagen debe ser JPG, PNG o JPEG.',
+                
+                'estado.required' => 'El estado es obligatorio.',
+                'estado.in' => 'Estado no válido.',
+            ];
+
+            $validatedData = $request->validate([
+                'codigo_matricula' => 'required|exists:matriculas,codigo_matricula',
+                'concepto' => 'required|string|max:100',
+                'monto' => 'required|numeric|min:0',
+                'fecha_pago' => 'required|date',
+                'comprobante_img' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
+                'estado' => 'required|in:Pendiente,Finalizado',
+            ], $messages);
+
+            // Manejo de la imagen
+            if ($request->hasFile('comprobante_img')) {
+                // Eliminar imagen anterior si existe
+                if ($pago->comprobante_img && Storage::disk('public')->exists($pago->comprobante_img)) {
+                    Storage::disk('public')->delete($pago->comprobante_img);
+                }
+                $validatedData['comprobante_img'] = $request->file('comprobante_img')->store('comprobantes', 'public');
+            } else {
+                unset($validatedData['comprobante_img']); // No actualizar la imagen si no se subió una nueva
+            }
+
+            $pago->update($validatedData);
+            
+            Log::info("Pago actualizado", ['pago' => $pago]);
+
+            return redirect()->route('pagos.index')
+                ->with('success', 'Pago actualizado con éxito');
+
+        } catch (ValidationException $e) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors($e->validator);
+
+        } catch (Exception $e) {
+            Log::error("Error al actualizar pago", ['error' => $e->getMessage()]);
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error al actualizar el pago: ' . $e->getMessage());
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $pago = Pago::findOrFail($id);
+
+            // Eliminar imagen si existe
+            if ($pago->comprobante_img && Storage::disk('public')->exists($pago->comprobante_img)) {
+                Storage::disk('public')->delete($pago->comprobante_img);
+            }
+
+            $pago->delete();
+            
+            Log::info("Pago eliminado", ['id_pago' => $id]);
+
+            return redirect()->route('pagos.index')
+                ->with('success', 'Pago eliminado con éxito');
+
+        } catch (Exception $e) {
+            Log::error("Error al eliminar pago", ['error' => $e->getMessage()]);
+            return redirect()->back()
+                ->with('error', 'Error al eliminar el pago: ' . $e->getMessage());
+        }
     }
 }

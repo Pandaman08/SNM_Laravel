@@ -41,4 +41,8 @@ class Estudiante extends Model
         return $this->belongsToMany(Tutor::class, 'estudiantes_tutores', 'codigo_estudiante', 'id_tutor')
                     ->withPivot('tipo_relacion');
     }
+      public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
+    }
 }
