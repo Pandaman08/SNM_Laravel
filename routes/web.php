@@ -16,8 +16,7 @@ use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\TutorController;
 use App\Http\Controllers\PeriodoController;
 use App\Http\Controllers\AnioEscolarController;
-
-
+use App\Http\Controllers\TipoCalificacionController;
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
 Route::post('/', [UserController::class, 'login'])->name('login');
@@ -62,3 +61,5 @@ Route::get('/docentes/buscar', [AdminController::class, 'showDocente'])->name('d
 Route::resource('periodos', PeriodoController::class);
 
 Route::resource('anios-escolares', AnioEscolarController::class);
+
+Route::resource('tipos-calificacion', TipoCalificacionController::class)->except(['show']);
