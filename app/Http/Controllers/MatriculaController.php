@@ -284,7 +284,7 @@ class MatriculaController extends Controller
             'detallesAsignatura.asignatura'
         ])->where('codigo_matricula', $codigo_matricula)->firstOrFail();
 
-        return view('matriculas.show', compact('matricula'));
+        return view('pages.admin.matriculas.show', compact('matricula'));
     }
 
     public function obtenerGrados(Request $request)

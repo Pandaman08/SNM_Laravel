@@ -12,18 +12,18 @@ use Exception;
 
 class PagoController extends Controller
 {
-    
-         public function index(Request $request)
+
+    public function index(Request $request)
     {
         $searchTerm = $request->input('buscarpor');
-        
+
         $pagos = Pago::with('matricula.estudiante')
-            ->when($searchTerm, function($query) use ($searchTerm) {
-                $query->where('concepto', 'like', '%'.$searchTerm.'%')
-                      ->orWhereHas('matricula.estudiante', function($q) use ($searchTerm) {
-                          $q->where('nombre', 'like', '%'.$searchTerm.'%')
-                            ->orWhere('apellido', 'like', '%'.$searchTerm.'%');
-                      });
+            ->when($searchTerm, function ($query) use ($searchTerm) {
+                $query->where('concepto', 'like', '%' . $searchTerm . '%')
+                    ->orWhereHas('matricula.estudiante', function ($q) use ($searchTerm) {
+                        $q->where('nombre', 'like', '%' . $searchTerm . '%')
+                            ->orWhere('apellido', 'like', '%' . $searchTerm . '%');
+                    });
             })
             ->orderBy('fecha_pago', 'desc')
             ->paginate(10)
@@ -35,10 +35,10 @@ class PagoController extends Controller
         ]);
     }
 
-    public function create()
+    public function create($codigo)
     {
-        $matriculas = Matricula::with('estudiante')->get();
-        return view('pages.admin.pagos.create', compact('matriculas'));
+        $matricula = Matricula::findOrFail($codigo);
+        return view('pages.admin.pagos.create', compact('matricula'));
     }
 
     public function store(Request $request)
@@ -47,24 +47,23 @@ class PagoController extends Controller
             $messages = [
                 'codigo_matricula.required' => 'La matrícula es obligatoria.',
                 'codigo_matricula.exists' => 'La matrícula seleccionada no es válida.',
-                
+
                 'concepto.required' => 'El concepto es obligatorio.',
                 'concepto.string' => 'El concepto debe ser texto.',
                 'concepto.max' => 'El concepto no debe exceder 100 caracteres.',
-                
+
                 'monto.required' => 'El monto es obligatorio.',
                 'monto.numeric' => 'El monto debe ser un número.',
                 'monto.min' => 'El monto debe ser al menos 0.',
-                
+
                 'fecha_pago.required' => 'La fecha de pago es obligatoria.',
                 'fecha_pago.date' => 'La fecha debe ser válida.',
-                
+
                 'comprobante_img.image' => 'El archivo debe ser una imagen.',
                 'comprobante_img.max' => 'La imagen no debe exceder 4MB.',
                 'comprobante_img.mimes' => 'La imagen debe ser JPG, PNG o JPEG.',
-                
-                'estado.required' => 'El estado es obligatorio.',
-                'estado.in' => 'Estado no válido.',
+
+
             ];
 
             $validatedData = $request->validate([
@@ -73,7 +72,7 @@ class PagoController extends Controller
                 'monto' => 'required|numeric|min:0',
                 'fecha_pago' => 'required|date',
                 'comprobante_img' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
-                'estado' => 'required|in:Pendiente,Finalizado',
+
             ], $messages);
 
             $rutaImagen = null;
@@ -87,12 +86,12 @@ class PagoController extends Controller
                 'monto' => $validatedData['monto'],
                 'fecha_pago' => $validatedData['fecha_pago'],
                 'comprobante_img' => $rutaImagen,
-                'estado' => $validatedData['estado']
+                'estado' => 'Pendiente'
             ]);
-            
+
             Log::info("Nuevo pago registrado", ['pago' => $pago]);
 
-            return redirect()->route('pagos.index')
+            return redirect()->route('matriculas.mis-matriculas')
                 ->with('success', 'Pago registrado con éxito');
 
         } catch (ValidationException $e) {
@@ -112,11 +111,20 @@ class PagoController extends Controller
     {
         $pago = Pago::findOrFail($id);
         $matriculas = Matricula::with('estudiante')->get();
-        
+
         return view('pages.admin.pagos.edit', [
             'pago' => $pago,
             'matriculas' => $matriculas
         ]);
+    }
+    public function show($id_pago)
+    {
+        $pago = Pago::with([
+            'matricula.estudiante.persona',
+            'matricula.seccion.grado.nivelEducativo'
+        ])->findOrFail($id_pago);
+
+        return view('pages.admin.pagos.show', compact('pago'));
     }
 
     public function update(Request $request, $id)
@@ -127,22 +135,22 @@ class PagoController extends Controller
             $messages = [
                 'codigo_matricula.required' => 'La matrícula es obligatoria.',
                 'codigo_matricula.exists' => 'La matrícula seleccionada no es válida.',
-                
+
                 'concepto.required' => 'El concepto es obligatorio.',
                 'concepto.string' => 'El concepto debe ser texto.',
                 'concepto.max' => 'El concepto no debe exceder 100 caracteres.',
-                
+
                 'monto.required' => 'El monto es obligatorio.',
                 'monto.numeric' => 'El monto debe ser un número.',
                 'monto.min' => 'El monto debe ser al menos 0.',
-                
+
                 'fecha_pago.required' => 'La fecha de pago es obligatoria.',
                 'fecha_pago.date' => 'La fecha debe ser válida.',
-                
+
                 'comprobante_img.image' => 'El archivo debe ser una imagen.',
                 'comprobante_img.max' => 'La imagen no debe exceder 4MB.',
                 'comprobante_img.mimes' => 'La imagen debe ser JPG, PNG o JPEG.',
-                
+
                 'estado.required' => 'El estado es obligatorio.',
                 'estado.in' => 'Estado no válido.',
             ];
@@ -168,7 +176,7 @@ class PagoController extends Controller
             }
 
             $pago->update($validatedData);
-            
+
             Log::info("Pago actualizado", ['pago' => $pago]);
 
             return redirect()->route('pagos.index')
@@ -198,7 +206,7 @@ class PagoController extends Controller
             }
 
             $pago->delete();
-            
+
             Log::info("Pago eliminado", ['id_pago' => $id]);
 
             return redirect()->route('pagos.index')

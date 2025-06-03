@@ -19,7 +19,7 @@
                     </button>
                 </form>
             </div>
-            <a href="{{route('pagos.create')}}" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-700">
+            <a href="" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-700">
                 Registrar Pago
             </a>
         </div>

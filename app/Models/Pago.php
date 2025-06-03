@@ -21,4 +21,10 @@ class Pago extends Model
         'comprobante_img',
         'estado',
     ];
+
+    public function matricula()
+    {
+        return $this->hasOne(Matricula::class, 'codigo_matricula');
+    }
+
 }
