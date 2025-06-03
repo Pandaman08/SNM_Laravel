@@ -59,6 +59,9 @@ Route::get('/matriculas/crear', [MatriculaController::class, 'create'])->name('m
 Route::post('/matriculas', [MatriculaController::class, 'store'])->name('matriculas.store');
 Route::get('/matriculas/{codigo_matricula}', [MatriculaController::class, 'show'])->name('matriculas.show');
 
+Route::get('/matriculas/{matricula}/ficha', [MatriculaController::class, 'generarFicha'])
+     ->name('matriculas.ficha');
+     
 // Rutas para tutores
 Route::get('/mis-matriculas', [MatriculaController::class, 'misMatriculas'])->name('matriculas.mis-matriculas');
 Route::get('/solicitar-matricula', [MatriculaController::class, 'createTutor'])->name('matriculas.create-tutor');
