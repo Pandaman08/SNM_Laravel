@@ -4,22 +4,19 @@ use App\Http\Controllers\SecretariaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
-
-
+use App\Http\Controllers\TutorController;
+use App\Http\Controllers\EstudianteController;
+use App\Http\Controllers\AsistenciaController;
+use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\GradoController;
 use App\Http\Controllers\SeccionController;
 use App\Http\Controllers\AsignaturaController;
-
-
-
-use App\Http\Controllers\TutorController;
 use App\Http\Controllers\MatriculaController;
-use App\Http\Controllers\EstudianteController;
-use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\PeriodoController;
 use App\Http\Controllers\AnioEscolarController;
 use App\Http\Controllers\TipoCalificacionController;
 use App\Http\Controllers\PagoController;
+
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
 Route::post('/', [UserController::class, 'login'])->name('login');
@@ -49,7 +46,7 @@ Route::resource('asignaturas', AsignaturaController::class);
 // Route::get('tutores', [TutorController::class, 'indexTutores'])->name('tutores.index');
 Route::get('/tutores/aprobar', [AdminController::class, 'index_tutor'])->name('tutores.panel-aprobar');
 Route::post('/tutores/{id}/approve', [AdminController::class, 'approveUser'])->name('person.approve');
-  Route::delete('tutores/tutor/{id}', [AdminController::class, 'destroy_person'])->name('person.destroy_person');
+Route::delete('tutores/tutor/{id}', [AdminController::class, 'destroy_person'])->name('person.destroy_person');
 Route::get('/tutor/register', [TutorController::class, 'create'])->name('tutor.register');
 Route::post('/tutor/register', [TutorController::class, 'store'])->name('tutor.store');
 //-------------------------Matriculas-----------------------------------
@@ -82,7 +79,9 @@ Route::get('/buscar-estudiante', [MatriculaController::class, 'buscarEstudiante'
 Route::get('estudiantes',[EstudianteController::class,'index'])->name('estudiantes.index');
 Route::get('/estudiantes/buscar',[AdminController::class,'showEstudiante'])->name('estudiantes.buscar');
 
-// ------------------- docentes----------------
+//------------------------ docentes ---------------------------------
+//Route::get('/docentes',[DocenteController::class, 'index'])->name('docente');
+//Route::get('/docentes/create',[DocenteController::class, 'create'])->name('docente.create');
 Route::get('/docentes/buscar', [AdminController::class, 'showDocente'])->name('docentes.buscar');
 
 // ------------------------ tesoreros -------------------------
@@ -92,8 +91,9 @@ Route::get('/tesoreros/buscar', [SecretariaController::class, 'showTesoreros'])-
 // ---------- periodos -----------
 
 Route::resource('periodos', PeriodoController::class);
-
 Route::resource('anios-escolares', AnioEscolarController::class);
+
+// ---------- Competencia ---------------------------------------------------
 
 Route::resource('tipos-calificacion', TipoCalificacionController::class)->except(['show']);
 

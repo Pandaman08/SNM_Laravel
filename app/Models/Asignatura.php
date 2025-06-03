@@ -5,12 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+    // ASOCIAR EL id_competencias aqui dentro. Como lo hago?
+
 class Asignatura extends Model
 {
     use HasFactory;
-
+    protected $table = 'asignaturas';
     protected $primaryKey = 'codigo_asignatura';
-    
+    public $incrementing = true; // true por defecto, pero lo aclaramos por seguridad
+    protected $keyType = 'int';
+
     protected $fillable = [
         'id_grado',
         'nombre'

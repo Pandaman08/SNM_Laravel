@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="/admin/dist/css/style.css">
-
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet"> -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -19,7 +19,7 @@
     <aside
         class="fixed left-0 top-0 w-[300px] h-full bg-[#0f1657] p-4 z-50 sidebar-menu transition-transform overflow-y-auto shadow-2xl">
         <a href="" class="flex items-center py-8 border-b border-b-[#98C560]">
-            <img src="/images/logo-bruning2.png" alt="logo_labcam" class="max-w-full">
+            <img src="/images/logo-bruning2.png" alt="logo_bruning" class="max-w-full">
         </a>
         <ul class="mt-8">
             @auth
@@ -314,15 +314,31 @@
                             </li>
                         </ul>
                     </li>
+
                     <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
                         <a
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
                             <i class="ri-instance-line mr-3 text-lg"></i>
-                            <span class="text-sm">Gestionar Periodos</span>
+
+                            <span class="text-sm">Gestionar Docentes</span>
+
+                        <!--    <span class="text-sm">Gestionar Periodos</span>  -->
                             <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                         </a>
                         <ul class="pl-7 mt-2 hidden group-[.selected]:block">
                             <li class="mb-4">
+                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('person') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Registrar Docente
+                                </a>
+                            </li>
+                            <li class="mb-4">
+                                <a href=" " class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Listar Docente
+
                                 <a href="{{ route('periodos.index') }}"
                                     class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                                     <span
@@ -672,7 +688,7 @@
                             @elseif(Auth::check())
                                 <div
                                     class="w-12 h-12 bg-gray-300 text-gray-700 flex items-center justify-center rounded-full text-xl font-bold uppercase">
-                                    {{ substr(Auth::user()->persona->name, 0, 1) }}
+                                    {{ substr(Auth::user()->persona->name, 0, 1) }}                                 
                                 </div>
                             @endif
                         </div>
