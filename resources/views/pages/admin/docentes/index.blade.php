@@ -54,7 +54,7 @@
                                     <div class="px-8 py-0.1 text-center">
                                         <button
                                             class="w-8 h-8 flex items-center justify-start rounded shadow cursor-pointer"
-                                            onclick="openModal('{{ Storage::url('' . Auth::user()->persona->photo) }}', 'image')">
+                                            onclick="openModal('{{ Storage::url('' . $usuario->persona->photo) }}', 'image')">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
                                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                                 class="w-6 h-6" viewBox="0 0 24 24">
@@ -71,7 +71,7 @@
                             </td>
                             <td class="px-4 py-3 flex items-center justify-center space-x-4">
 
-                                 <button type="button" onclick="openAsignaturasModal(this)"
+                                <button type="button" onclick="openAsignaturasModal(this)"
                                     cursos-docente='@json($usuario->docente)'
                                     class="text-yellow-500 hover:text-yellow-700 flex items-center justify-center mt-2">
                                     <svg class="h-6 w-6" fill="#036ffc" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg" stroke="#036ffc"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M1750.21 0v1468.235h-225.882v338.824h169.412V1920H451.387c-82.447 0-161.506-36.141-214.701-99.388-43.934-51.953-67.652-116.33-67.652-182.965V282.353C169.034 126.494 295.528 0 451.387 0H1750.21Zm-338.823 1468.235H463.81c-89.223 0-166.136 59.86-179.576 140.047-1.242 9.036-2.259 18.07-2.259 27.106v2.26c0 40.658 13.553 77.928 40.659 109.552 32.753 38.4 79.059 59.859 128.753 59.859h960v-112.941H409.599v-112.942h1001.788v-112.94Zm225.882-1355.294H451.387c-92.725 0-169.412 75.67-169.412 169.412v1132.8c50.824-37.27 113.958-59.859 181.835-59.859h1173.46V112.941ZM1354.882 903.53v112.942H564.294V903.529h790.588Zm56.47-564.705v451.764H507.825V338.824h903.529Zm-112.94 112.94H620.765v225.883h677.647V451.765Z" fill-rule="evenodd"></path> </g></svg>
@@ -189,7 +189,7 @@
                                 <label for="edit_name" class="block text-gray-700">Nombres:</label>
                                 <input type="text" id="edit_name" name="name"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
 
@@ -198,7 +198,7 @@
                                 <label for="edit_lastname" class="block text-gray-700">Apellidos:</label>
                                 <input type="text" id="edit_lastname" name="lastname"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
 
@@ -207,7 +207,7 @@
                                 <label for="edit_dni" class="block text-gray-700">DNI:</label>
                                 <input type="text" id="edit_dni" name="dni"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
 
@@ -216,7 +216,7 @@
                                 <label for="edit_phone" class="block text-gray-700">Teléfono:</label>
                                 <input type="text" id="edit_phone" name="phone"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
 
@@ -225,7 +225,7 @@
                                 <label for="edit_sexo" class="block text-gray-700">Sexo:</label>
                                 <select id="edit_sexo" name="sexo"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="M">Masculino</option>
                                     <option value="F">Femenino</option>
                                 </select>
@@ -239,7 +239,7 @@
                                 <label for="edit_email" class="block text-gray-700">Email:</label>
                                 <input type="email" id="edit_email" name="email"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
 
@@ -248,7 +248,7 @@
                                 <label for="edit_rol" class="block text-gray-700">Rol:</label>
                                 <select id="edit_rol" name="rol"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     @foreach ($roles as $role)
                                         <option value="{{ $role->value }}">{{ $role->name }}</option>
                                     @endforeach
@@ -260,7 +260,7 @@
                                 <label for="edit_estado_civil" class="block text-gray-700">Estado Civil:</label>
                                 <select id="edit_estado_civil" name="estado_civil"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="S">Soltero/a</option>
                                     <option value="C">Casado/a</option>
                                     <option value="D">Divorciado/a</option>
@@ -273,7 +273,7 @@
                                 <label for="edit_address" class="block text-gray-700">Dirección:</label>
                                 <input type="text" id="edit_address" name="address"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
 
@@ -282,7 +282,7 @@
                                 <label for="edit_fecha_nacimiento" class="block text-gray-700">Fecha Nacimiento:</label>
                                 <input type="date" id="edit_fecha_nacimiento" name="fecha_nacimiento"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
                         </div>
@@ -362,11 +362,11 @@
 
                         <!-- Columna Izquierda -->
                         <div class="space-y-4">
-                              <div>
+                            <div>
                                 <label for="edit_fecha_nacimiento" class="block text-gray-700">Fecha:</label>
                                 <input type="date" id="edit_fecha_nacimiento" name="fecha_nacimiento"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
                         </div>
@@ -374,13 +374,13 @@
                         <!-- Columna Derecha -->
                         <div class="space-y-4">
 
-                          
+                        
                             <!-- Estado Civil -->
                             <div>
                                 <label for="edit_estado_civil" class="block text-gray-700">Estado Civil:</label>
                                 <select id="edit_estado_civil" name="estado_civil"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="S">Soltero/a</option>
                                     <option value="C">Casado/a</option>
                                     <option value="D">Divorciado/a</option>
@@ -523,9 +523,9 @@
         function openAsignaturasModal(button) {
             const user = JSON.parse(button.getAttribute('docente-cursos'));
 
-         
+        
 
-         
+        
 
             // Mostrar el modal
             document.getElementById('asignaturasModal').classList.remove('hidden');

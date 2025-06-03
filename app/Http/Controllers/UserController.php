@@ -33,8 +33,11 @@ class UserController extends Controller
         ]);
 
         if (Auth::attempt($request->only('email', 'password'))) {
-            // return redirect()->route('dashboard')->with('success', 'Sesión iniciada correctamente')
-            // $user = Auth::user();
+             $user = Auth::user();
+             if (!$user->estado) {
+                Auth::logout();
+                return back()->withErrors(['email' => 'Tu cuenta aún no ha sido aprobada por un administrador.'])->withInput();
+            }
 
             return redirect()->route('home')->with('success', 'Sesión iniciada correctamente');
         }
@@ -56,9 +59,7 @@ class UserController extends Controller
         $users = User::where('estado', true)
             ->when($query, function ($queryBuilder) use ($query) {
                 $queryBuilder->where(function ($q) use ($query) {
-                    $q->where('name', 'like', '%' . $query . '%')
-                        ->orWhere('lastname', 'like', '%' . $query . '%')
-                        ->orWhere('email', 'like', '%' . $query . '%');
+                    $q->Where('email', 'like', '%' . $query . '%');
                 });
             })
             ->paginate(10);

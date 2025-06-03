@@ -10,11 +10,12 @@ class Matricula extends Model
     use HasFactory;
 
     protected $primaryKey = 'codigo_matricula';
-    
+
     protected $fillable = [
         'codigo_estudiante',
         'id_anio_escolar',
         'id_tipo_matricula',
+        'estado_validacion',
         'seccion_id', // ← AGREGAR FK a secciones
         'fecha'
     ];
@@ -23,7 +24,7 @@ class Matricula extends Model
 
     public function estudiante()
     {
-        return $this->belongsTo(Estudiante::class, 'codigo_estudiante', 'codigo_estudiante');
+        return $this->hasOne(Estudiante::class, 'codigo_estudiante', 'codigo_estudiante');
     }
 
     public function anioEscolar()
@@ -47,8 +48,12 @@ class Matricula extends Model
         return $this->hasMany(DetalleAsignatura::class, 'codigo_matricula', 'codigo_matricula');
     }
 
-    public function pagos()
+    public function pago()
     {
-        return $this->hasMany(Pago::class, 'codigo_matricula', 'codigo_matricula');
+        return $this->belongsTo(Pago::class, 'id_pago', 'id_pago');
     }
+    public function pagos()
+{
+    return $this->hasMany(Pago::class, 'codigo_matricula', 'codigo_matricula');
+}
 }

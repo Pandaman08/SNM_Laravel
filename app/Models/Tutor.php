@@ -28,5 +28,10 @@ class Tutor extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
+
+     public function detalles()
+    {
+         return $this->hasMany(EstudianteTutor::class, 'codigo_estudiante', 'codigo_estudiante');
+    }
 }
 
