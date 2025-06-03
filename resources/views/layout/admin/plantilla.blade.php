@@ -102,6 +102,22 @@
                                     Panel Docentes
                                 </a>
                             </li>
+                             <li class="mb-4">
+                                <a href="{{ route('tesoreros.buscar') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Panel Tesoreros
+                                </a>
+                            </li>
+                               <li class="mb-4">
+                                <a href="{{ route('estudiantes.buscar') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Panel Estudiantes
+                                </a>
+                            </li>
 
                             <li class="mb-4">
                                 <a href="{{ route('tutores.panel-aprobar') }}"

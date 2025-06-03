@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SecretariaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
@@ -79,9 +80,14 @@ Route::get('/buscar-estudiante', [MatriculaController::class, 'buscarEstudiante'
 
 //------------------------ estudiantes ---------------------------------
 Route::get('estudiantes',[EstudianteController::class,'index'])->name('estudiantes.index');
+Route::get('/estudiantes/buscar',[AdminController::class,'showEstudiante'])->name('estudiantes.buscar');
 
 // ------------------- docentes----------------
 Route::get('/docentes/buscar', [AdminController::class, 'showDocente'])->name('docentes.buscar');
+
+// ------------------------ tesoreros -------------------------
+Route::get('/tesoreros/buscar', [SecretariaController::class, 'showTesoreros'])->name('tesoreros.buscar');
+
 
 // ---------- periodos -----------
 

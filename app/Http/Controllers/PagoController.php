@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Exception;
+use Illuminate\Support\Str;
 
 class PagoController extends Controller
 {
@@ -44,6 +45,7 @@ class PagoController extends Controller
     public function store(Request $request)
     {
         try {
+            $this->handleFileSize();
             $messages = [
                 'codigo_matricula.required' => 'La matrícula es obligatoria.',
                 'codigo_matricula.exists' => 'La matrícula seleccionada no es válida.',
@@ -130,6 +132,7 @@ class PagoController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            $this->handleFileSize();
             $pago = Pago::findOrFail($id);
 
             $messages = [
@@ -217,5 +220,12 @@ class PagoController extends Controller
             return redirect()->back()
                 ->with('error', 'Error al eliminar el pago: ' . $e->getMessage());
         }
+    }
+
+    public function handleFileSize()
+    {
+        ini_set('post_max_size', '10M');
+        ini_set('upload_max_filesize', '10M');
+        ini_set('max_execution_time', '300');
     }
 }

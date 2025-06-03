@@ -38,8 +38,8 @@
                     <p class="text-sm text-gray-500">Nivel/Grado/Sección</p>
                     <p class="font-medium">
                         {{ $pago->matricula->seccion->grado->nivelEducativo->nombre ?? 'N/A' }} /
-                        {{ $pago->matricula->seccion->grado->nombre ?? 'N/A' }} /
-                        {{ $pago->matricula->seccion->nombre ?? 'N/A' }}
+                        {{ $pago->matricula->seccion->grado->grado ?? 'N/A' }} /
+                        {{ $pago->matricula->seccion->seccion ?? 'N/A' }}
                     </p>
                 </div>
             </div>
