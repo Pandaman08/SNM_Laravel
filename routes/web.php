@@ -88,4 +88,6 @@ Route::resource('anios-escolares', AnioEscolarController::class);
 
 Route::resource('tipos-calificacion', TipoCalificacionController::class)->except(['show']);
 
-Route::resource('pagos', PagoController::class)->except(['show']);
+Route::resource('pagos', PagoController::class)->except(['create']);
+
+Route::get('/pagos/create/{matricula}', [PagoController::class, 'create'])->name('pagos.create');
