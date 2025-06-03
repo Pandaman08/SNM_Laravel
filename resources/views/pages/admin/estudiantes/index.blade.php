@@ -6,13 +6,13 @@
     <div class="max-w-screen-2xl mx-auto my-8 px-4">
 
         <div class="text-center mb-6">
-            <h1 class="text-2xl font-bold text-[#2e5382]">Tesoreros</h1>
+            <h1 class="text-2xl font-bold text-[#2e5382]">Alumnos</h1>
             <div class="w-1/4 mx-auto h-0.5 bg-[#64d423]"></div>
         </div>
 
         <div class="flex justify-between mb-6">
             <div class="flex space-x-4">
-                <input type="text" id="search" placeholder="Buscar por nombre o email" class="px-4 py-2 border rounded"
+                <input type="text" id="search" placeholder="Buscar por email" class="px-4 py-2 border rounded"
                     oninput="buscarUsuarios(this.value)">
             </div>
             <button class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-700" onclick="openCreateModal()">
@@ -26,7 +26,6 @@
                     <tr>
                         <th class="px-4 py-3">Nombre</th>
                         <th class="px-4 py-3">Apellido</th>
-                        <th class="px-4 py-3">Email</th>
                         <th class="px-4 py-3">Teléfono</th>
                         <th class="px-4 py-3">Dirección</th>
 
@@ -39,7 +38,6 @@
                         <tr class="border-b hover:bg-gray-50">
                             <td class="px-4 py-3">{{ $usuario->persona->name }}</td>
                             <td class="px-4 py-3">{{ $usuario->persona->lastname }}</td>
-                            <td class="px-4 py-3">{{ $usuario->email }}</td>
                             <td class="px-4 py-3">{{ $usuario->persona->phone }}</td>
                             <td class="px-4 py-3">{{ $usuario->persona->address }}</td>
                             <td class="px-4 py-3">
@@ -104,46 +102,86 @@
             <h2 class="text-xl font-bold mb-2">Crear Usuario</h2>
             <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="mb-4">
-                    <label for="name" class="block">Nombre</label>
-                    <input type="text" id="name" name="name" class="w-full px-4 py-2 border rounded" required>
-                </div>
-                <div class="mb-4">
-                    <label for="lastname" class="block">Apellido</label>
-                    <input type="text" id="lastname" name="lastname" class="w-full px-4 py-2 border rounded" required>
-                </div>
-                <div class="mb-4">
-                    <label for="email" class="block">Email</label>
-                    <input type="email" id="email" name="email" class="w-full px-4 py-2 border rounded" required>
-                </div>
-                <div class="mb-4">
-                    <label for="password" class="block">Contraseña</label>
-                    <div class="relative">
-                        <input type="password" id="password" name="password" class="w-full px-4 py-2 border rounded"
-                            oninput="validatePassword()" required>
-                        <button type="button" class="absolute inset-y-0 right-0 px-3 text-gray-600"
-                            onclick="togglePasswordVisibility('password')">
-                            👁️
-                        </button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="mb-4">
+                            <label for="name" class="block">Nombre</label>
+                            <input type="text" id="name" name="name" class="w-full px-4 py-2 border rounded"
+                                required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="lastname" class="block">Apellido</label>
+                            <input type="text" id="lastname" name="lastname" class="w-full px-4 py-2 border rounded"
+                                required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="lastname" class="block">DNI</label>
+                            <input type="text" id="dni" name="dni" class="w-full px-4 py-2 border rounded"
+                                required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="email" class="block">Email</label>
+                            <input type="email" id="email" name="email" class="w-full px-4 py-2 border rounded"
+                                required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="block">Contraseña</label>
+                            <div class="relative">
+                                <input type="password" id="password" name="password"
+                                    class="w-full px-4 py-2 border rounded" oninput="validatePassword()" required>
+                                <button type="button" class="absolute inset-y-0 right-0 px-3 text-gray-600"
+                                    onclick="togglePasswordVisibility('password')">
+                                    👁️
+                                </button>
+                            </div>
+                            <div id="password-strength" class="text-sm mt-2"></div>
+
+                        </div>
                     </div>
-                    <div id="password-strength" class="text-sm mt-2"></div>
-                </div>
 
+                    <div class="space-y-4">
+                        <div class="mb-4">
+                            <label for="phone" class="block">Teléfono</label>
+                            <input type="text" id="phone" name="phone" class="w-full px-4 py-2 border rounded"
+                                required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="address" class="block">Dirección</label>
+                            <input type="text" id="address" name="address" class="w-full px-4 py-2 border rounded"
+                                required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="esexo" class="block text-gray-700">Sexo:</label>
+                            <select id="sexo" name="sexo" class="w-full px-4 py-2 border rounded">
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="estado_civil" class="block text-gray-700">Estado Civil:</label>
+                            <select id="estado_civil" name="estado_civil"
+                                class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="S">Soltero/a</option>
+                                <option value="C">Casado/a</option>
+                                <option value="D">Divorciado/a</option>
+                                <option value="V">Viudo/a</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="fecha_nacimiento" class="block text-gray-700">Fecha Nacimiento:</label>
+                            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento"
+                                class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required>
+                        </div>
 
-                <div class="mb-4">
-                    <label for="phone" class="block">Teléfono</label>
-                    <input type="text" id="phone" name="phone" class="w-full px-4 py-2 border rounded"
-                        required>
-                </div>
-                <div class="mb-4">
-                    <label for="address" class="block">Dirección</label>
-                    <input type="text" id="address" name="address" class="w-full px-4 py-2 border rounded"
-                        required>
-                </div>
-                <div class="mb-4">
-                    <label for="photo" class="block">Foto</label>
-                    <input type="file" id="photo" name="photo" class="w-full px-2 py-1 border rounded"
-                        accept="image/jpeg,image/png">
+                        <div class="mb-4">
+                            <label for="photo" class="block">Foto</label>
+                            <input type="file" id="photo" name="photo" class="w-full px-2 py-1 border rounded"
+                                accept="image/jpeg,image/png">
+                        </div>
+                    </div>
                 </div>
                 <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-700">Guardar</button>
             </form>
@@ -240,6 +278,7 @@
                                 </select>
                             </div>
 
+
                             <!-- Estado Civil -->
                             <div>
                                 <label for="edit_estado_civil" class="block text-gray-700">Estado Civil:</label>
@@ -302,9 +341,9 @@
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 7l-.867 12.142A2 2 0
-                                                                                                     0116.138 21H7.862a2 2 0
-                                                                                                     01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2
-                                                                                                     0 00-2-2H9a2 2 0 00-2 2v2m3 0h4" />
+                                                                                                                 0116.138 21H7.862a2 2 0
+                                                                                                                 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2
+                                                                                                                 0 00-2-2H9a2 2 0 00-2 2v2m3 0h4" />
                                 </svg>
                             </button>
                             <input type="file" id="edit_photo" name="photo" class="hidden"
@@ -366,6 +405,17 @@
                 }
             });
         </script>
+    @elseif (session('success'))
+        <script>
+            Swal.fire({
+                title: "Registrado!",
+                text: "{{ session('success') }}",
+                icon: "success",
+                customClass: {
+                    confirmButton: 'bg-green-500 text-white hover:bg-green-600 focus:ring-2 focus:ring-green-300 rounded-lg py-2 px-4'
+                }
+            });
+        </script>
     @elseif (session('success-destroy'))
         <script>
             Swal.fire({
@@ -374,6 +424,19 @@
                 icon: "success",
                 customClass: {
                     confirmButton: 'bg-green-500 text-white hover:bg-green-600 focus:ring-2 focus:ring-green-300 rounded-lg py-2 px-4'
+                }
+            });
+        </script>
+    @elseif (session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: '¡Hubo un error!',
+                html: "{!! session('error') !!}",
+                showConfirmButton: true,
+                confirmButtonText: 'Aceptar',
+                customClass: {
+                    confirmButton: 'bg-red-500 text-white hover:bg-red-600 focus:ring-2 focus:ring-red-300 rounded-lg py-2 px-4'
                 }
             });
         </script>
@@ -400,7 +463,7 @@
             document.getElementById('edit_sexo').value = user.persona.sexo;
             document.getElementById('edit_estado_civil').value = user.persona.estado_civil;
             document.getElementById('edit_address').value = user.persona.address;
-            console.log("fecha nacimiento: ",user.persona.fecha_nacimiento)
+            console.log("fecha nacimiento: ", user.persona.fecha_nacimiento)
             document.getElementById('edit_fecha_nacimiento').value = user.persona.fecha_nacimiento;
             document.getElementById('edit_email').value = user.email;
             document.getElementById('edit_rol').value = user.rol;
@@ -493,7 +556,7 @@
             document.getElementById('deleteModal').classList.remove('hidden');
             document.getElementById('usuarioNombre').innerText = firstname;
             const form = document.getElementById('deleteForm');
-           
+
 
         }
 
@@ -502,7 +565,7 @@
         }
 
         function buscarUsuarios(query) {
-            fetch(`/tesoreros/buscar?search=${query}`, {
+            fetch(`/estudiantes/buscar?search=${query}`, {
                     method: 'GET',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
