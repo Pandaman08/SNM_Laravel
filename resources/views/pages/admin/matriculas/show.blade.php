@@ -11,11 +11,22 @@
                 <h1 class="text-2xl font-bold text-gray-800">Detalles de Matrícula</h1>
                 <p class="text-gray-600">Código: {{ $matricula->codigo_matricula }}</p>
             </div>
-            <div>
+             <div class="flex items-center space-x-2">
                 <span class="px-3 py-1 text-xs rounded-full 
                     {{ $matricula->estado_validacion ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                     {{ $matricula->estado_validacion ? 'Validada' : 'Pendiente de validación' }}
                 </span>
+                
+                @if($matricula->estado_validacion && $matricula->pagos->where('estado', 'Finalizado')->count() > 0)
+                <a href="{{ route('matriculas.ficha', $matricula->codigo_matricula) }}" 
+                   class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center text-sm"
+                   target="_blank">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Ficha de Matrícula
+                </a>
+                @endif
             </div>
         </div>
     </div>
@@ -56,8 +67,8 @@
                 <div>
                     <p class="text-sm text-gray-500">Grado/Sección</p>
                     <p class="font-medium">
-                        {{ $matricula->seccion->grado->nombre ?? 'N/A' }} /
-                        {{ $matricula->seccion->nombre ?? 'N/A' }}
+                        {{ $matricula->seccion->grado->grado ?? 'N/A' }} /
+                        {{ $matricula->seccion->seccion ?? 'N/A' }}
                     </p>
                 </div>
                 <div>

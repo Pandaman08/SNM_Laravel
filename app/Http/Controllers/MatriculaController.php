@@ -16,6 +16,7 @@ use App\Models\Asignatura;
 use App\Models\DetalleAsignatura;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class MatriculaController extends Controller
 {
@@ -424,6 +425,28 @@ class MatriculaController extends Controller
         return "{$anio}{$numero}";
     }
 
+    public function generarFicha($codigo_matricula)
+{
+    $matricula = Matricula::with([
+        'estudiante.persona',
+        'anioEscolar',
+        'tipoMatricula',
+        'seccion.grado.nivelEducativo',
+        'detallesAsignatura.asignatura',
+        'pagos' => function($query) {
+            $query->where('estado', 'Finalizado')->latest();
+        }
+    ])->findOrFail($codigo_matricula);
+
+    // Verificar que la matrícula esté validada y tenga pagos finalizados
+    if(!$matricula->estado_validacion || $matricula->pagos->isEmpty()) {
+        return back()->with('error', 'La matrícula no está validada o no tiene pagos finalizados');
+    }
+
+    $pdf = Pdf::loadView('pages.admin.matriculas.ficha-matricula', compact('matricula'));
+    
+    return $pdf->download('ficha-matricula-'.$matricula->codigo_matricula.'.pdf');
+}
     /**
      * Generar código único para matrícula
      */
