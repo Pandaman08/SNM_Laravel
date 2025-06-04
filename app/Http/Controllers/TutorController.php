@@ -68,7 +68,8 @@ class TutorController extends Controller
                 'email' => $request->correo,
                 'password' => Hash::make($request->password),
                 'rol' => 'tutor',
-                'persona_id' => $persona->persona_id
+                'persona_id' => $persona->persona_id,
+                'estado' => false
             ]);
 
             Tutor::create([

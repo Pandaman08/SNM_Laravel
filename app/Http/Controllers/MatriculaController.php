@@ -16,6 +16,7 @@ use App\Models\Asignatura;
 use App\Models\DetalleAsignatura;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class MatriculaController extends Controller
 {
@@ -254,8 +255,9 @@ class MatriculaController extends Controller
     /**
      * Ver matrículas del tutor logueado
      */
-    public function misMatriculas()
+    public function misMatriculas(Request $request)
     {
+         $buscarpor = $request->input('buscarpor');
         $matriculas = Matricula::whereHas('estudiante', function($query) {
             $query->whereHas('tutores', function($q) {
                 $q->where('tutores.id_tutor', Auth::user()->tutor->id_tutor);
@@ -265,9 +267,9 @@ class MatriculaController extends Controller
             'tipoMatricula', 
             'anioEscolar',
             'seccion.grado.nivelEducativo'
-        ])->orderBy('fecha', 'desc')->get();
+        ])->orderBy('fecha', 'desc')->paginate(10);
 
-        return view('matriculas.mis-matriculas', compact('matriculas'));
+        return view('pages.admin.tutor.matriculas', compact('matriculas','buscarpor'));
     }
 
     /**
@@ -283,7 +285,7 @@ class MatriculaController extends Controller
             'detallesAsignatura.asignatura'
         ])->where('codigo_matricula', $codigo_matricula)->firstOrFail();
 
-        return view('matriculas.show', compact('matricula'));
+        return view('pages.admin.matriculas.show', compact('matricula'));
     }
 
     public function obtenerGrados(Request $request)
@@ -423,6 +425,28 @@ class MatriculaController extends Controller
         return "{$anio}{$numero}";
     }
 
+    public function generarFicha($codigo_matricula)
+{
+    $matricula = Matricula::with([
+        'estudiante.persona',
+        'anioEscolar',
+        'tipoMatricula',
+        'seccion.grado.nivelEducativo',
+        'detallesAsignatura.asignatura',
+        'pagos' => function($query) {
+            $query->where('estado', 'Finalizado')->latest();
+        }
+    ])->findOrFail($codigo_matricula);
+
+    // Verificar que la matrícula esté validada y tenga pagos finalizados
+    if(!$matricula->estado_validacion || $matricula->pagos->isEmpty()) {
+        return back()->with('error', 'La matrícula no está validada o no tiene pagos finalizados');
+    }
+
+    $pdf = Pdf::loadView('pages.admin.matriculas.ficha-matricula', compact('matricula'));
+    
+    return $pdf->download('ficha-matricula-'.$matricula->codigo_matricula.'.pdf');
+}
     /**
      * Generar código único para matrícula
      */

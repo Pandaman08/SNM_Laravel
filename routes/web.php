@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SecretariaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\PeriodoController;
 use App\Http\Controllers\AnioEscolarController;
 use App\Http\Controllers\TipoCalificacionController;
 use App\Http\Controllers\PagoController;
+
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
 Route::post('/', [UserController::class, 'login'])->name('login');
@@ -55,6 +57,9 @@ Route::get('/matriculas/crear', [MatriculaController::class, 'create'])->name('m
 Route::post('/matriculas', [MatriculaController::class, 'store'])->name('matriculas.store');
 Route::get('/matriculas/{codigo_matricula}', [MatriculaController::class, 'show'])->name('matriculas.show');
 
+Route::get('/matriculas/{matricula}/ficha', [MatriculaController::class, 'generarFicha'])
+     ->name('matriculas.ficha');
+     
 // Rutas para tutores
 Route::get('/mis-matriculas', [MatriculaController::class, 'misMatriculas'])->name('matriculas.mis-matriculas');
 Route::get('/solicitar-matricula', [MatriculaController::class, 'createTutor'])->name('matriculas.create-tutor');
@@ -72,17 +77,27 @@ Route::get('/buscar-estudiante', [MatriculaController::class, 'buscarEstudiante'
 
 //------------------------ estudiantes ---------------------------------
 Route::get('estudiantes',[EstudianteController::class,'index'])->name('estudiantes.index');
+Route::get('/estudiantes/buscar',[AdminController::class,'showEstudiante'])->name('estudiantes.buscar');
 
 //------------------------ docentes ---------------------------------
 //Route::get('/docentes',[DocenteController::class, 'index'])->name('docente');
 //Route::get('/docentes/create',[DocenteController::class, 'create'])->name('docente.create');
 Route::get('/docentes/buscar', [AdminController::class, 'showDocente'])->name('docentes.buscar');
 
+// ------------------------ tesoreros -------------------------
+Route::get('/tesoreros/buscar', [SecretariaController::class, 'showTesoreros'])->name('tesoreros.buscar');
+
+
 // ---------- periodos -----------
 
 Route::resource('periodos', PeriodoController::class);
 Route::resource('anios-escolares', AnioEscolarController::class);
 
+// ---------- Competencia ---------------------------------------------------
+
 Route::resource('tipos-calificacion', TipoCalificacionController::class)->except(['show']);
 
+Route::resource('pagos', PagoController::class)->except(['create']);
+
+Route::get('/pagos/create/{matricula}', [PagoController::class, 'create'])->name('pagos.create');
 Route::resource('pagos', PagoController::class)->except(['show']);
