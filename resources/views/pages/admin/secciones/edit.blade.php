@@ -16,7 +16,7 @@
                 class="w-full rounded-md border border-gray-300 p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#98C560] focus:border-[#98C560]" 
                 required aria-describedby="id_grado_help"
             >
-                <option value="" disabled {{ old('id_grado', $seccion->id_grado) ? '' : 'selected' }}>Seleccione un grado</option>
+                <option value="" disabled {{ old('id_grado', $seccion->id_grado) ? '' : 'selected' }} title="Seleccione un grado">Seleccione un grado</option>
                 @foreach ($grados as $grado)
                     <option value="{{ $grado->id_grado }}" {{ old('id_grado', $seccion->id_grado) == $grado->id_grado ? 'selected' : '' }}>
                         {{ $grado->grado }}
@@ -36,11 +36,11 @@
                 name="seccion" 
                 value="{{ old('seccion', $seccion->seccion) }}" 
                 maxlength="1" 
-                class="w-full rounded-md border border-gray-300 p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#98C560] focus:border-[#98C560]" 
+                class="w-full uppercase rounded-md border border-gray-300 p-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#98C560] focus:border-[#98C560]" 
                 required 
                 aria-describedby="seccion_help"
                 pattern="[A-Za-z]"
-                title="Ingrese una letra para la sección"
+                title="Ingrese una sola letra para la sección"
             >
             @error('seccion')
                 <p id="seccion_help" class="text-red-600 text-sm mt-1">{{ $message }}</p>
