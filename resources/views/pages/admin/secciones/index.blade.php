@@ -17,8 +17,9 @@
     @endif
 
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-semibold">Secciones registradas</h1>
-        <a href="{{ route('secciones.create') }}" class="bg-[#98C560] hover:bg-[#7aa94f] text-white px-4 py-2 rounded-md text-sm flex items-center gap-1">
+        <h1 class="text-2xl font-semibold text-gray-800">Secciones registradas</h1>
+        <a href="{{ route('secciones.create') }}" 
+            class="bg-[#98C560] hover:bg-[#7aa94f] text-white px-4 py-2 rounded-md text-sm flex items-center gap-1 shadow">
             <i class="ri-add-line text-lg"></i> Nueva sección
         </a>
     </div>
@@ -35,18 +36,28 @@
             <tbody class="divide-y divide-gray-200">
                 @forelse ($secciones as $seccion)
                     <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-3">{{ $seccion->grado->grado ?? 'N/A' }}</td>
-                        <td class="px-6 py-3">{{ $seccion->seccion }}</td>
+                        <td class="px-6 py-3">
+                            {{ $seccion->grado->grado ?? '—' }}
+                        </td>
+                        <td class="px-6 py-3 font-semibold text-gray-700">
+                            {{ $seccion->seccion }}
+                        </td>
                         <td class="px-6 py-3">
                             <div class="flex items-center space-x-2">
-                                <a href="{{ route('secciones.edit', $seccion->id_seccion) }}" class="text-blue-600 hover:text-blue-800" title="Editar">
-                                    <i class="ri-pencil-line"></i>
+                                <a href="{{ route('secciones.edit', $seccion->id_seccion) }}" 
+                                   class="text-blue-600 hover:text-blue-800 transition" 
+                                   title="Editar sección">
+                                    <i class="ri-pencil-line text-lg"></i>
                                 </a>
-                                <form action="{{ route('secciones.destroy', $seccion->id_seccion) }}" method="POST" onsubmit="return confirm('¿Eliminar sección?')">
+                                <form action="{{ route('secciones.destroy', $seccion->id_seccion) }}" 
+                                      method="POST" 
+                                      onsubmit="return confirm('¿Eliminar esta sección?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800" title="Eliminar">
-                                        <i class="ri-delete-bin-2-line"></i>
+                                    <button type="submit" 
+                                            class="text-red-600 hover:text-red-800 transition" 
+                                            title="Eliminar sección">
+                                        <i class="ri-delete-bin-2-line text-lg"></i>
                                     </button>
                                 </form>
                             </div>
