@@ -39,7 +39,7 @@ class UserController extends Controller
                 return back()->withErrors(['email' => 'Tu cuenta aún no ha sido aprobada por un administrador.'])->withInput();
             }
 
-            return redirect()->route('home')->with('success', 'Sesión iniciada correctamente');
+            return redirect()->route('home.admin')->with('success', 'Sesión iniciada correctamente');
         }
 
         return back()->withErrors(['email' => 'Las credenciales no coinciden'])->withInput();

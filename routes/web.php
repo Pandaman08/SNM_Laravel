@@ -20,7 +20,7 @@ use App\Http\Controllers\PagoController;
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
 Route::post('/', [UserController::class, 'login'])->name('login');
-Route::get('/home', [AdminController::class, 'index'])->name('home');
+Route::get('/home', [AdminController::class, 'index_admin'])->name('home.admin');
 Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 
 // ----------------------- users ---------------------------------

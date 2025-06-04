@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
-    public function index()
+    public function index_admin()
     {
         $user = Auth::user();
-        return view("pages.admin.index", compact('user'));
+        return view("pages.admin.panels.admin", compact('user'));
     }
 
     public function index_tutor()
