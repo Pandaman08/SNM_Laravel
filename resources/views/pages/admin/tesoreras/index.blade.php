@@ -6,7 +6,7 @@
     <div class="max-w-screen-2xl mx-auto my-8 px-4">
 
         <div class="text-center mb-6">
-            <h1 class="text-2xl font-bold text-[#2e5382]">Usuarios</h1>
+            <h1 class="text-2xl font-bold text-[#2e5382]">Tesoreros</h1>
             <div class="w-1/4 mx-auto h-0.5 bg-[#64d423]"></div>
         </div>
 
@@ -26,7 +26,6 @@
                     <tr>
                         <th class="px-4 py-3">Nombre</th>
                         <th class="px-4 py-3">Apellido</th>
-                        <th class="px-4 py-3">Rol</th>
                         <th class="px-4 py-3">Email</th>
                         <th class="px-4 py-3">Teléfono</th>
                         <th class="px-4 py-3">Dirección</th>
@@ -40,7 +39,6 @@
                         <tr class="border-b hover:bg-gray-50">
                             <td class="px-4 py-3">{{ $usuario->persona->name }}</td>
                             <td class="px-4 py-3">{{ $usuario->persona->lastname }}</td>
-                            <td class="px-4 py-3">{{ $usuario->rol }}</td>
                             <td class="px-4 py-3">{{ $usuario->email }}</td>
                             <td class="px-4 py-3">{{ $usuario->persona->phone }}</td>
                             <td class="px-4 py-3">{{ $usuario->persona->address }}</td>
@@ -49,7 +47,7 @@
                                     <div class="px-8 py-0.1 text-center">
                                         <button
                                             class="w-8 h-8 flex items-center justify-start rounded shadow cursor-pointer"
-                                            onclick="openModal('{{ Storage::url('' . Auth::user()->persona->photo) }}', 'image')">
+                                            onclick="openModal('{{ Storage::url('' . $usuario->persona->photo) }}', 'image')">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
                                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                                 class="w-6 h-6" viewBox="0 0 24 24">

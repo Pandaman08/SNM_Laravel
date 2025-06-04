@@ -54,6 +54,12 @@ class DatabaseSeeder extends Seeder
             ->has(\App\Models\Tutor::factory())
             ->count(20)
             ->create();
+
+        $this->call([
+            NivelesEducativosSeeder::class,  // 1° Crear niveles educativos
+            GradosSeeder::class,      // 2° Crear grados para tu estructura
+            SeccionesSeeder::class,          // 3° Crear secciones
+        ]);
     
     }
 }

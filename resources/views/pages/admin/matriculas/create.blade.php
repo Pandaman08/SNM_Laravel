@@ -3,523 +3,687 @@
 @section('title', 'Matricular')
 
 @section('contenido')
-    <div class="paper-container">
-        <div class="main-title flex flex-col items-center gap-3 mb-8">
-            <div class="title text-2xl font-semibold text-[#2e5382]">Matricular</div>
-            <div class="blue-line w-1/5 h-0.5 bg-[#64d423]"></div>
-        </div>
-
-        <form class="p-10" action="{{ route('papers.store') }}" method="post" id="form" enctype="multipart/form-data">
-            @csrf
-
-            <!-- Contenedor principal en 2 columnas -->
-            <div class="grid md:grid-cols-2 gap-6 bg-slate-200 p-6 rounded-lg">
-
-                <!-- COLUMNA IZQUIERDA -->
-                <div class="flex flex-col gap-6">
-                    <!-- TÍTULO -->
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
                     <div>
-                        <label for="titulo" class="block mb-2 text-sm font-medium text-gray-900 align-baseline">
-                            Titulo
-                        </label>
-                        <input type="text" name="titulo" id="titulo"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                                   focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            placeholder="Titulo del paper" required />
+                        <h1 class="text-2xl font-bold text-gray-900">Matrícula de Estudiante</h1>
+                        <p class="text-gray-600 mt-1">Seleccione el tipo de matrícula para continuar</p>
                     </div>
-
-                    <!-- AUTORES -->
-                    <div>
-                        <label for="autores" class="block mb-2 text-sm font-medium text-gray-900">Autores</label>
-                        <div id="authors-container" class="space-y-2">
-                            <input type="text" id="new-author"
-                                class="author-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                                       focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                placeholder="Nombre del autor" />
-                            <!-- Input oculto para enviar los autores ingresados -->
-                            <input type="hidden" name="autores" id="autores-json" />
-                        </div>
-                        <div id="dropdownSearch" class="z-20 hidden bg-white rounded-lg shadow w-60 absolute mt-8">
-                            <div class="p-3">
-                                <ul id="authors-list" class="h-auto px-3 pb-3 overflow-y-auto text-sm text-gray-700"
-                                    aria-labelledby="dropdownSearchButton">
-                                </ul>
-                                <button id="remove-authors-btn"
-                                    class="flex items-center p-3 px-10 text-sm font-medium text-red-600 border-t border-gray-200 rounded-b-lg bg-gray-50 hover:bg-gray-100">
-                                    <svg class="w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                        fill="currentColor" viewBox="0 0 20 18">
-                                        <path
-                                            d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Zm11-3h-6a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2Z" />
-                                    </svg>
-                                    Remover autor
-                                </button>
-                            </div>
-                        </div>
-                        <div class="flex justify-between">
-                            <button type="button" id="add-author-btn"
-                                class="mt-2 text-sm font-medium text-blue-500 hover:underline">
-                                + Añadir autor
-                            </button>
-                            <button type="button" id="show-authors-btn"
-                                class="mt-2 px-4 text-sm font-medium text-green-500 hover:underline">
-                                Mostrar Autores
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- FECHA DE PUBLICACIÓN -->
-                    <div>
-                        <label for="fecha_publicacion" class="block mb-2 text-sm font-medium text-gray-900">
-                            Fecha Publicación
-                        </label>
-                        <input type="date" name="fecha_publicacion" id="fecha_publicacion"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                                   focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            required />
-                    </div>
-
-                    <!-- TÓPICOS -->
-                    <div>
-                        <div class="relative">
-                            <label for="topicos" class="block mb-2 text-sm font-medium text-gray-900">Tópicos</label>
-                            <!-- Botón que activa el menú -->
-                            <button type="button" id="toggle-menu"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                                       focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-left">
-                                Selecciona Tópicos
-                            </button>
-                            <!-- Menú desplegable flotante -->
-                            <div id="topicos-menu"
-                                class="absolute z-10 w-full bg-white border border-gray-300 shadow-md rounded-lg hidden">
-                                <div class="max-h-48 overflow-y-auto p-2">
-                                    @if (!$topicos->isEmpty())
-                                        @foreach ($topicos as $topico)
-                                            <label class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md">
-                                                <input type="checkbox" value="{{ $topico->id }}" class="checkbox-topico">
-                                                <span>{{ $topico->nombre }}</span>
-                                            </label>
-                                        @endforeach
-                                    @else
-                                        <label class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md">
-                                            <span>No hay topicos registrados</span>
-                                        </label>
-                                    @endif
-                                </div>
-                            </div>
-                            <!-- Input oculto para enviar los IDs de los tópicos seleccionados -->
-                            <input type="hidden" name="topicos" id="topicos">
-                        </div>
-                    </div>
-
-                    <!-- ABSTRACT -->
-                    <div>
-                        <label for="descripcion" class="block mb-2 text-sm font-medium text-gray-900">
-                            Abstract
-                            (<span class="text-sm text-green-500 border focus:outline-none p-2 mt-2" id="char-count">1000
-                                caracteres restantes</span>)
-                        </label>
-                        <textarea
-                            class="block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding
-                                   border border-solid border-gray-300 rounded transition ease-in-out m-0
-                                   focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                            id="descripcion" name="descripcion" rows="8" placeholder="Descripción" required></textarea>
+                    <div class="text-right">
+                        <span class="text-sm text-gray-500">Año Escolar:</span>
+                        <span class="font-semibold text-blue-600">2025</span>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- COLUMNA DERECHA -->
-                <div class="flex flex-col gap-6">
-                    <!-- DOI -->
-                    <div>
-                        <label for="doi" class="block mb-2 text-sm font-medium text-gray-900">DOI</label>
-                        <input type="text" name="doi" id="doi"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                                   focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            placeholder="DOI" required />
-                    </div>
+        <!-- Mostrar mensajes de éxito o error -->
+        @if (session('success'))
+            <div class="mb-6 p-4 bg-green-100 text-green-700 rounded-lg border border-green-300">
+                {{ session('success') }}
+            </div>
+        @endif
 
-                    <!-- PUBLISHER -->
-                    <div>
-                        <label for="publisher" class="block mb-2 text-sm font-medium text-gray-900">Publisher</label>
-                        <input type="text" name="publisher" id="publisher"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                                   focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            placeholder="Nombre publisher" required />
-                    </div>
+        @if (session('error'))
+            <div class="mb-6 p-4 bg-red-100 text-red-700 rounded-lg border border-red-300">
+                {{ session('error') }}
+            </div>
+        @endif
 
-                    <!-- ÁREA -->
-                    <div>
-                        <label for="area_id" class="block mb-2 text-sm font-medium text-gray-900">Área</label>
-                        <select name="area_id" id="area"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                                   focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            required>
-                            <option value="" disabled selected>Selecciona un Area de Investigación</option>
-                            @if (!$areas->isEmpty())
-                                @foreach ($areas as $area)
-                                    <option value="{{ $area->id }}">{{ $area->nombre }}</option>
+        @if ($errors->any())
+            <div class="mb-6 p-4 bg-red-100 text-red-700 rounded-lg border border-red-300">
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <!-- Formulario -->
+        <form action="{{ route('matriculas.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+            @csrf
+            
+            <!-- Sección 1: Tipo de Matrícula (Siempre visible) -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="ri-file-list-line text-blue-500 mr-2"></i>
+                        Tipo de Matrícula
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Tipo de Matrícula -->
+                        <div>
+                            <label for="tipo_matricula_id" class="block text-sm font-medium text-gray-700 mb-2">Tipo de Matrícula *</label>
+                            <select name="tipo_matricula_id" id="tipo_matricula_id" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                    required onchange="cambiarTipoMatricula()">
+                                <option value="" disabled selected>Seleccione el tipo de matrícula</option>
+                                @foreach($tiposMatricula as $tipo)
+                                    <option value="{{ $tipo->id_tipo_matricula }}" data-nombre="{{ strtolower($tipo->nombre) }}">
+                                        {{ $tipo->nombre }}
+                                    </option>
                                 @endforeach
-                            @else
-                                <option value="none">No hay areas Registradas</option>
-                            @endif
-                        </select>
-                    </div>
+                            </select>
+                        </div>
 
-                    <!-- IMAGEN PAPER -->
-                    <div>
-                        <label for="img_filename" class="block mb-2 text-sm font-medium text-gray-900">
-                            Imagen Paper
-                        </label>
-                        <div id="image-upload"
-                            class="border-2 border-dashed border-gray-300 bg-white w-full h-[233px] flex flex-col
-                                   items-center justify-center cursor-pointer relative text-center rounded-md"
-                            onclick="document.getElementById('img_filename').click()" ondragover="handleDragOver(event)"
-                            ondrop="handleDrop(event, 'img_filename')">
-                            <!-- Placeholder (solo se ve si no hay img_filename) -->
-                            <span id="image-placeholder" class="text-gray-500 flex flex-col items-center">
-                                <svg class="w-8 h-8 mb-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 20 16" aria-hidden="true">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
-                                </svg>
-                                Selecciona o arrastra una imagen (png, jpeg, jpg, gif)
-                            </span>
-                            <!-- Vista previa -->
-                            <img id="previewImage" src="" alt="Vista previa"
-                                class="hidden w-full h-full object-cover rounded shadow mx-auto">
-                            <!-- Botón eliminar img_filename -->
-                            <button type="button" id="remove-image"
-                                class="hidden absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full
-                                       hover:bg-red-600 transition cursor-pointer"
-                                onclick="removeImage(event)">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0
-                                               0116.138 21H7.862a2 2 0
-                                               01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2
-                                               0 00-2-2H9a2 2 0 00-2 2v2m3 0h4" />
-                                </svg>
-                            </button>
-                            <input type="file" id="img_filename" name="img_filename" class="hidden"
-                                accept="image/png, image/jpeg, image/jpg" onchange="mostrarVistaPrevia(event)">
+                        <!-- Año Escolar -->
+                        <div>
+                            <label for="anio_escolar_id" class="block text-sm font-medium text-gray-700 mb-2">Año Escolar *</label>
+                            <select name="anio_escolar_id" id="anio_escolar_id" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                    required>
+                                <option value="" disabled selected>Seleccione el año escolar</option>
+                                @foreach($aniosEscolares as $anio)
+                                    <option value="{{ $anio->id_anio_escolar }}">
+                                        {{ $anio->anio }} - {{ $anio->descripcion ?? '' }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
 
-                    <!-- ARCHIVO PDF -->
-                    <div>
-                        <label for="pdf_filename" class="block mb-2 text-sm font-medium text-gray-900">
-                            Archivo PDF
-                        </label>
-                        <div id="pdf_filename-upload"
-                            class="border-2 border-dashed border-gray-300 bg-white w-full h-11 flex flex-col
-                                   items-center justify-center cursor-pointer relative text-center rounded-md"
-                            onclick="document.getElementById('pdf_filename').click()" ondragover="handleDragOver(event)"
-                            ondrop="handleDrop(event, 'pdf_filename')">
-                            <!-- Placeholder pdf_filename -->
-                            <span id="pdf_filename-placeholder" class="text-gray-500">
-                                Selecciona o arrastra un archivo PDF
-                            </span>
-                            <!-- Nombre de archivo pdf_filename -->
-                            <div id="pdf_filename-file-info" class="hidden text-sm"></div>
-                            <!-- Botón eliminar pdf_filename -->
-                            <button type="button" id="remove-pdf_filename"
-                                class="hidden absolute top-1 right-2 bg-red-500 text-white p-1 rounded-full
-                                       hover:bg-red-600 transition cursor-pointer"
-                                onclick="removepdf_filename(event)">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0
-                                               0116.138 21H7.862a2 2 0
-                                               01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2
-                                               0 00-2-2H9a2 2 0 00-2 2v2m3 0h4" />
-                                </svg>
-                            </button>
-                            <input type="file" id="pdf_filename" name="pdf_filename" class="hidden"
-                                accept="application/pdf" onchange="mostrarpdf_filename(event)">
+                    <!-- Información del tipo seleccionado -->
+                    <div id="info_tipo" class="mt-6 p-4 rounded-lg" style="display: none;">
+                        <div id="info_ingreso" class="info-tipo bg-green-50 border border-green-200" style="display: none;">
+                            <h4 class="font-semibold text-green-800 mb-2">📝 Matrícula de Ingreso</h4>
+                            <p class="text-green-700 text-sm">Complete todos los datos del estudiante. Es la primera vez que se matricula en esta institución.</p>
+                        </div>
+                        <div id="info_regular" class="info-tipo bg-blue-50 border border-blue-200" style="display: none;">
+                            <h4 class="font-semibold text-blue-800 mb-2">🔍 Matrícula Regular</h4>
+                            <p class="text-blue-700 text-sm">Ingrese el DNI del estudiante para buscar sus datos y matricularlo al siguiente grado.</p>
+                        </div>
+                        <div id="info_traslado" class="info-tipo bg-orange-50 border border-orange-200" style="display: none;">
+                            <h4 class="font-semibold text-orange-800 mb-2">🏫 Matrícula por Traslado</h4>
+                            <p class="text-orange-700 text-sm">Busque al estudiante por DNI y actualice los datos necesarios de la institución anterior.</p>
+                        </div>
+                        <div id="info_reincorporacion" class="info-tipo bg-purple-50 border border-purple-200" style="display: none;">
+                            <h4 class="font-semibold text-purple-800 mb-2">↩️ Reincorporación</h4>
+                            <p class="text-purple-700 text-sm">Busque al estudiante por DNI y verifique el grado correspondiente según el tiempo transcurrido.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Botones finales -->
-            <div class="flex justify-center gap-2 mt-10">
-                <button type="submit"
-                    class="focus:outline-none text-white bg-green-500 hover:bg-green-600 focus:ring-4
-                           focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
-                    Guardar
-                </button>
-                <a href="{{ route('papers.create') }}"
-                    class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4
-                           focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 cursor-pointer">
-                    Cancelar
-                </a>
-                <a href="{{ route('papers.index') }}"
-                    class="focus:outline-none text-white bg-blue-500 hover:bg-blue-600 focus:ring-4
-                           focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 cursor-pointer">
-                    Volver
-                </a>
+            <!-- Sección 2: Búsqueda de Estudiante (Para tipos: regular, traslado, reincorporación) -->
+            <div id="seccion_busqueda" class="bg-white rounded-lg shadow-sm border border-gray-200" style="display: none;">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="ri-search-line text-green-500 mr-2"></i>
+                        Buscar Estudiante
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="flex gap-4 items-end">
+                        <div class="flex-1">
+                            <label for="dni_busqueda" class="block text-sm font-medium text-gray-700 mb-2">DNI del Estudiante *</label>
+                            <input type="text" id="dni_busqueda" maxlength="8" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                   placeholder="Ingrese el DNI del estudiante">
+                        </div>
+                        <button type="button" onclick="buscarEstudiante()" 
+                                class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
+                            <i class="ri-search-line mr-2"></i>
+                            Buscar
+                        </button>
+                    </div>
+
+                    <!-- Resultado de búsqueda -->
+                    <div id="resultado_busqueda" class="mt-6" style="display: none;">
+                        <div class="p-4 bg-gray-50 rounded-lg border">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">Estudiante Encontrado</h4>
+                                    <p id="datos_estudiante" class="text-gray-600 text-sm mt-1"></p>
+                                </div>
+                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Activo</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje de no encontrado -->
+                    <div id="no_encontrado" class="mt-6" style="display: none;">
+                        <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+                            <div class="flex">
+                                <i class="ri-error-warning-line text-red-500 mr-2 mt-0.5"></i>
+                                <div>
+                                    <h4 class="font-semibold text-red-800">Estudiante No Encontrado</h4>
+                                    <p class="text-red-700 text-sm mt-1">No se encontró ningún estudiante con ese DNI. Verifique el número o use matrícula de "Ingreso".</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 3: Datos del Estudiante (Para tipo: ingreso o edición en traslado) -->
+            <div id="seccion_datos_estudiante" class="bg-white rounded-lg shadow-sm border border-gray-200" style="display: none;">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="ri-user-line text-blue-500 mr-2"></i>
+                        <span id="titulo_datos">Datos del Estudiante</span>
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <!-- Información sobre código automático -->
+                    <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div class="flex">
+                            <i class="ri-information-line text-blue-500 mr-2 mt-0.5"></i>
+                            <div>
+                                <h4 class="font-semibold text-blue-800">Código de Estudiante</h4>
+                                <p class="text-blue-700 text-sm mt-1">El código del estudiante se generará automáticamente al completar la matrícula (formato: EST2025XXXX).</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Nombre -->
+                        <div>
+                            <label for="nombre" class="block text-sm font-medium text-gray-700 mb-2">Nombre *</label>
+                            <input type="text" name="nombre" id="nombre" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Apellidos -->
+                        <div>
+                            <label for="apellidos" class="block text-sm font-medium text-gray-700 mb-2">Apellidos *</label>
+                            <input type="text" name="apellidos" id="apellidos" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- DNI -->
+                        <div>
+                            <label for="dni" class="block text-sm font-medium text-gray-700 mb-2">DNI *</label>
+                            <input type="text" name="dni" id="dni" maxlength="8" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Sexo -->
+                        <div>
+                            <label for="sexo" class="block text-sm font-medium text-gray-700 mb-2">Sexo *</label>
+                            <select name="sexo" id="sexo" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="" disabled selected>Seleccione</option>
+                                <option value="masculino">Masculino</option>
+                                <option value="femenino">Femenino</option>
+                            </select>
+                        </div>
+
+                        <!-- Fecha de Nacimiento -->
+                        <div>
+                            <label for="fecha_nacimiento" class="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento *</label>
+                            <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- País -->
+                        <div>
+                            <label for="pais" class="block text-sm font-medium text-gray-700 mb-2">País *</label>
+                            <input type="text" name="pais" id="pais" value="Perú" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Provincia -->
+                        <div>
+                            <label for="provincia" class="block text-sm font-medium text-gray-700 mb-2">Provincia *</label>
+                            <input type="text" name="provincia" id="provincia" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Distrito -->
+                        <div>
+                            <label for="distrito" class="block text-sm font-medium text-gray-700 mb-2">Distrito *</label>
+                            <input type="text" name="distrito" id="distrito" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Departamento -->
+                        <div>
+                            <label for="departamento" class="block text-sm font-medium text-gray-700 mb-2">Departamento *</label>
+                            <input type="text" name="departamento" id="departamento" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Dirección -->
+                            <div>
+                                <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Dirección *</label>
+                                <input type="text" name="address" id="address"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    value="{{ old('address') }}"
+                                    required>
+                            </div>
+                            
+                        <!-- Lengua Materna -->
+                        <div>
+                            <label for="lengua_materna" class="block text-sm font-medium text-gray-700 mb-2">Lengua Materna *</label>
+                            <select name="lengua_materna" id="lengua_materna" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="" disabled selected>Seleccione</option>
+                                <option value="Español">Español</option>
+                                <option value="Quechua">Quechua</option>
+                                <option value="Aymara">Aymara</option>
+                                <option value="Ashuar">Ashuar</option>
+                                <option value="Awajún">Awajún</option>
+                                <option value="Shipibo">Shipibo</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+
+                        <!-- Religión -->
+                        <div>
+                            <label for="religion" class="block text-sm font-medium text-gray-700 mb-2">Religión</label>
+                            <select name="religion" id="religion" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="" disabled selected>Seleccione</option>
+                                <option value="Católica">Católica</option>
+                                <option value="Evangélica">Evangélica</option>
+                                <option value="Testigo de Jehová">Testigo de Jehová</option>
+                                <option value="Adventista">Adventista</option>
+                                <option value="Otra">Otra</option>
+                                <option value="Ninguna">Ninguna</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 4: Información de Matrícula -->
+            <div id="seccion_info_matricula" class="bg-white rounded-lg shadow-sm border border-gray-200" style="display: none;">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="ri-book-line text-green-500 mr-2"></i>
+                        Información de Matrícula
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Nivel Educativo -->
+                        <div>
+                            <label for="nivel_educativo_id" class="block text-sm font-medium text-gray-700 mb-2">Nivel Educativo *</label>
+                            <select name="nivel_educativo_id" id="nivel_educativo_id" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                    required onchange="cargarGrados()">
+                                <option value="" disabled selected>Seleccione el nivel</option>
+                                @foreach($nivelesEducativos as $nivel)
+                                    <option value="{{ $nivel->id_nivel_educativo }}">
+                                        {{ $nivel->nombre }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Grado -->
+                        <div>
+                            <label for="grado_id" class="block text-sm font-medium text-gray-700 mb-2">Grado *</label>
+                            <select name="grado_id" id="grado_id" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                    required disabled onchange="cargarSecciones()">
+                                <option value="" disabled selected>Primero seleccione el nivel</option>
+                            </select>
+                        </div>
+
+                        <!-- Sección -->
+                        <div>
+                            <label for="seccion_id" class="block text-sm font-medium text-gray-700 mb-2">Sección *</label>
+                            <select name="seccion_id" id="seccion_id" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                    required disabled>
+                                <option value="" disabled selected>Primero seleccione el grado</option>
+                            </select>
+                        </div>
+
+                        <!-- Fecha de Matrícula -->
+                        <div>
+                            <label for="fecha_matricula" class="block text-sm font-medium text-gray-700 mb-2">Fecha de Matrícula *</label>
+                            <input type="datetime-local" name="fecha_matricula" id="fecha_matricula" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                required>
+                        </div>
+
+                        <!-- Estado de Matrícula -->
+                        <div>
+                            <label for="estado_matricula" class="block text-sm font-medium text-gray-700 mb-2">Estado de Matrícula *</label>
+                            <select name="estado_matricula" id="estado_matricula" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                    required>
+                                <option value="1" selected>Activo</option>
+                                <option value="0">Inactivo</option>
+                            </select>
+                        </div>
+
+                        <!-- Estado de Pago -->
+                        <div>
+                            <label for="estado_pago" class="block text-sm font-medium text-gray-700 mb-2">Estado de Pago *</label>
+                            <select name="estado_pago" id="estado_pago" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                    required>
+                                <option value="Pendiente" selected>Pendiente</option>
+                                <option value="Finalizado">Finalizado</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 5: Relación Estudiante-Tutor -->
+            <div id="seccion_tutor" class="bg-white rounded-lg shadow-sm border border-gray-200" style="display: none;">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="ri-parent-line text-purple-500 mr-2"></i>
+                        Relación con Tutor
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Tutor -->
+                        <div>
+                            <label for="tutor_id" class="block text-sm font-medium text-gray-700 mb-2">Tutor *</label>
+                            <select name="tutor_id" id="tutor_id" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                    required>
+                                <option value="" disabled selected>Seleccione un tutor</option>
+                                @foreach($tutores as $tutor)
+                                    <option value="{{ $tutor->id_tutor }}">
+                                        {{ $tutor->user->persona->name }} {{ $tutor->user->persona->lastname }}
+                                        ({{ $tutor->user->persona->dni }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Tipo de Relación -->
+                        <div>
+                            <label for="tipo_relacion" class="block text-sm font-medium text-gray-700 mb-2">Tipo de Relación *</label>
+                            <select name="tipo_relacion" id="tipo_relacion" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                    required>
+                                <option value="" disabled selected>Seleccione</option>
+                                <option value="Padre">Padre</option>
+                                <option value="Madre">Madre</option>
+                                <option value="Tutor Legal">Tutor Legal</option>
+                                <option value="Abuelo/a">Abuelo/a</option>
+                                <option value="Tío/a">Tío/a</option>
+                                <option value="Hermano/a">Hermano/a</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div id="seccion_botones" class="bg-white rounded-lg shadow-sm border border-gray-200" style="display: none;">
+                <div class="px-6 py-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <a href="{{ route('matriculas.index') }}"
+                           class="w-full sm:w-auto px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-center">
+                            <i class="ri-arrow-left-line mr-2"></i>
+                            Cancelar
+                        </a>
+                        
+                        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                            <button type="button" 
+                                    class="w-full sm:w-auto px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200">
+                                <i class="ri-save-line mr-2"></i>
+                                Guardar Borrador
+                            </button>
+                            
+                            <button type="submit" 
+                                    class="w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 font-semibold">
+                                <i class="ri-check-line mr-2"></i>
+                                <span id="texto_boton_submit">Matricular Estudiante</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
+</div>
 
-    @if (session('success'))
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: '¡Creado exitosamente!',
-                text: "{{ session('success') }}",
-                showConfirmButton: true,
-                confirmButtonText: 'Aceptar',
-                customClass: {
-                    confirmButton: 'bg-green-500 text-white hover:bg-green-600 focus:ring-2 focus:ring-green-300 rounded-lg py-2 px-4'
-                }
-            });
-        </script>
-    @elseif (session('error'))
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: '¡Hubo un error!',
-                html: "{!! session('error') !!}",
-                showConfirmButton: true,
-                confirmButtonText: 'Aceptar',
-                customClass: {
-                    confirmButton: 'bg-red-500 text-white hover:bg-red-600 focus:ring-2 focus:ring-red-300 rounded-lg py-2 px-4'
-                }
-            });
-        </script>
-    @endif
-@endsection
-
-@section('script')
-    <!-- Mismos scripts y funciones de vista previa / validaciones -->
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Lógica para Autores
-            const authorsContainer = document.getElementById("authors-container");
-            const authorsList = document.getElementById("authors-list");
-            const addAuthorBtn = document.getElementById("add-author-btn");
-            const showAuthorsBtn = document.getElementById("show-authors-btn");
-            const dropdownSearch = document.getElementById("dropdownSearch");
-            const removeAuthorsBtn = document.getElementById("remove-authors-btn");
-            const autoresJsonInput = document.getElementById("autores-json");
-            const form = document.getElementById("form");
-
-            const addedAuthors = new Set();
-
-            addAuthorBtn.addEventListener("click", () => {
-                const authorInput = document.getElementById("new-author");
-                const authorName = authorInput.value.trim();
-                if (authorName && !addedAuthors.has(authorName)) {
-                    addedAuthors.add(authorName);
-                    const listItem = document.createElement("li");
-                    listItem.innerHTML = `
-                        <div class="flex items-center ps-2 rounded hover:bg-gray-100 w-full">
-                          <input type="checkbox" class="author-checkbox w-4 h-4 text-blue-600 bg-gray-100
-                                                     border-gray-300 rounded focus:ring-blue-500" value="${authorName}">
-                          <label class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded">
-                            ${authorName}
-                          </label>
-                        </div>`;
-                    authorsList.appendChild(listItem);
-                    authorInput.value = "";
-                }
-            });
-
-            document.addEventListener("click", function(event) {
-                if (!dropdownSearch.contains(event.target) && !showAuthorsBtn.contains(event.target)) {
-                    dropdownSearch.classList.add("hidden");
-                }
-            });
-
-            showAuthorsBtn.addEventListener("click", () => {
-                if (addedAuthors.size > 0) {
-                    dropdownSearch.classList.toggle("hidden");
-                }
-            });
-
-            removeAuthorsBtn.addEventListener("click", () => {
-                const checkboxes = document.querySelectorAll(".author-checkbox:checked");
-                checkboxes.forEach((checkbox) => {
-                    const authorName = checkbox.value;
-                    addedAuthors.delete(authorName);
-                    checkbox.closest("li").remove();
-                });
-                if (addedAuthors.size === 0) {
-                    dropdownSearch.classList.toggle("hidden");
-                }
-            });
-
-            form.addEventListener("submit", (event) => {
-                const authorsArray = Array.from(addedAuthors);
-                autoresJsonInput.value = JSON.stringify(authorsArray);
-            });
-
-            // Contador de caracteres para Abstract
-            const textarea = document.getElementById('descripcion');
-            const charCount = document.getElementById('char-count');
-            const maxChars = 1000;
-
-            const updateCount = () => {
-                const content = textarea.value;
-                const remainingChars = maxChars - content.length;
-                charCount.textContent = `${remainingChars} caracteres restantes`;
-                if (remainingChars < 20) {
-                    charCount.classList.add("text-red-500");
+<script>
+    function cambiarTipoMatricula() {
+        const tipoSelect = document.getElementById('tipo_matricula_id');
+        const selectedOption = tipoSelect.options[tipoSelect.selectedIndex];
+        const nombreTipo = selectedOption.dataset.nombre || '';
+        
+        // Ocultar todas las secciones
+        document.getElementById('seccion_busqueda').style.display = 'none';
+        document.getElementById('seccion_datos_estudiante').style.display = 'none';
+        document.getElementById('seccion_info_matricula').style.display = 'none';
+        document.getElementById('seccion_tutor').style.display = 'none';
+        document.getElementById('seccion_botones').style.display = 'none';
+        
+        // Ocultar todas las informaciones
+        document.querySelectorAll('.info-tipo').forEach(el => el.style.display = 'none');
+        document.getElementById('info_tipo').style.display = 'none';
+        
+        if (tipoSelect.value) {
+            // Mostrar información del tipo seleccionado
+            document.getElementById('info_tipo').style.display = 'block';
+            
+            // Determinar el tipo basado en el nombre
+            if (nombreTipo.includes('ingreso') || nombreTipo.includes('nuevo') || nombreTipo.includes('primera')) {
+                document.getElementById('info_ingreso').style.display = 'block';
+                // Para ingreso: mostrar formulario completo
+                document.getElementById('seccion_datos_estudiante').style.display = 'block';
+                document.getElementById('seccion_info_matricula').style.display = 'block';
+                document.getElementById('seccion_tutor').style.display = 'block';
+                document.getElementById('seccion_botones').style.display = 'block';
+                document.getElementById('titulo_datos').textContent = 'Datos del Nuevo Estudiante';
+                document.getElementById('texto_boton_submit').textContent = 'Matricular Nuevo Estudiante';
+                
+                // Hacer campos requeridos
+                hacerCamposRequeridos(true);
+                
+            } else if (nombreTipo.includes('regular') || nombreTipo.includes('continuidad')) {
+                document.getElementById('info_regular').style.display = 'block';
+                // Para regular: mostrar búsqueda primero
+                document.getElementById('seccion_busqueda').style.display = 'block';
+                document.getElementById('texto_boton_submit').textContent = 'Matricular para Continuidad';
+                
+            } else if (nombreTipo.includes('traslado')) {
+                document.getElementById('info_traslado').style.display = 'block';
+                // Para traslado: mostrar búsqueda primero
+                document.getElementById('seccion_busqueda').style.display = 'block';
+                document.getElementById('texto_boton_submit').textContent = 'Matricular por Traslado';
+                
+            } else if (nombreTipo.includes('reincorporacion') || nombreTipo.includes('reingreso')) {
+                document.getElementById('info_reincorporacion').style.display = 'block';
+                // Para reincorporación: mostrar búsqueda primero
+                document.getElementById('seccion_busqueda').style.display = 'block';
+                document.getElementById('texto_boton_submit').textContent = 'Reincorporar Estudiante';
+                
+            } else {
+                // Tipo desconocido, mostrar búsqueda por defecto
+                document.getElementById('info_regular').style.display = 'block';
+                document.getElementById('seccion_busqueda').style.display = 'block';
+                document.getElementById('texto_boton_submit').textContent = 'Matricular Estudiante';
+            }
+        }
+    }
+    
+    function buscarEstudiante() {
+        const dni = document.getElementById('dni_busqueda').value;
+        const tipoMatricula = document.getElementById('tipo_matricula').value;
+        
+        if (!dni || dni.length !== 8) {
+            alert('Por favor ingrese un DNI válido de 8 dígitos');
+            return;
+        }
+        
+        // Aquí iría la llamada AJAX para buscar el estudiante
+        // Por ahora simulamos la respuesta
+        
+        // Simular búsqueda exitosa
+        const encontrado = Math.random() > 0.3; // 70% de probabilidad de encontrar
+        
+        if (encontrado) {
+            // Estudiante encontrado
+            document.getElementById('resultado_busqueda').style.display = 'block';
+            document.getElementById('no_encontrado').style.display = 'none';
+            document.getElementById('datos_estudiante').textContent = `Juan Pérez Gómez - DNI: ${dni} - Último grado: 3° Grado`;
+            
+            // Llenar datos del estudiante (simulado)
+            document.getElementById('dni').value = dni;
+            document.getElementById('nombre').value = 'Juan';
+            document.getElementById('apellidos').value = 'Pérez Gómez';
+            // El código se genera automáticamente, no se llena
+            
+            // Mostrar secciones correspondientes
+            if (tipoMatricula === 'traslado') {
+                document.getElementById('seccion_datos_estudiante').style.display = 'block';
+                document.getElementById('titulo_datos').textContent = 'Actualizar Datos del Estudiante';
+                hacerCamposRequeridos(false); // Para traslado algunos campos pueden no ser requeridos
+            } else {
+                document.getElementById('titulo_datos').textContent = 'Datos del Estudiante (Solo lectura)';
+                hacerCamposReadonly(true);
+            }
+            
+            document.getElementById('seccion_info_matricula').style.display = 'block';
+            document.getElementById('seccion_tutor').style.display = 'block';
+            document.getElementById('seccion_botones').style.display = 'block';
+            
+        } else {
+            // Estudiante no encontrado
+            document.getElementById('resultado_busqueda').style.display = 'none';
+            document.getElementById('no_encontrado').style.display = 'block';
+        }
+    }
+    
+    function hacerCamposRequeridos(requeridos) {
+        const campos = ['nombre', 'apellidos', 'dni', 'sexo', 'fecha_nacimiento', 'pais', 'provincia', 'distrito', 'departamento', 'lengua_materna'];
+        campos.forEach(campo => {
+            const elemento = document.getElementById(campo);
+            if (elemento) {
+                if (requeridos) {
+                    elemento.setAttribute('required', 'required');
                 } else {
-                    charCount.classList.remove("text-red-500");
+                    elemento.removeAttribute('required');
                 }
-            };
-
-            textarea.addEventListener('input', updateCount);
-
-            textarea.addEventListener('keydown', (event) => {
-                const content = textarea.value;
-                if (content.length >= maxChars &&
-                    !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(
-                        event.key)) {
-                    event.preventDefault();
-                }
-            });
-
-            textarea.addEventListener('paste', (event) => {
-                const content = textarea.value;
-                const clipboardText = (event.clipboardData || window.clipboardData).getData('text');
-                const remainingChars = maxChars - content.length;
-                if (clipboardText.length > remainingChars) {
-                    event.preventDefault();
-                    const truncatedText = clipboardText.substring(0, remainingChars);
-                    textarea.value += truncatedText;
-                }
-                updateCount();
-            });
-
-            updateCount();
+            }
         });
-    </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Manejo de Tópicos
-            const toggleButton = document.getElementById("toggle-menu");
-            const menu = document.getElementById("topicos-menu");
-            const checkboxes = document.querySelectorAll(".checkbox-topico");
-            const hiddenInput = document.getElementById("topicos");
-            let selectedTopicos = [];
-
-            toggleButton.addEventListener("click", function() {
-                menu.classList.toggle("hidden");
-            });
-
-            document.addEventListener("click", function(event) {
-                if (!toggleButton.contains(event.target) && !menu.contains(event.target)) {
-                    menu.classList.add("hidden");
-                }
-            });
-
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener("change", function() {
-                    const id = this.value;
-                    if (this.checked) {
-                        if (!selectedTopicos.includes(id)) {
-                            selectedTopicos.push(id);
-                        }
+    }
+    function cargarGrados() {
+        const nivelSelect = document.getElementById('nivel_educativo_id');
+        const gradoSelect = document.getElementById('grado_id');
+        const seccionSelect = document.getElementById('seccion_id');
+        
+        const nivelId = nivelSelect.value;
+        console.log('📊 Cargando grados para nivel:', nivelId);
+        
+        // Limpiar grados y secciones
+        gradoSelect.innerHTML = '<option value="" disabled selected>Cargando grados...</option>';
+        gradoSelect.disabled = true;
+        seccionSelect.innerHTML = '<option value="" disabled selected>Primero seleccione el grado</option>';
+        seccionSelect.disabled = true;
+        
+        if (nivelId) {
+            fetch(`/obtener-grados?nivel_id=${nivelId}`)
+                .then(response => response.json())
+                .then(data => {
+                    gradoSelect.innerHTML = '<option value="" disabled selected>Seleccione el grado</option>';
+                    
+                    if (data.grados && data.grados.length > 0) {
+                        data.grados.forEach(grado => {
+                            const option = document.createElement('option');
+                            option.value = grado.id_grado;
+                            option.textContent = `${grado.grado}° Grado`;
+                            gradoSelect.appendChild(option);
+                        });
+                        gradoSelect.disabled = false;
+                        console.log('✅ Grados cargados:', data.grados.length);
                     } else {
-                        selectedTopicos = selectedTopicos.filter(t => t !== id);
+                        gradoSelect.innerHTML = '<option value="" disabled selected>No hay grados disponibles</option>';
                     }
-                    hiddenInput.value = selectedTopicos.join(",");
+                })
+                .catch(error => {
+                    console.error('❌ Error al cargar grados:', error);
+                    gradoSelect.innerHTML = '<option value="" disabled selected>Error al cargar grados</option>';
                 });
-            });
-        });
-
-        // ---------- FUNCIONES DE VISTA PREVIA (img_filename) ----------
-        function mostrarVistaPrevia(event) {
-            const input = event.target;
-            const previewImage = document.getElementById("previewImage");
-            const imagePlaceholder = document.getElementById("image-placeholder");
-            const removeBtn = document.getElementById("remove-image");
-
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
-                if (!allowedTypes.includes(file.type)) {
-                    alert("Tipo de archivo no permitido. Solo se permiten png, jpeg, jpg, gif.");
-                    input.value = "";
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewImage.src = e.target.result;
-                    previewImage.classList.remove('hidden');
-                    imagePlaceholder.classList.add('hidden');
-                    removeBtn.classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
         }
+    }
 
-        function removeImage(event) {
-            if (event) event.stopPropagation();
-            const imageInput = document.getElementById("img_filename");
-            imageInput.value = "";
-            const previewImage = document.getElementById("previewImage");
-            previewImage.src = "";
-            previewImage.classList.add('hidden');
-            document.getElementById("image-placeholder").classList.remove('hidden');
-            document.getElementById("remove-image").classList.add('hidden');
-        }
-
-        // ---------- FUNCIONES DE VISTA PREVIA (pdf_filename) ----------
-        function mostrarpdf_filename(event) {
-            const input = event.target;
-            const pdf_filenamePlaceholder = document.getElementById("pdf_filename-placeholder");
-            const pdf_filenameFileInfo = document.getElementById("pdf_filename-file-info");
-            const removeBtn = document.getElementById("remove-pdf_filename");
-
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                if (file.type !== 'application/pdf') {
-                    alert("Tipo de archivo no permitido. Solo se permite PDF.");
-                    input.value = "";
-                    return;
-                }
-                pdf_filenameFileInfo.textContent = file.name;
-                pdf_filenameFileInfo.classList.remove('hidden');
-                pdf_filenamePlaceholder.classList.add('hidden');
-                removeBtn.classList.remove('hidden');
-            }
-        }
-
-        function removepdf_filename(event) {
-            if (event) event.stopPropagation();
-            const pdf_filenameInput = document.getElementById("pdf_filename");
-            pdf_filenameInput.value = "";
-            document.getElementById("pdf_filename-file-info").textContent = "";
-            document.getElementById("pdf_filename-file-info").classList.add('hidden');
-            document.getElementById("pdf_filename-placeholder").classList.remove('hidden');
-            document.getElementById("remove-pdf_filename").classList.add('hidden');
-        }
-
-        // ---------- DRAG & DROP ----------
-        function handleDragOver(event) {
-            event.preventDefault();
-        }
-
-        function handleDrop(event, inputId) {
-            event.preventDefault();
-            const inputElement = document.getElementById(inputId);
-            if (event.dataTransfer.files && event.dataTransfer.files[0]) {
-                inputElement.files = event.dataTransfer.files;
-                if (inputId === 'img_filename') {
-                    mostrarVistaPrevia({
-                        target: inputElement
+    function cargarSecciones() {
+        const gradoSelect = document.getElementById('grado_id');
+        const seccionSelect = document.getElementById('seccion_id');
+        
+        const gradoId = gradoSelect.value;
+        console.log('📊 Cargando secciones para grado:', gradoId);
+        
+        // Limpiar secciones
+        seccionSelect.innerHTML = '<option value="" disabled selected>Cargando secciones...</option>';
+        seccionSelect.disabled = true;
+        
+        if (gradoId) {
+            fetch(`/obtener-secciones?grado_id=${gradoId}`)
+                .then(response => {
+                    console.log('📡 Respuesta status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('📊 Datos recibidos:', data);
+                    
+                    seccionSelect.innerHTML = '<option value="" disabled selected>Seleccione la sección</option>';
+                    
+                    if (data.secciones && data.secciones.length > 0) {
+                        data.secciones.forEach(seccion => {
+                            const option = document.createElement('option');
+                            option.value = seccion.id_seccion;
+                            option.textContent = `Sección ${seccion.seccion}`;
+                            seccionSelect.appendChild(option);
+                        });
+                        seccionSelect.disabled = false;
+                        console.log('✅ Secciones cargadas:', data.secciones.length);
+                    } else {
+                        console.log('⚠️ No hay secciones para este grado');
+                        seccionSelect.innerHTML = '<option value="" disabled selected>No hay secciones disponibles</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Error al cargar secciones:', error);
+                    seccionSelect.innerHTML = '<option value="" disabled selected>Error al cargar secciones</option>';
+                    
+                    // Mostrar más detalles del error en consola
+                    console.error('Detalles del error:', {
+                        message: error.message,
+                        gradoId: gradoId,
+                        url: `/obtener-secciones?grado_id=${gradoId}`
                     });
+                });
+        }
+    }
+    function hacerCamposReadonly(readonly) {
+        const campos = ['nombre', 'apellidos', 'dni', 'sexo', 'fecha_nacimiento', 'pais', 'provincia', 'distrito', 'departamento', 'lengua_materna', 'religion'];
+        campos.forEach(campo => {
+            const elemento = document.getElementById(campo);
+            if (elemento) {
+                if (readonly) {
+                    elemento.setAttribute('readonly', 'readonly');
+                    elemento.classList.add('bg-gray-100', 'cursor-not-allowed');
                 } else {
-                    mostrarpdf_filename({
-                        target: inputElement
-                    });
+                    elemento.removeAttribute('readonly');
+                    elemento.classList.remove('bg-gray-100', 'cursor-not-allowed');
                 }
             }
-        }
-    </script>
+        });
+    }
+    
+    // Establecer fecha y hora actual para la matrícula
+    document.addEventListener('DOMContentLoaded', function() {
+        const fechaMatricula = document.getElementById('fecha_matricula');
+        const ahora = new Date();
+        const fechaLocal = new Date(ahora.getTime() - ahora.getTimezoneOffset() * 60000);
+        fechaMatricula.value = fechaLocal.toISOString().slice(0, 16);
+    });
+</script>
 @endsection

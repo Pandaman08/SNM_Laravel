@@ -1,85 +1,463 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Pago;
-use App\Models\Matricula;
+
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
-use Exception;
+use App\Models\Matricula;
+use App\Models\TipoMatricula;
+use App\Models\AnioEscolar;
+use App\Models\Tutor;
+use App\Models\Estudiante;
+use App\Models\NivelEducativo;
+use App\Models\Grado;
+use App\Models\Seccion;
+use App\Models\Persona;
+use App\Models\Asignatura;
+use App\Models\DetalleAsignatura;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class MatriculaController extends Controller
 {
+    /**
+     * Lista de todas las matrículas (admin/secretaria)
+     */
+    public function index()
+    {
+        $matriculas = Matricula::with([
+            'estudiante', 
+            'tipoMatricula', 
+            'anioEscolar',
+            'seccion.grado.nivelEducativo'
+        ])->orderBy('fecha', 'desc')->get();
+        
+        return view('pages.admin.matriculas.index', compact('matriculas'));
+    }
+
+    /**
+     * Vista para crear matrícula (admin/secretaria)
+     */
+    public function create()
+    {
+        // Redirigir a tutores a su vista específica
+        if (Auth::check() && Auth::user()->tutor) {
+            return redirect()->route('matriculas.create-tutor');
+        }
+
+        $tiposMatricula = TipoMatricula::all();
+        $aniosEscolares = AnioEscolar::all();
+        $tutores = Tutor::with('user')->get();
+        $nivelesEducativos = NivelEducativo::activos()->get();
+        $secciones = Seccion::with('grado.nivelEducativo')->get();
+        
+        return view('pages.admin.matriculas.create', compact(
+            'tiposMatricula', 
+            'aniosEscolares', 
+            'tutores', 
+            'nivelesEducativos', 
+            'secciones'
+        ));
+    }
+
+    /**
+     * Vista específica para tutores
+     */
+    public function createTutor()
+    {
+        $tiposMatricula = TipoMatricula::all();
+        $aniosEscolares = AnioEscolar::all();
+        $nivelesEducativos = NivelEducativo::activos()->get();
+        $grados = Grado::with('nivelEducativo')
+            ->orderBy('grado')
+            ->get(['id_grado', 'grado', 'nivel_educativo_id']);
+        $secciones = Seccion::with('grado.nivelEducativo')
+            ->orderBy('seccion')
+            ->get(['id_seccion', 'seccion', 'id_grado']);
+
+        return view('pages.admin.matriculas.create-tutor', compact(
+            'tiposMatricula', 
+            'aniosEscolares', 
+            'nivelesEducativos', 
+            'grados', 
+            'secciones'
+        ));
+    }
+
+    /**
+     * Guardar matrícula desde admin/secretaria
+     */
     public function store(Request $request)
     {
+
+
+
+        $validated = $request->validate([
+            'id_tipo_matricula' => 'required|exists:tipos_matricula,id_tipo_matricula',
+            'id_anio_escolar' => 'required|exists:anios_escolares,id_anio_escolar',
+            'nombre' => 'required|string|max:255',
+            'apellidos' => 'required|string|max:255',
+            'dni' => 'required|string|size:8|unique:personas,dni',
+            'sexo' => 'required|in:M,F',
+            'fecha_nacimiento' => 'required|date',
+            'pais' => 'required|string|max:100',
+            'provincia' => 'required|string|max:100',
+            'distrito' => 'required|string|max:100',
+            'departamento' => 'required|string|max:100',
+            'lengua_materna' => 'required|string|max:50',
+            'religion' => 'nullable|string|max:50',
+            'seccion_id' => 'required|exists:secciones,id_seccion',
+            'fecha' => 'required|date',
+            'id_tutor' => 'required|exists:tutores,id_tutor',
+            'tipo_relacion' => 'required|string|max:50',
+            'adress'=> 'required|string|max:255'
+        ]);
+
+        DB::beginTransaction();
+        
         try {
-            //
-            $messages = [
-                'id_tipo_matricula.required' => 'El campo monto es obligatorio.',
-                'fecha.required' => 'El campo fecha es obligatorio.',
-                'fecha.date' => 'El campo fecha debe ser una fecha válida.',
-                'concepto.required' => 'El campo concepto es requerido.',
-                'concepto.string' => 'El campo concepto debe ser una cadena de texto.',
-                'concepto.max' => 'El campo concepto no debe exceder 100.',
-                'monto.required' => 'El campo monto es obligatorio.',
-                'fecha_pago.date' => 'El campo fecha debe ser una fecha válida.',
-                'comprobante_img.image' => 'El archivo debe ser una imagen.',
-                'comprobante_img.max' => 'La imagen no debe exceder los 4MB.',
-                'comprobante_img.mimes' => 'La imagen debe ser de tipo JPG, PNG o JPEG.',
-            ];
+            
+            $persona = Persona::create([
+                'name' => $validated['nombre'],
+                'lastname' => $validated['apellidos'],
+                'dni' => $validated['dni'],
+                'sexo' => $validated['sexo'],
+                'fecha_nacimiento' => $validated['fecha_nacimiento'],
+                'address' => $validated['address']
+            ]);
 
-            $request->validate([
-                'concepto' => 'required|string|max:100',
-                'monto' => 'required|float',
-                'id_tipo_matricula' => 'required',
-                'fecha' => 'required|date',
-                'fecha_pago' => 'required|date',
-                'comprobante_img' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
-            ], $messages);
+            $estudiante = Estudiante::create([
+                'codigo_estudiante' => $this->generarCodigoEstudiante(),
+                'persona_id' => $persona->persona_id, 
+                'pais' => $validated['pais'],
+                'provincia' => $validated['provincia'],
+                'distrito' => $validated['distrito'],
+                'departamento' => $validated['departamento'],
+                'lengua_materna' => $validated['lengua_materna'],
+                'religion' => $validated['religion'],
+            ]);
 
-            $rutaImagen = null;
-            if ($request->hasFile('comprobante_img')) {
-                $imagen = $request->file('comprobante_img');
-                $rutaImagen = $imagen->store('upload/pagos', 'public'); // Guardar imagen en el directorio public
-            }
-
-
+            // Crear matrícula
             $matricula = Matricula::create([
-                'codigo_estudiante' => $request->codigo_estudiante,
-                'id_anio_escolar' => $request->contenido,
-                'id_tipo_matricula' => $request->autor,
-                'fecha' => $request->fecha,
-                'estado' => false
+                'codigo_matricula' => $this->generarCodigoMatricula(),
+                'codigo_estudiante' => $estudiante->codigo_estudiante,
+                'id_tipo_matricula' => $validated['id_tipo_matricula'],
+                'id_anio_escolar' => $validated['id_anio_escolar'],
+                'seccion_id' => $validated['seccion_id'],
+                'fecha' => $validated['fecha']
             ]);
 
-            $pago = Pago::create([
-
-                'codigo_matricula' => $matricula->codigo_matricula,
-                'concepto' => $request->concepto,
-                'monto' => $request->monto,
-                'fecha_pago' => $request->fecha_pago,
-                'comprobante_img' => $rutaImagen,
-                'estado' => 'Pendiente'
+            // Crear relación estudiante-tutor
+            DB::table('estudiantes_tutores')->insert([
+                'codigo_estudiante' => $estudiante->codigo_estudiante,
+                'id_tutor' => $validated['id_tutor'],
+                'tipo_relacion' => $validated['tipo_relacion'],
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
 
+            // Crear detalles de asignaturas automáticamente
+            $this->crearDetallesAsignaturas($matricula);
 
+            DB::commit();
 
+            return redirect()->route('matriculas.index')
+                           ->with('success', 'Matrícula registrada exitosamente.');
 
-
-            return redirect()->route('matriculas.index')->with('success', 'Matricula registrada con éxito');
-        } catch (ValidationException $e) {
-            $errorMessage = implode('<br>', $e->validator->errors()->all());
-            return redirect()->back()
-                ->withInput()
-                ->with('error', $errorMessage);
-        } catch (Exception $e) {
-
-            return redirect()->back()->with('error', 'Error: ' . 'Hubo un error. Porfavor, pruebe denuevo');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Error al procesar la matrícula: ' . $e->getMessage())
+                        ->withInput();
         }
     }
 
-    public function index()
+    /**
+     * Guardar solicitud de matrícula desde tutor
+     */
+    public function storeTutor(Request $request)
     {
+        $validated = $request->validate([
+            'id_tipo_matricula' => 'required|exists:tipos_matricula,id_tipo_matricula',
+            'id_anio_escolar' => 'required|exists:anios_escolares,id_anio_escolar',
+            'nombre' => 'required|string|max:255',
+            'apellidos' => 'required|string|max:255',
+            'dni' => 'required|string|size:8|unique:personas,dni',
+            'sexo' => 'required|in:M,F',
+            'fecha_nacimiento' => 'required|date',
+            'pais' => 'required|string|max:100',
+            'provincia' => 'required|string|max:100',
+            'distrito' => 'required|string|max:100',
+            'departamento' => 'required|string|max:100',
+            'lengua_materna' => 'required|string|max:50',
+            'religion' => 'nullable|string|max:50',
+            'seccion_id' => 'required|exists:secciones,id_seccion',
+            'fecha' => 'required|date',
+            'tipo_relacion' => 'required|string|max:50',
+            'address'=> 'required|string|max:255'
+        ]);
 
+        DB::beginTransaction();
+        
+        try {
+            // Crear estudiante con estado pendiente (activo = false)
+            $persona = Persona::create([
+                'name' => $validated['nombre'],
+                'lastname' => $validated['apellidos'],
+                'dni' => $validated['dni'],
+                'sexo' => $validated['sexo'],
+                'fecha_nacimiento' => $validated['fecha_nacimiento'],
+                'address' => $validated['address']
+            ]);
+
+            $estudiante = Estudiante::create([
+                'codigo_estudiante' => $this->generarCodigoEstudiante(),
+                'persona_id' => $persona->persona_id, 
+                'pais' => $validated['pais'],
+                'provincia' => $validated['provincia'],
+                'distrito' => $validated['distrito'],
+                'departamento' => $validated['departamento'],
+                'lengua_materna' => $validated['lengua_materna'],
+                'religion' => $validated['religion'],
+            ]);
+
+
+            // Crear matrícula en estado pendiente
+            $matricula = Matricula::create([
+                'codigo_matricula' => null, // Se generará cuando se apruebe
+                'codigo_estudiante' => $estudiante->codigo_estudiante,
+                'id_tipo_matricula' => $validated['id_tipo_matricula'],
+                'id_anio_escolar' => $validated['id_anio_escolar'],
+                'seccion_id' => $validated['seccion_id'],
+                'fecha' => $validated['fecha']
+            ]);
+
+            // Crear relación estudiante-tutor
+            DB::table('estudiantes_tutores')->insert([
+                'codigo_estudiante' => $estudiante->codigo_estudiante,
+                'id_tutor' => Auth::user()->tutor->id_tutor,
+                'tipo_relacion' => $validated['tipo_relacion'],
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('matriculas.mis-matriculas')
+                           ->with('success', 'Solicitud de matrícula enviada exitosamente. Será revisada por la administración.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Error al enviar la solicitud: ' . $e->getMessage())
+                        ->withInput();
+        }
     }
 
+    /**
+     * Ver matrículas del tutor logueado
+     */
+    public function misMatriculas(Request $request)
+    {
+         $buscarpor = $request->input('buscarpor');
+        $matriculas = Matricula::whereHas('estudiante', function($query) {
+            $query->whereHas('tutores', function($q) {
+                $q->where('tutores.id_tutor', Auth::user()->tutor->id_tutor);
+            });
+        })->with([
+            'estudiante', 
+            'tipoMatricula', 
+            'anioEscolar',
+            'seccion.grado.nivelEducativo'
+        ])->orderBy('fecha', 'desc')->paginate(10);
+
+        return view('pages.admin.tutor.matriculas', compact('matriculas','buscarpor'));
+    }
+
+    /**
+     * Mostrar una matrícula específica
+     */
+    public function show($codigo_matricula)
+    {
+        $matricula = Matricula::with([
+            'estudiante',
+            'tipoMatricula',
+            'anioEscolar',
+            'seccion.grado.nivelEducativo',
+            'detallesAsignatura.asignatura'
+        ])->where('codigo_matricula', $codigo_matricula)->firstOrFail();
+
+        return view('pages.admin.matriculas.show', compact('matricula'));
+    }
+
+    public function obtenerGrados(Request $request)
+    {
+        try {
+            // Validar usando el campo correcto según tu migración
+            $request->validate([
+                'nivel_id' => 'required|integer|exists:niveles_educativos,id_nivel_educativo'
+            ]);
+
+            $nivelId = $request->get('nivel_id');
+            
+            \Log::info('Buscando grados para nivel ID: ' . $nivelId);
+            
+            // Buscar usando el campo FK correcto según tu migración
+            $grados = Grado::where('nivel_educativo_id', $nivelId) 
+                        ->orderBy('grado')
+                        ->get(['id_grado', 'grado']);
+            
+            \Log::info('Grados encontrados: ' . $grados->count());
+            
+            return response()->json([
+                'success' => true,
+                'grados' => $grados
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error al obtener grados: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener los grados',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtener secciones por grado (AJAX)
+     */
+    public function obtenerSecciones(Request $request)
+    {
+        
+        try {
+            $request->validate([
+                'grado_id' => 'required|integer|exists:grados,id_grado'
+            ]);
+
+            $gradoId = $request->get('grado_id');
+            
+            
+            // Buscar secciones usando el campo correcto
+            $secciones = Seccion::where('id_grado', $gradoId)
+                                        ->orderBy('seccion')
+                                        ->get(['id_seccion', 'seccion']);
+            
+            if ($secciones->isEmpty()) {
+                
+                $totalSecciones = \App\Models\Seccion::count();
+                $gradoExiste = \App\Models\Grado::find($gradoId);
+                
+                return response()->json([
+                    'success' => true,
+                    'secciones' => [],
+                    'message' => 'No hay secciones disponibles para este grado',
+                    'debug' => [
+                        'grado_id' => $gradoId,
+                        'total_secciones_bd' => $totalSecciones,
+                        'grado_existe' => $gradoExiste ? true : false
+                    ]
+                ]);
+            }
+            
+            $response = [
+                'success' => true,
+                'secciones' => $secciones,
+                'grado_id' => $gradoId,
+                'count' => $secciones->count()
+            ];
+            
+            return response()->json($response);
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error de validación',
+                'details' => $e->errors()
+            ], 422);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error en obtenerSecciones', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]); 
+            
+            return response()->json([
+                'success' => false,
+                'error' => 'Error interno del servidor',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Crear detalles de asignaturas para una matrícula
+     */
+    private function crearDetallesAsignaturas($matricula)
+    {
+        // Obtener el grado de la sección de la matrícula
+        $grado = $matricula->seccion->grado;
+        
+        // Obtener todas las asignaturas del grado
+        $asignaturas = Asignatura::where('grado_id', $grado->id_grado)->get();
+        
+        // Crear un detalle por cada asignatura
+        foreach ($asignaturas as $asignatura) {
+            DetalleAsignatura::create([
+                'codigo_asignatura' => $asignatura->codigo_asignatura,
+                'codigo_matricula' => $matricula->codigo_matricula,
+                'fecha' => $matricula->fecha
+            ]);
+        }
+    }
+
+    /**
+     * Generar código único para estudiante
+     */
+    private function generarCodigoEstudiante()
+    {
+        $anio = date('Y');
+        $ultimoNumero = Estudiante::where('codigo_estudiante', 'like', "{$anio}%")
+                                 ->whereNotNull('codigo_estudiante')
+                                 ->count();
+        $numero = str_pad($ultimoNumero + 1, 4, '0', STR_PAD_LEFT);
+        
+        return "{$anio}{$numero}";
+    }
+
+    public function generarFicha($codigo_matricula)
+{
+    $matricula = Matricula::with([
+        'estudiante.persona',
+        'anioEscolar',
+        'tipoMatricula',
+        'seccion.grado.nivelEducativo',
+        'detallesAsignatura.asignatura',
+        'pagos' => function($query) {
+            $query->where('estado', 'Finalizado')->latest();
+        }
+    ])->findOrFail($codigo_matricula);
+
+    // Verificar que la matrícula esté validada y tenga pagos finalizados
+    if(!$matricula->estado_validacion || $matricula->pagos->isEmpty()) {
+        return back()->with('error', 'La matrícula no está validada o no tiene pagos finalizados');
+    }
+
+    $pdf = Pdf::loadView('pages.admin.matriculas.ficha-matricula', compact('matricula'));
+    
+    return $pdf->download('ficha-matricula-'.$matricula->codigo_matricula.'.pdf');
+}
+    /**
+     * Generar código único para matrícula
+     */
+    private function generarCodigoMatricula()
+    {
+        $anio = date('Y');
+        $ultimoNumero = Matricula::where('codigo_matricula', 'like', "MAT{$anio}%")
+                                ->whereNotNull('codigo_matricula')
+                                ->count();
+        $numero = str_pad($ultimoNumero + 1, 4, '0', STR_PAD_LEFT);
+        
+        return "MAT{$anio}{$numero}";
+    }
 }

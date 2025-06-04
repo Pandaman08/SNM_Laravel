@@ -12,7 +12,7 @@
 
         <div class="flex justify-between mb-6">
             <div class="flex space-x-4">
-                <input type="text" id="search" placeholder="Buscar por nombre o email" class="px-4 py-2 border rounded"
+                <input type="text" id="search" placeholder="Buscar por email" class="px-4 py-2 border rounded"
                     oninput="buscarUsuarios(this.value)">
             </div>
             <button class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-700" onclick="openCreateModal()">
@@ -49,7 +49,7 @@
                                     <div class="px-8 py-0.1 text-center">
                                         <button
                                             class="w-8 h-8 flex items-center justify-start rounded shadow cursor-pointer"
-                                            onclick="openModal('{{ Storage::url('' . Auth::user()->persona->photo) }}', 'image')">
+                                            onclick="openModal('{{ Storage::url('' . $usuario->persona->photo) }}', 'image')">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
                                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                                 class="w-6 h-6" viewBox="0 0 24 24">
