@@ -285,6 +285,14 @@
                                     Registrar Asignatura
                                 </a>
                             </li>
+                            <li class="mb-2">
+                                <a href="{{route('asignaturas.asignar.docentes')}}" 
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white hover:bg-[#98C560] {{ request()->routeIs('asignaturas.create') ? 'bg-[#98C560]' : '' }}">
+                                    <span
+                                        class="w-2 h-2 rounded-full mr-3 {{ request()->routeIs('asignaturas.create') ? 'bg-[#98C560]' : 'bg-gray-400' }}"></span>
+                                    Asignar docente
+                                </a>
+                            </li>
                         </ul>
                     </li>
 
