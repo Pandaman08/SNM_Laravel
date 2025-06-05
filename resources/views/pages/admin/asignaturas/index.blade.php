@@ -39,7 +39,7 @@
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-3">{{ $a->codigo_asignatura }}</td>
                         <td class="px-6 py-3">{{ $a->nombre }}</td>
-                        <td class="px-6 py-3">{{ $a->grado->grado }}</td>
+                        <td class="px-6 py-3">{{ $a->grado->grado }} - {{ $a->grado->nivelEducativo->nombre}}</td>
                         <td class="px-6 py-3 text-center space-x-3">
                             <a href="{{ route('asignaturas.edit', $a->codigo_asignatura) }}" 
                                class="text-blue-600 hover:text-blue-800" 

@@ -30,6 +30,11 @@ class Asignatura extends Model
         return $this->hasMany(DetalleAsignatura::class, 'codigo_asignatura', 'codigo_asignatura');
     }
 
+     public function asignaturasDocente()
+    {
+        return $this->hasMany(AsignaturaDocente::class, 'codigo_asignatura', 'codigo_asignatura');
+    }
+
     public function competencias()
     {
         return $this->hasMany(Competencia::class, 'codigo_asignatura', 'codigo_asignatura');

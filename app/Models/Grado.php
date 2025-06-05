@@ -35,7 +35,7 @@ class Grado extends Model
     // Relación: Un grado tiene muchas asignaturas
     public function asignaturas()
     {
-        return $this->hasMany(Asignatura::class, 'grado_id', 'id_grado');
+        return $this->hasMany(Asignatura::class, 'id_grado', 'id_grado');
     }
 
     // Relación: Obtener todas las matrículas de este grado (a través de secciones)

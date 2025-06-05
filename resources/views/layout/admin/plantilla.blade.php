@@ -412,7 +412,7 @@
                     <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Secretaria</h4>
 
                     <li class="mb-1 group cursor-pointer">
-                        <a href="{{route('home.admin')}}"
+                        <a href="{{route('home.secretaria')}}"
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md {{ request()->routeIs('admin-homeSlider') ? 'bg-[#98C560]' : 'bg-transparent' }}">
                             <i class="ri-instance-line mr-3 text-lg"></i>
                             <span class="text-sm">Principal</span>
@@ -487,7 +487,7 @@
                     <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Docente</h4>
 
                     <li class="mb-1 group cursor-pointer">
-                        <a href=""
+                        <a href="{{route('home.docente')}}"
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md {{ request()->routeIs('admin-homeSlider') ? 'bg-[#98C560]' : 'bg-transparent' }}">
                             <i class="ri-instance-line mr-3 text-lg"></i>
                             <span class="text-sm">Principal</span>
@@ -554,7 +554,7 @@
                     <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Usuario</h4>
 
                     <li class="mb-1 group cursor-pointer">
-                        <a href=""
+                        <a href="{{route('home.tutor')}}"
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md {{ request()->routeIs('admin-homeSlider') ? 'bg-[#98C560]' : 'bg-transparent' }}">
                             <i class="ri-instance-line mr-3 text-lg"></i>
                             <span class="text-sm">Principal</span>

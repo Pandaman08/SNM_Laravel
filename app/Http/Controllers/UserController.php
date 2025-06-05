@@ -33,17 +33,25 @@ class UserController extends Controller
         ]);
 
         if (Auth::attempt($request->only('email', 'password'))) {
-             $user = Auth::user();
-             if (!$user->estado) {
+            $user = Auth::user();
+            if (!$user->estado) {
                 Auth::logout();
                 return back()->withErrors(['email' => 'Tu cuenta aún no ha sido aprobada por un administrador.'])->withInput();
             }
 
-            return redirect()->route('home.admin')->with('success', 'Sesión iniciada correctamente');
+            return $this->redirectToRoleDashboard($user->rol);
         }
 
         return back()->withErrors(['email' => 'Las credenciales no coinciden'])->withInput();
     }
+
+   protected function redirectToRoleDashboard(UserRole $role)
+{
+    $route = $role->dashboardRoute(); // Using the enum method we'll create
+    
+    return redirect()->route($route)
+        ->with('success', 'Sesión iniciada correctamente');
+}
 
     public function logout()
     {
@@ -330,7 +338,7 @@ class UserController extends Controller
             'dni' => 'required|string|size:8',
             'phone' => 'required|string|max:15',
             'address' => 'required|string|max:200',
-            'email' => 'required|email|unique:users,email,'.$user->user_id.',user_id',
+            'email' => 'required|email|unique:users,email,' . $user->user_id . ',user_id',
             'photo' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
         ]);
 

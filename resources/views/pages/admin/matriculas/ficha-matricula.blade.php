@@ -81,7 +81,7 @@
                 <th>Asignatura</th>
                 <th>Docente</th>
             </tr>
-            @foreach($matricula->detallesAsignatura as $detalle)
+            @foreach($detalles as $detalle)
             <tr>
                 <td>{{ $detalle->asignatura->nombre }}</td>
                 <td>{{ $detalle->docente->persona->name ?? 'Por asignar' }}</td>
