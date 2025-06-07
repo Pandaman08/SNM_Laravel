@@ -12,11 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('asignaturas_docentes', function (Blueprint $table) {
-            $table->string('id_asignatura_docente', 45)->primary();
+            $table->id('id_asignatura_docente'); // Cambio aquí: usar id() para auto-incremental
             $table->unsignedBigInteger('codigo_asignatura');
             $table->unsignedBigInteger('codigo_docente');
             $table->date('fecha');
-            $table->timestamps();
 
             $table->foreign('codigo_asignatura')->references('codigo_asignatura')->on('asignaturas');
             $table->foreign('codigo_docente')->references('codigo_docente')->on('docentes');

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class GradoController extends Controller
 {
-    public function index()
+    public function index() 
     {
         $grados = Grado::all();
         return view('pages.admin.grados.index', compact('grados'));
