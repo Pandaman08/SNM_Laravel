@@ -3,19 +3,22 @@
 @section('titulo', 'Registrar Sección')
 
 @section('contenido')
-<div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md">
-    <h1 class="text-2xl font-bold mb-6 text-gray-800">Registrar Sección</h1>
+<div class="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800 border-b pb-2">Registrar Sección</h1>
 
     <form action="{{ route('secciones.store') }}" method="POST" class="space-y-6" novalidate>
         @csrf
 
+        {{-- Grado --}}
         <div>
-            <label for="id_grado" class="block text-gray-700 font-semibold mb-2">Grado <span class="text-red-500">*</span></label>
+            <label for="id_grado" class="block text-gray-700 font-semibold mb-2">
+                Grado <span class="text-red-500">*</span>
+            </label>
             <select id="id_grado" name="id_grado" 
-                class="w-full rounded-md border border-gray-300 p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#98C560] focus:border-[#98C560]" 
+                class="w-full rounded-md border border-gray-300 p-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#98C560] focus:border-[#98C560]" 
                 required aria-describedby="id_grado_help"
             >
-                <option value="" disabled {{ old('id_grado') ? '' : 'selected' }}>Seleccione un grado</option>
+                <option value="" disabled {{ old('id_grado') ? '' : 'selected' }} title="Seleccione un grado">Seleccione un grado</option>
                 @foreach ($grados as $grado)
                     <option value="{{ $grado->id_grado }}" {{ old('id_grado') == $grado->id_grado ? 'selected' : '' }}>
                         {{ $grado->grado }}
@@ -27,33 +30,37 @@
             @enderror
         </div>
 
+        {{-- Sección --}}
         <div>
-            <label for="seccion" class="block text-gray-700 font-semibold mb-2">Sección <span class="text-red-500">*</span></label>
+            <label for="seccion" class="block text-gray-700 font-semibold mb-2">
+                Sección <span class="text-red-500">*</span>
+            </label>
             <input 
                 id="seccion" 
                 type="text" 
                 name="seccion" 
                 value="{{ old('seccion') }}" 
                 maxlength="1" 
-                class="w-full rounded-md border border-gray-300 p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#98C560] focus:border-[#98C560]" 
+                class="w-full uppercase rounded-md border border-gray-300 p-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#98C560] focus:border-[#98C560]" 
                 required 
                 aria-describedby="seccion_help"
                 pattern="[A-Za-z]"
-                title="Ingrese una letra para la sección"
+                title="Ingrese una sola letra para la sección"
             >
             @error('seccion')
                 <p id="seccion_help" class="text-red-600 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
-        <div class="flex justify-end space-x-3">
+        {{-- Botones --}}
+        <div class="flex justify-end space-x-3 pt-4 border-t">
             <a href="{{ route('secciones.index') }}" 
-                class="inline-block px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold transition"
+                class="inline-block px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold shadow-sm transition"
             >
                 Cancelar
             </a>
             <button type="submit" 
-                class="inline-block px-4 py-2 rounded-md bg-[#98C560] hover:bg-[#7aa94f] text-white font-semibold transition"
+                class="inline-block px-4 py-2 rounded-md bg-[#98C560] hover:bg-[#7aa94f] text-white font-semibold shadow-md transition"
             >
                 Registrar
             </button>

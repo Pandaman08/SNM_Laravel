@@ -1,6 +1,6 @@
 @extends('layout.admin.plantilla')
 
-@section('titulo','Panel de Control - Colegio Brunning')
+@section('titulo', 'Panel de Control - Colegio Brunning')
 
 @section('contenido')
     <div class="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 p-6">
@@ -12,10 +12,13 @@
             </div>
             <div class="flex items-center space-x-4">
                 <div class="text-right">
-                    <p class="font-medium">Bienvenido, <span class="text-blue-600">{{ Auth::user()->persona->name }}</span></p>
+                    <p class="font-medium">Bienvenido, <span class="text-blue-600">{{ Auth::user()->persona->name }}</span>
+                    </p>
                     <p class="text-sm text-gray-500">{{ now()->format('d M Y, H:i') }}</p>
                 </div>
-                <img class="w-12 h-12 rounded-full border-2 border-white shadow-md" src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->persona->name) }}&background=4f46e5&color=fff" alt="Usuario">
+                <img class="w-12 h-12 rounded-full border-2 border-white shadow-md"
+                    src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->persona->name) }}&background=4f46e5&color=fff"
+                    alt="Usuario">
             </div>
         </div>
 
@@ -28,7 +31,8 @@
                 </div>
                 <div>
                     <p class="text-gray-500 text-sm">Estudiantes Activos</p>
-                    <p class="text-2xl font-bold">1,248</p>
+                    <p class="text-2xl font-bold">
+                        {{ $matriculas->filter(function ($m) {return $m->estado_validacion;})->count() }}</p>
                 </div>
             </div>
 
@@ -38,7 +42,11 @@
                 </div>
                 <div>
                     <p class="text-gray-500 text-sm">Matrículas Hoy</p>
-                    <p class="text-2xl font-bold">24</p>
+                    <p class="text-2xl font-bold">
+                        {{ $matriculas->filter(function ($m) {
+                                return \Carbon\Carbon::parse($m->fecha)->isToday();
+                            })->count() }}
+                    </p>
                 </div>
             </div>
 
@@ -52,15 +60,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                <div class="p-3 rounded-full bg-amber-100 text-amber-600 mr-4">
-                    <i class="ri-calendar-todo-fill text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Eventos Próximos</p>
-                    <p class="text-2xl font-bold">3</p>
-                </div>
-            </div>
+          
         </div>
 
         <!-- Contenido Principal -->
@@ -73,37 +73,43 @@
                         <h2 class="text-xl font-bold">Acciones Rápidas</h2>
                     </div>
                     <div class="p-6 grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <a href="#" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-blue-50 transition-colors">
+                        <a href="{{route('matriculas.index')}}"
+                            class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-blue-50 transition-colors">
                             <div class="p-3 rounded-full bg-blue-100 text-blue-600 mb-2">
                                 <i class="ri-user-add-fill text-xl"></i>
                             </div>
                             <span class="text-sm font-medium text-center">Panel Matrícula</span>
                         </a>
-                        <a href="{{route('docentes.buscar')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-green-50 transition-colors">
+                        <a href="{{ route('docentes.buscar') }}"
+                            class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-green-50 transition-colors">
                             <div class="p-3 rounded-full bg-green-100 text-green-600 mb-2">
-                                <i class="ri-file-edit-fill text-xl"></i>
+                                  <i class="ri-user-add-fill text-xl"></i>
                             </div>
                             <span class="text-sm font-medium text-center">Panel Docentes</span>
                         </a>
-                        <a href="{{route('tesoreros.buscar')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-purple-50 transition-colors">
+                        <a href="{{ route('tesoreros.buscar') }}"
+                            class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-purple-50 transition-colors">
                             <div class="p-3 rounded-full bg-purple-100 text-purple-600 mb-2">
                                 <i class="ri-line-chart-fill text-xl"></i>
                             </div>
                             <span class="text-sm font-medium text-center">Panel Tesoreros</span>
                         </a>
-                        <a href="{{route('pagos.index')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-amber-50 transition-colors">
+                        <a href="{{ route('pagos.index') }}"
+                            class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-amber-50 transition-colors">
                             <div class="p-3 rounded-full bg-amber-100 text-amber-600 mb-2">
                                 <i class="ri-money-dollar-circle-fill text-xl"></i>
                             </div>
                             <span class="text-sm font-medium text-center">Pagos</span>
                         </a>
-                        <a href="{{route('estudiantes.buscar')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-red-50 transition-colors">
+                        <a href="{{ route('estudiantes.buscar') }}"
+                            class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-red-50 transition-colors">
                             <div class="p-3 rounded-full bg-red-100 text-red-600 mb-2">
                                 <i class="ri-notification-3-fill text-xl"></i>
                             </div>
                             <span class="text-sm font-medium text-center">Panel estudiantes Matriculados</span>
                         </a>
-                        <a href="{{route('users.edit_user')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-indigo-50 transition-colors">
+                        <a href="{{ route('users.edit_user') }}"
+                            class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-indigo-50 transition-colors">
                             <div class="p-3 rounded-full bg-indigo-100 text-indigo-600 mb-2">
                                 <i class="ri-settings-4-fill text-xl"></i>
                             </div>

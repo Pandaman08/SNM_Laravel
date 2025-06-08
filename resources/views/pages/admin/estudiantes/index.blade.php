@@ -26,8 +26,13 @@
                     <tr>
                         <th class="px-4 py-3">Nombre</th>
                         <th class="px-4 py-3">Apellido</th>
-                        <th class="px-4 py-3">Teléfono</th>
                         <th class="px-4 py-3">Dirección</th>
+                        <th class="px-4 py-3">Pais</th>
+                        <th class="px-4 py-3">Provincia</th>
+                        <th class="px-4 py-3">Distrito</th>
+                        <th class="px-4 py-3">Departamento</th>
+                        <th class="px-4 py-3">Lengua Materna</th>
+                        <th class="px-4 py-3">Religión</th>
 
                         <th class="px-4 py-3">Foto</th>
                         <th class="px-4 py-3">Acciones</th>
@@ -38,8 +43,13 @@
                         <tr class="border-b hover:bg-gray-50">
                             <td class="px-4 py-3">{{ $usuario->persona->name }}</td>
                             <td class="px-4 py-3">{{ $usuario->persona->lastname }}</td>
-                            <td class="px-4 py-3">{{ $usuario->persona->phone }}</td>
                             <td class="px-4 py-3">{{ $usuario->persona->address }}</td>
+                            <td class="px-4 py-3">{{ $usuario->pais }}</td>
+                            <td class="px-4 py-3">{{ $usuario->provincia }}</td>
+                            <td class="px-4 py-3">{{ $usuario->distrito }}</td>
+                            <td class="px-4 py-3">{{ $usuario->departamento }}</td>
+                            <td class="px-4 py-3">{{ $usuario->lengua_materna }}</td>
+                            <td class="px-4 py-3">{{ $usuario->religion }}</td>
                             <td class="px-4 py-3">
                                 @if ($usuario->persona->photo)
                                     <div class="px-8 py-0.1 text-center">
@@ -72,7 +82,8 @@
                                 </button>
 
 
-                                <button onclick="openDeleteModal({{ $usuario->user_id }}, '{{ $usuario->persona->name }}')"
+                                <button
+                                    onclick="openDeleteModal({{ $usuario->user_id }}, '{{ $usuario->persona->name }}')"
                                     class="text-red-500 hover:text-red-700 flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2">
@@ -341,9 +352,9 @@
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 7l-.867 12.142A2 2 0
-                                                                                                                 0116.138 21H7.862a2 2 0
-                                                                                                                 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2
-                                                                                                                 0 00-2-2H9a2 2 0 00-2 2v2m3 0h4" />
+                                                                                                                         0116.138 21H7.862a2 2 0
+                                                                                                                         01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2
+                                                                                                                         0 00-2-2H9a2 2 0 00-2 2v2m3 0h4" />
                                 </svg>
                             </button>
                             <input type="file" id="edit_photo" name="photo" class="hidden"
