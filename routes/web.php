@@ -59,7 +59,7 @@ Route::get('/asignaturas/asignar-docentes',[AsignaturaController::class, 'show']
 Route::get('/asignaturas/asignar/{id}', [AsignaturaController::class, 'asignar'])->name('asignaturas.asignar');
 Route::post('/asignaturas/asignar', [AsignaturaController::class, 'storeAsignacion'])->name('asignaturas.storeAsignacion');
 Route::get('cancelar', function () { 
-     return redirect()->route('home'); 
+     return redirect()->route('asignaturas.asignar.docentes'); 
 })->name('ruta.cancelar'); 
 
 //------------------------tutores--------------------------------------

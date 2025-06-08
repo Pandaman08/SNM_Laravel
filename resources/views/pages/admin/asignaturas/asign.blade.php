@@ -23,7 +23,7 @@
             Guardar Asignación
         </button>
         
-        <a href="{{ route('home') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 ml-2">
+        <a href="{{ route('asignaturas.asignar.docentes') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 ml-2">
             Cancelar
         </a>
     </form>

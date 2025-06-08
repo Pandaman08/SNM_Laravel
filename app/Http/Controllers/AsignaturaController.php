@@ -35,9 +35,9 @@ class AsignaturaController extends Controller
                 'fecha' => now()->toDateString()
             ]);
             
-            return redirect()->route('home')->with('success', 'Docente asignado con éxito');
+            return redirect()->route('asignaturas.asignar.docentes')->with('success', 'Docente asignado con éxito');
         } else {
-            return redirect()->route('home')->with('error', 'El docente ya está asignado a esta asignatura');
+            return redirect()->route('asignaturas.asignar.docentes')->with('error', 'El docente ya está asignado a esta asignatura');
         }
     }
 

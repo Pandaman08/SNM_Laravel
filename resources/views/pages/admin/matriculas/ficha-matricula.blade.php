@@ -84,7 +84,7 @@
             @foreach($detalles as $detalle)
             <tr>
                 <td>{{ $detalle->asignatura->nombre }}</td>
-                <td>{{ $detalle->docente->persona->name ?? 'Por asignar' }}</td>
+                <td>{{ $detalle->docente->user->persona->name . ' ' . $detalle->docente->user->persona->lastname ?? 'Por asignar' }}</td>
             </tr>
             @endforeach
         </table>

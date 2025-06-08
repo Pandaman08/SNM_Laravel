@@ -58,7 +58,7 @@
                 🔍 Buscar Asignaturas
             </button>
             @if(request('nivelEducativo') || request('grado'))
-                <a href="{{ route('asignaturas.show') }}" 
+                <a href="{{ route('asignaturas.asignar.docentes') }}" 
                    class="ml-3 px-6 py-2 bg-gray-500 text-white font-semibold rounded-md shadow-sm hover:bg-gray-600 transition duration-200">
                     Limpiar Filtros
                 </a>
