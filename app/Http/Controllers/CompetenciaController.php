@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Competencia;
-
+use Illuminate\Support\Facades\Auth;
 class CompetenciaController extends Controller
 {
     public function index(Request $request) {

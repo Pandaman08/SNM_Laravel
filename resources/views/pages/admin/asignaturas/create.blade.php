@@ -21,7 +21,7 @@
                 <option value="" disabled {{ old('id_grado') ? '' : 'selected' }}>Seleccione un grado</option>
                 @foreach($grados as $g)
                     <option value="{{ $g->id_grado }}" {{ old('id_grado') == $g->id_grado ? 'selected' : '' }}>
-                        {{ $g->grado }}
+                        {{ $g->grado }} . {{ $g->nivelEducativo->nombre}}
                     </option>
                 @endforeach
             </select>

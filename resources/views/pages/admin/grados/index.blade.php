@@ -36,7 +36,7 @@
                 @forelse ($grados as $grado)
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4 font-medium text-gray-800">{{ $grado->id_grado }}</td>
-                        <td class="px-6 py-4 text-gray-700">{{ $grado->grado }}</td>
+                        <td class="px-6 py-4 text-gray-700">{{ $grado->grado }}  </td>
                         <td class="px-6 py-4">
                             <div class="flex items-center space-x-3">
                                 <a href="{{ route('grados.edit', $grado->id_grado) }}" 

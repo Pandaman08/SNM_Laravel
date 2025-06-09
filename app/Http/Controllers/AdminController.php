@@ -9,16 +9,34 @@ use App\Models\User;
 use App\Enums\UserRole;
 use App\Models\Estudiante;
 use Illuminate\Support\Facades\Storage;
-
+use App\Models\Matricula;
 
 class AdminController extends Controller
 {
-    public function index()
+    public function panel_admin()
     {
         $user = Auth::user();
-        return view("pages.admin.index", compact('user'));
+        $matriculas = Matricula::get();
+        return view("pages.admin.panels.admin", compact('user', 'matriculas'));
     }
 
+    public function panel_docente()
+    {
+        $user = Auth::user();
+        return view("pages.admin.panels.docente", compact('user'));
+    }
+
+    public function panel_secretaria()
+    {
+        $user = Auth::user();
+        $matriculas = Matricula::get();
+        return view("pages.admin.panels.secretaria", compact('user', 'matriculas'));
+    }
+    public function panel_tutor()
+    {
+        $user = Auth::user();
+        return view("pages.admin.panels.tutor", compact('user'));
+    }
     public function index_tutor()
     {
 

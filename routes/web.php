@@ -20,7 +20,12 @@ use App\Http\Controllers\PagoController;
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
 Route::post('/', [UserController::class, 'login'])->name('login');
-Route::get('/home', [AdminController::class, 'index'])->name('home');
+Route::get('/panel/admin', [AdminController::class, 'panel_admin'])->name('home.admin');
+Route::get('/panel/docente', [AdminController::class, 'panel_docente'])->name('home.docente');
+Route::get('/panel/tesorero', [AdminController::class, 'panel_secretaria'])->name('home.secretaria');
+Route::get('/panel/tutor', [AdminController::class, 'panel_tutor'])->name('home.tutor');
+
+
 Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 
 // ----------------------- users ---------------------------------
@@ -37,10 +42,25 @@ Route::put('/users/me/{id}', [UserController::class, 'update_user'])->name('user
 Route::put('/users/{id}/photo', [UserController::class, 'update_photo'])->name('users.update_photo');
 Route::put('users/{id}/password', [UserController::class, 'update_password'])->name('users.update_password');
 
-
+//------------------------Grado--------------------------------------
 Route::resource('grados', GradoController::class);
+
 Route::resource('secciones', SeccionController::class);
-Route::resource('asignaturas', AsignaturaController::class);
+
+//------------------------Asignatura--------------------------------------
+// Route::resource('asignaturas', AsignaturaController::class);
+Route::get('/asignaturas', [AsignaturaController::class, 'index'])->name('asignaturas.index');
+Route::get('/asignaturas/create', [AsignaturaController::class, 'create'])->name('asignaturas.create');
+Route::post('/asignaturas', [AsignaturaController::class, 'store'])->name('asignaturas.store');
+Route::get('/asignaturas/{id}/edit', [AsignaturaController::class, 'edit'])->name('asignaturas.edit');
+Route::put('/asignaturas/{id}', [AsignaturaController::class, 'update'])->name('asignaturas.update');
+Route::delete('/asignaturas/{id}', [AsignaturaController::class, 'destroy'])->name('asignaturas.destroy');
+Route::get('/asignaturas/asignar-docentes',[AsignaturaController::class, 'show'])->name('asignaturas.asignar.docentes');
+Route::get('/asignaturas/asignar/{id}', [AsignaturaController::class, 'asignar'])->name('asignaturas.asignar');
+Route::post('/asignaturas/asignar', [AsignaturaController::class, 'storeAsignacion'])->name('asignaturas.storeAsignacion');
+Route::get('cancelar', function () { 
+     return redirect()->route('asignaturas.asignar.docentes'); 
+})->name('ruta.cancelar'); 
 
 //------------------------tutores--------------------------------------
 // Route::get('tutores', [TutorController::class, 'indexTutores'])->name('tutores.index');
@@ -100,3 +120,4 @@ Route::resource('tipos-calificacion', TipoCalificacionController::class)->except
 Route::resource('pagos', PagoController::class)->except(['create']);
 
 Route::get('/pagos/create/{matricula}', [PagoController::class, 'create'])->name('pagos.create');
+Route::resource('pagos', PagoController::class)->except(['show']);

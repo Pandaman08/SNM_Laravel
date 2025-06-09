@@ -32,10 +32,7 @@
                 <thead class="bg-gray-200 text-gray-700 uppercase">
                     <tr>
                         <th class="px-4 py-3">Nombre</th>
-                        <th class="px-4 py-3">Numero Periodo</th>
-                        <th class="px-4 py-3">Fecha Inicio</th>
-                        <th class="px-4 py-3">Fecha Final</th>
-                        <th class="px-4 py-3">Estado</th>
+                
                         <th class="px-4 py-3">Acciones</th>
                     </tr>
                 </thead>
@@ -43,10 +40,7 @@
                     @foreach ($periodos as $periodo)
                         <tr class="border-b hover:bg-gray-50">
                             <td class="px-4 py-3">{{ $periodo->nombre }}</td>
-                            <td class="px-4 py-3">{{ $periodo->numero_periodo}}</td>
-                            <td class="px-4 py-3">{{$periodo->fecha_inicio }}</td>
-                            <td class="px-4 py-3">{{ $periodo->fecha_final }}</td>
-                              <td class="px-4 py-3">{{ $periodo->estado }}</td>
+                          
         
                             <td class="px-4 py-3 flex items-center justify-center space-x-4">
 
