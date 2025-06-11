@@ -56,7 +56,7 @@
 
 
                                 <button
-                                    onclick="openDeleteModal({{ $periodo->id_periodo }}, '{{ $periodo->name }}')"
+                                    onclick="openDeleteModal({{ $periodo->id_periodo }}, '{{ $periodo->nombre }}')"
                                     class="text-red-500 hover:text-red-700 flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2">
@@ -83,7 +83,7 @@
                 <button class="absolute top-0.5 right-0.5 text-gray-500 hover:text-black text-3xl p-2"
                     onclick="closeDeleteModal()">&times;</button>
                 <h2 class="text-xl font-bold mb-4">Eliminar Periodo</h2>
-                <p>¿Estás seguro de que deseas eliminar al usuario "<span id="usuarioNombre"></span>"?</p>
+                <p>¿Estás seguro de que deseas eliminar periodo "<span id="usuarioNombre"></span>"?</p>
                 <form id="deleteForm" method="POST" action="">
                     @csrf
                     @method('DELETE')
@@ -134,8 +134,7 @@
  function openDeleteModal(id, firstname) {
             document.getElementById('deleteModal').classList.remove('hidden');
             document.getElementById('usuarioNombre').innerText = firstname;
-            const form = document.getElementById('deleteForm');
-
+            document.getElementById('deleteForm').action = `/periodos/${id}/delete`;
 
         }
 

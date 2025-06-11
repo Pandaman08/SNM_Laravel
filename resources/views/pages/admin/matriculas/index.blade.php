@@ -99,15 +99,29 @@
 
             <!-- Mensajes -->
             @if (session('success'))
-                <div class="mb-6 p-4 bg-green-100 text-green-700 rounded-lg border border-green-300">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            @if (session('error'))
-                <div class="mb-6 p-4 bg-red-100 text-red-700 rounded-lg border border-red-300">
-                    {{ session('error') }}
-                </div>
+                <script>
+                    Swal.fire({
+                        title: "Exito!",
+                        text: "{{ session('success') }}",
+                        icon: "success",
+                        customClass: {
+                            confirmButton: 'bg-green-500 text-white hover:bg-green-600 focus:ring-2 focus:ring-green-300 rounded-lg py-2 px-4'
+                        }
+                    });
+                </script>
+            @elseif (session('error'))
+                <script>
+                    Swal.fire({
+                        icon: 'error',
+                        title: '¡Hubo un error!',
+                        html: "{!! session('error') !!}",
+                        showConfirmButton: true,
+                        confirmButtonText: 'Aceptar',
+                        customClass: {
+                            confirmButton: 'bg-red-500 text-white hover:bg-red-600 focus:ring-2 focus:ring-red-300 rounded-lg py-2 px-4'
+                        }
+                    });
+                </script>
             @endif
 
             <!-- Filtros -->
@@ -280,35 +294,31 @@
 
                                             @if (!$matricula->estado_validacion)
                                                 <!-- Aprobar -->
-                                                <form
+                                                <form id="aprobar-form-{{ $matricula->codigo_matricula }}"
                                                     action="{{ route('matriculas.aprobar', $matricula->codigo_matricula) }}"
                                                     method="POST" class="inline">
                                                     @csrf
                                                     @method('PATCH')
-                                                    <button type="submit"
+                                                    <button type="button"
                                                         class="text-green-600 hover:text-green-900 p-1 rounded"
-                                                        onclick="return confirm('¿Está seguro de aprobar esta matrícula?')">
+                                                        onclick="confirmarAprobacion('{{ $matricula->codigo_matricula }}')">
                                                         <i class="ri-check-line"></i>
                                                     </button>
                                                 </form>
 
-                                                <!-- Rechazar -->
-                                                <button
-                                                    onclick="mostrarModalRechazo('{{ $matricula->codigo_matricula }}')"
-                                                    class="text-red-600 hover:text-red-900 p-1 rounded">
-                                                    <i class="ri-close-line"></i>
-                                                </button>
+
+                                                @if ($matricula->estado_validacion)
+                                                    <!-- Rechazar -->
+                                                    <button
+                                                        onclick="mostrarModalRechazo('{{ $matricula->codigo_matricula }}')"
+                                                        class="text-red-600 hover:text-red-900 p-1 rounded">
+                                                        <i class="ri-close-line"></i>
+                                                    </button>
+                                                @endif
                                             @endif
 
-                                            <!-- Eliminar -->
-                                            <form action="" method="POST" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900 p-1 rounded"
-                                                    onclick="return confirm('¿Está seguro de eliminar esta matrícula? Esta acción no se puede deshacer.')">
-                                                    <i class="ri-delete-bin-line"></i>
-                                                </button>
-                                            </form>
+                                           
+
                                         </div>
                                     </td>
                                 </tr>
@@ -424,5 +434,45 @@
                 cerrarModalRechazo();
             }
         });
+
+
+        function confirmarAprobacion(codigoMatricula) {
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: 'Esta acción aprobará la matrícula del estudiante.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, aprobar',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    confirmButton: 'bg-green-500 text-white hover:bg-green-600 px-4 py-2 rounded',
+                    cancelButton: 'bg-gray-300 text-gray-800 hover:bg-gray-400 px-4 py-2 rounded ml-2'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('aprobar-form-' + codigoMatricula).submit();
+                }
+            });
+        }
+
+
+        function confirmarEliminacion(codigoMatricula) {
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: "Esta acción eliminará la matrícula y no se puede deshacer.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    confirmButton: 'bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded',
+                    cancelButton: 'bg-gray-300 text-gray-800 hover:bg-gray-400 px-4 py-2 rounded ml-2'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('eliminar-form-' + codigoMatricula).submit();
+                }
+            });
+        }
     </script>
 @endsection

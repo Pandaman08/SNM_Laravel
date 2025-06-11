@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ReporteNotasController;
 use App\Http\Controllers\SecretariaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\PeriodoController;
 use App\Http\Controllers\AnioEscolarController;
 use App\Http\Controllers\TipoCalificacionController;
 use App\Http\Controllers\PagoController;
+use App\Http\Controllers\CompetenciaController;
 
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
@@ -61,7 +63,8 @@ Route::post('/asignaturas/asignar', [AsignaturaController::class, 'storeAsignaci
 Route::get('cancelar', function () { 
      return redirect()->route('asignaturas.asignar.docentes'); 
 })->name('ruta.cancelar'); 
-
+Route::get('/asignaturas-asignadas', [DocenteController::class, 'index_asignaturas'])->name('docentes.asignaturas');
+Route::get('/estudiantes-matriculado/{id_asignatura}/asignatura', [DocenteController::class, 'index_estudiantes'])->name('docentes.estudiantes');
 //------------------------tutores--------------------------------------
 // Route::get('tutores', [TutorController::class, 'indexTutores'])->name('tutores.index');
 Route::get('/tutores/aprobar', [AdminController::class, 'index_tutor'])->name('tutores.panel-aprobar');
@@ -102,22 +105,33 @@ Route::get('/estudiantes/buscar',[AdminController::class,'showEstudiante'])->nam
 //------------------------ docentes ---------------------------------
 //Route::get('/docentes',[DocenteController::class, 'index'])->name('docente');
 //Route::get('/docentes/create',[DocenteController::class, 'create'])->name('docente.create');
-Route::get('/docentes/buscar', [AdminController::class, 'showDocente'])->name('docentes.buscar');
-
+Route::get('/docentes/buscar', [DocenteController::class, 'index'])->name('docentes.buscar');
+Route::post('/docentes', [DocenteController::class, 'store'])->name('docentes.store');
+Route::put('/docentes/{user_id}', [DocenteController::class, 'update'])->name('docentes.update');
+Route::get('/docentes/{user_id}/edit', [DocenteController::class, 'edit'])->name('docentes.edit');
+Route::delete('/docentes/{user_id}/delete', [DocenteController::class, 'destroy'])->name('docentes.destroy');
 // ------------------------ tesoreros -------------------------
-Route::get('/tesoreros/buscar', [SecretariaController::class, 'showTesoreros'])->name('tesoreros.buscar');
-
+Route::get('/secretarias/buscar', [SecretariaController::class, 'showTesoreros'])->name('secretarias.buscar');
+Route::post('/secretarias', [SecretariaController::class, 'store'])->name('secretarias.store');
+Route::put('/secretarias/{user_id}', [SecretariaController::class, 'update'])->name('secretarias.update');
+Route::get('/secretarias/{user_id}/edit', [SecretariaController::class, 'edit'])->name('secretarias.edit');
+Route::delete('/secretarias/{user_id}/delete', [SecretariaController::class, 'destroy'])->name('secretarias.destroy');
 
 // ---------- periodos -----------
 
-Route::resource('periodos', PeriodoController::class);
+Route::resource('periodos', PeriodoController::class)->except(['destroy']);
+Route::delete('/periodos/{periodo_id}/delete', [UserController::class, 'destroy'])->name('periodos.destroy');
 Route::resource('anios-escolares', AnioEscolarController::class);
 
 // ---------- Competencia ---------------------------------------------------
+Route::resource('competencias', CompetenciaController::class);
 
 Route::resource('tipos-calificacion', TipoCalificacionController::class)->except(['show']);
-
+Route::resource('reporte_notas', ReporteNotasController::class)->except(['show','create']);
+// Route::get('/reporte_notas/create/{codigo_matricula}/estudiante', [ReporteNotasController::class, 'create'])->name('reporte_notas.create');
+Route::get('/reporte_notas/{codigo_matricula}/{id_asignatura}/create', [ReporteNotasController::class, 'create'])->name('reporte_notas.create');
+Route::get('/reporte_notas/docente/{id_asignatura}', [ReporteNotasController::class, 'docente_view'])->name('reporte_notas.docente');
+Route::get('/reporte_notas/export/{id_asignatura}', [ReporteNotasController::class, 'exportExcel'])->name('reporte_notas.export');
 Route::resource('pagos', PagoController::class)->except(['create']);
 
-Route::get('/pagos/create/{matricula}', [PagoController::class, 'create'])->name('pagos.create');
-Route::resource('pagos', PagoController::class)->except(['show']);
+Route::get('/pagos/create/{matricula_id}/matricula', [PagoController::class, 'create'])->name('pagos.create');

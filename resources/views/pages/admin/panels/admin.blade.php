@@ -87,7 +87,7 @@
                             </div>
                             <span class="text-sm font-medium text-center">Panel Docentes</span>
                         </a>
-                        <a href="{{ route('tesoreros.buscar') }}"
+                        <a href="{{ route('secretarias.buscar') }}"
                             class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-purple-50 transition-colors">
                             <div class="p-3 rounded-full bg-purple-100 text-purple-600 mb-2">
                                 <i class="ri-line-chart-fill text-xl"></i>
