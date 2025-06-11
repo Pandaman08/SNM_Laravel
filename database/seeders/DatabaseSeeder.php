@@ -59,6 +59,7 @@ class DatabaseSeeder extends Seeder
             NivelesEducativosSeeder::class,  // 1° Crear niveles educativos
             GradosSeeder::class,      // 2° Crear grados para tu estructura
             SeccionesSeeder::class,          // 3° Crear secciones
+              TipoCalificacionSeeder::class,
         ]);
     
     }

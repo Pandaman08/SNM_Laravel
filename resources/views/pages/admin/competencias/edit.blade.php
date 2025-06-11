@@ -1,6 +1,6 @@
 @extends('layout.admin.plantilla')
 
-@section('titulo','Registrar Competencia')
+@section('titulo','Editar Competencia')
 
 @section('contenido')
 <div class="max-w-xl mx-auto bg-gradient-to-br from-white to-gray-50 p-8 rounded-3xl shadow-2xl border border-gray-100 animate-fade-in">
@@ -8,11 +8,12 @@
         <span class="p-3 bg-[#38b2ac] rounded-full text-white shadow-lg">
             <i class="ri-trophy-line text-2xl"></i>
         </span>
-        Registrar Competencia
+        Editar Competencia
     </h1>
 
-    <form action="{{ route('competencias.store') }}" method="POST" class="space-y-8">
+    <form action="{{ route('competencias.update', $competencia->id_competencias) }}" method="POST" class="space-y-8">
         @csrf
+        @method('PUT')
 
         {{-- Asignatura --}}
         <div class="space-y-1">
@@ -22,10 +23,9 @@
                     class="w-full appearance-none rounded-xl border border-gray-300 bg-white px-4 py-3 pr-10 shadow-inner
                            focus:outline-none focus:ring-2 focus:ring-[#38b2ac] focus:border-transparent transition"
                     required>
-                    <option value="" disabled selected>Seleccione una asignatura...</option>
                     @foreach($asignaturas as $asignatura)
                         <option value="{{ $asignatura->codigo_asignatura }}"
-                            {{ old('codigo_asignatura') == $asignatura->codigo_asignatura ? 'selected' : '' }}>
+                            {{ old('codigo_asignatura', $competencia->codigo_asignatura) == $asignatura->codigo_asignatura ? 'selected' : '' }}>
                             {{ $asignatura->nombre }} ({{ $asignatura->grado->grado }}° {{ $asignatura->grado->nivelEducativo->nombre }})
                         </option>
                     @endforeach
@@ -46,8 +46,7 @@
                 <textarea id="descripcion" name="descripcion" rows="4"
                     class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 shadow-inner
                            focus:outline-none focus:ring-2 focus:ring-[#38b2ac] focus:border-transparent transition"
-                    placeholder="Ingrese la descripción de la competencia..."
-                    required>{{ old('descripcion') }}</textarea>
+                    required>{{ old('descripcion', $competencia->descripcion) }}</textarea>
                 <div class="absolute inset-y-0 right-3 top-3 text-gray-400">
                     <i class="ri-file-text-line text-lg"></i>
                 </div>
@@ -67,7 +66,7 @@
                 class="px-6 py-3 bg-gradient-to-r from-[#38b2ac] to-[#2c7a7b]
                        hover:from-[#2c7a7b] hover:to-[#285e61] text-white font-semibold rounded-xl
                        shadow-lg transition transform hover:-translate-y-0.5">
-                <i class="ri-save-line mr-2 text-lg"></i> Guardar
+                <i class="ri-save-line mr-2 text-lg"></i> Actualizar
             </button>
         </div>
     </form>

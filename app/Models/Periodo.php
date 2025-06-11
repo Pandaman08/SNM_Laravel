@@ -12,14 +12,10 @@ class Periodo extends Model
     protected $primaryKey = 'id_periodo';
     
     protected $fillable = [
-        'numero_periodo',
         'nombre',
-        'fecha_inicio',
-        'fecha_final',
-        'estado'
     ];
 
-    protected $dates = ['fecha_inicio', 'fecha_final'];
+
 
     public function reportesNotas()
     {

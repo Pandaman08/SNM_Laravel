@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\AsignaturaDocente;
 
+
 class MatriculaController extends Controller
 {
     /**
@@ -283,7 +284,6 @@ class MatriculaController extends Controller
             'tipoMatricula',
             'anioEscolar',
             'seccion.grado.nivelEducativo',
-            'detallesAsignatura.asignatura'
         ])->where('codigo_matricula', $codigo_matricula)->firstOrFail();
 
         return view('pages.admin.matriculas.show', compact('matricula'));
@@ -353,10 +353,10 @@ class MatriculaController extends Controller
                     'secciones' => [],
                     'message' => 'No hay secciones disponibles para este grado',
                     'debug' => [
-                        'grado_id' => $gradoId,
-                        'total_secciones_bd' => $totalSecciones,
-                        'grado_existe' => $gradoExiste ? true : false
-                    ]
+                            'grado_id' => $gradoId,
+                            'total_secciones_bd' => $totalSecciones,
+                            'grado_existe' => $gradoExiste ? true : false
+                        ]
                 ]);
             }
 
@@ -484,14 +484,20 @@ class MatriculaController extends Controller
                 'motivo_rechazo' => null // Limpiar motivo de rechazo si existía
             ]);
 
+
             // Actualizar el último pago a estado "Finalizado"
             $ultimoPago = $matricula->pagos->sortByDesc('created_at')->first();
             $ultimoPago->update(['estado' => 'Finalizado']);
-
-            // Opcional: Activar al estudiante si es necesario
-            if ($matricula->estudiante) {
-                $matricula->estudiante->update(['activo' => true]);
+            foreach ($matricula->seccion->grado->asignaturas as $asignatura) {
+                foreach ($asignatura->competencias as $competencia) {
+                    DetalleAsignatura::create([
+                        'id_competencias' => $competencia->id_competencias,
+                        'codigo_matricula' => $matricula->codigo_matricula,
+                        'fecha' => now()
+                    ]);
+                }
             }
+
 
             return back()->with('success', 'Matrícula aprobada exitosamente');
 
