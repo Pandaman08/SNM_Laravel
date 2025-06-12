@@ -100,8 +100,8 @@ Route::get('/buscar-estudiante', [MatriculaController::class, 'buscarEstudiante'
 
 //------------------------ estudiantes ---------------------------------
 Route::get('estudiantes',[EstudianteController::class,'index'])->name('estudiantes.index');
-Route::get('/estudiantes/buscar',[AdminController::class,'showEstudiante'])->name('estudiantes.buscar');
-
+Route::get('/estudiantes/buscar',[EstudianteController::class,'showEstudiante'])->name('estudiantes.buscar');
+Route::put('/estudiantes/{estudiante_id}', [EstudianteController::class, 'update'])->name('estudiantes.update');
 //------------------------ docentes ---------------------------------
 //Route::get('/docentes',[DocenteController::class, 'index'])->name('docente');
 //Route::get('/docentes/create',[DocenteController::class, 'create'])->name('docente.create');

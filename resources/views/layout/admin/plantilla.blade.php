@@ -274,7 +274,8 @@
                     <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
                         <a
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
-                            <i class="ri-instance-line mr-3 text-lg"></i>
+                            <i class="ri-team-line mr-3 text-lg"></i>
+
 
                             <span class="text-sm">Gestionar Docentes</span>
 
@@ -282,12 +283,13 @@
                             <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                         </a>
                         <ul class="pl-7 mt-2 hidden group-[.selected]:block">
-                        
+
                             <li class="mb-4">
-                                <a href=" {{ route('asignaturas.asignar.docentes') }}" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                <a href=" {{ route('asignaturas.asignar.docentes') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                                     <span
                                         class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                   Asignar Docente
+                                    Asignar Docente
 
                                 </a>
                             </li>
@@ -297,7 +299,7 @@
                     <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
                         <a
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
-                            <i class="ri-instance-line mr-3 text-lg"></i>
+                            <i class="ri-calendar-line mr-3 text-lg"></i>
                             <span class="text-sm">Gestionar Años Escolares</span>
                             <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                         </a>
@@ -323,7 +325,7 @@
                     <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
                         <a
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
-                            <i class="ri-instance-line mr-3 text-lg"></i>
+                            <i class="ri-award-line mr-3 text-lg"></i>
                             <span class="text-sm">Gestionar Tipos Calificaciones</span>
                             <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                         </a>
@@ -349,7 +351,7 @@
                     <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
                         <a
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
-                            <i class="ri-instance-line mr-3 text-lg"></i>
+                            <i class="ri-timer-line mr-3 text-lg"></i>
                             <span class="text-sm">Gestionar Periodos</span>
                             <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                         </a>
@@ -372,10 +374,10 @@
                             </li>
                         </ul>
                     </li>
-                       <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
+                    <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
                         <a
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
-                            <i class="ri-instance-line mr-3 text-lg"></i>
+                            <i class="ri-lightbulb-line mr-3 text-lg"></i>
                             <span class="text-sm">Gestionar Competencias</span>
                             <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                         </a>
@@ -415,7 +417,7 @@
                         class="mb-1 group cursor-pointer {{ request()->routeIs(['papers.create', 'papers.index', 'papers.edit']) ? 'active' : '' }}">
                         <a
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
-                            <i class="ri-instance-line mr-3 text-lg"></i>
+                            <i class="ri-contacts-book-line mr-3 text-lg"></i>
                             <span class="text-sm">Gestionar Matricula</span>
                             <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                         </a>
@@ -495,12 +497,13 @@
                         </a>
                         <ul class="pl-7 mt-2 hidden group-[.selected]:block">
                             <li class="mb-4">
-                                <a href="{{route('docentes.asignaturas')}}" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                <a href="{{ route('docentes.asignaturas') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                                     <span
                                         class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs(['papers.index', 'papers.edit']) ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
                                     Asignaturas Asignadas</a>
                             </li>
-                           
+
                         </ul>
                     </li>
 
@@ -602,11 +605,7 @@
                         </a>
                         <ul class="pl-7 mt-2 hidden group-[.selected]:block">
                             <li class="mb-4">
-                                <a href="#" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                                    <span
-                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('capital_index') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Registrar Comprobante
-                                </a>
+                              
                             </li>
                             <li class="mb-4">
                                 <a href="{{ route('pagos.index') }}"
