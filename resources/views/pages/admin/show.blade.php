@@ -121,12 +121,12 @@
                         <div class="mb-4">
                             <label for="dni" class="block">DNI</label>
                             <input type="text" id="dni" name="dni" class="w-full px-4 py-2 border rounded"
-                                required>
+                                required maxlength="8" pattern="[0-9]{8}">
                         </div>
                         <div class="mb-4">
                             <label for="phone" class="block">Teléfono</label>
                             <input type="text" id="phone" name="phone" class="w-full px-4 py-2 border rounded"
-                                required>
+                                required maxlength="9" pattern="[0-9]{9}">
                         </div>
                     </div>
 
@@ -211,7 +211,7 @@
                                 <input type="text" id="edit_dni" name="edit_dni"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
                     focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required>
+                                    required maxlength="8" pattern="[0-9]{8}">
                             </div>
 
                             <div>
@@ -219,7 +219,7 @@
                                 <input type="text" id="edit_phone" name="edit_phone"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
                     focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required>
+                                    required maxlength="9" pattern="[0-9]{9}">
                             </div>
                         </div>
 
