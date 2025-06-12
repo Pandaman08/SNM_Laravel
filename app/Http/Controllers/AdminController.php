@@ -63,22 +63,7 @@ class AdminController extends Controller
         return view('pages.admin.docentes.index', compact('users', 'roles'));
     }
 
-    public function showEstudiante(Request $request)
-    {
-        $query = $request->input('search');
-
-        $users = Estudiante::when($query, function ($queryBuilder) use ($query) {
-            $queryBuilder->where(function ($q) use ($query) {
-                $q->where('name', 'like', '%' . $query . '%')
-                    ->orWhere('lastname', 'like', '%' . $query . '%')
-                    ->orWhere('email', 'like', '%' . $query . '%');
-            });
-        })
-            ->paginate(10);
-        $roles = UserRole::cases();
-
-        return view('pages.admin.estudiantes.index', compact('users', 'roles'));
-    }
+   
 
 
     public function approveUser($id)
