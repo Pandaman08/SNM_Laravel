@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asignatura;
+use App\Models\Competencia;
 use Illuminate\Http\Request;
 use App\Models\ReporteNota;
 use App\Models\DetalleAsignatura;
@@ -14,6 +15,9 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+
 
 class ReporteNotasController extends Controller
 {
@@ -71,10 +75,14 @@ class ReporteNotasController extends Controller
         $tipos_cal = TipoCalificacion::all();
         $periodos = Periodo::all();
 
-        $detalles_asignatura = DetalleAsignatura::where('codigo_matricula', $codigo_matricula)->get();
+        $competencias = Competencia::with('detallesAsignatura')
+            ->where('codigo_asignatura', $id_asignatura)
+            ->get();
 
-        // Creamos una colección de una sola matrícula para usar foreach
-
+        // Flatten the collection of detalles_asignatura
+        $detalles_asignatura = $competencias->flatMap(function ($competencia) {
+            return DetalleAsignatura::where('id_competencias', $competencia->id_competencias)->get();
+        });
 
 
         return view('pages.admin.reporte_notas.create', compact('matricula', 'detalles_asignatura', 'tipos_cal', 'periodos', 'id_asignatura'));
@@ -105,34 +113,55 @@ class ReporteNotasController extends Controller
             ->with('success', 'Nota registrada correctamente.');
     }
 
+    public function getDetalles($id_asignatura)
+    {
+        // $asignatura = Asignatura::findOrFail($id_asignatura);
+
+        $competencias = Competencia::where('codigo_asignatura', $id_asignatura)->get();
+        $competenciaIds = $competencias->pluck('id_competencias');
+
+        $detalles = DetalleAsignatura::whereIn('id_competencias', $competenciaIds)->get();
+        $detalleIds = $detalles->pluck('id_detalle_asignatura');
+
+
+        return ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
+            ->with([
+                'detalleAsignatura' => function ($query) {
+                    $query->select('*');
+                },
+                'tipoCalificacion',
+                'periodo'
+            ])
+            ->get();
+    }
+
     public function docente_view($id_asignatura)
     {
         $asignatura = Asignatura::findOrFail($id_asignatura);
-        $reportes = collect();
 
-        foreach ($asignatura->competencias as $competencia) {
-            foreach ($competencia->detallesAsignatura as $detalle) {
-                $reportesDetalle = ReporteNota::where('id_detalle_asignatura', $detalle->id_detalle_asignatura)
-                    ->with(['detalleAsignatura.asignatura', 'tipoCalificacion', 'periodo'])
-                    ->get();
+        $competencias = Competencia::where('codigo_asignatura', $id_asignatura)->get();
+        $competenciaIds = $competencias->pluck('id_competencias');
 
-                $reportes = $reportes->merge($reportesDetalle);
-            }
-        }
+        $detalles = DetalleAsignatura::whereIn('id_competencias', $competenciaIds)->get();
+        $detalleIds = $detalles->pluck('id_detalle_asignatura');
+
+
+        $reportes = ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
+            ->with([
+                'detalleAsignatura' => function ($query) {
+                    $query->select('*');
+                },
+                'tipoCalificacion',
+                'periodo'
+            ])
+            ->get();
 
         return view('pages.admin.reporte_notas.docentes-view', compact('reportes', 'asignatura'));
     }
 
     public function exportExcel($id_asignatura)
     {
-        $reportes = ReporteNota::whereHas('detalleAsignatura', function ($q) use ($id_asignatura) {
-            $q->where('codigo_asignatura', $id_asignatura);
-        })->with([
-                    'detalleAsignatura.asignatura',
-                    'detalleAsignatura.matricula.estudiante',
-                    'tipoCalificacion',
-                    'periodo',
-                ])->get();
+        $reportes = $this->getDetalles($id_asignatura);
 
         $data = $reportes->map(function ($r) {
             return [
@@ -142,17 +171,16 @@ class ReporteNotasController extends Controller
                 'Tipo Calificación' => $r->tipoCalificacion->nombre ?? '',
                 'Periodo' => $r->periodo->nombre ?? '',
                 'Observación' => $r->observacion,
-                'Fecha Registro' => $r->fecha_registro->format('Y-m-d'),
+                'Fecha Registro' => $r->fecha_registro,
             ];
         });
 
-        $nombreArchivo = 'reporte_notas_' . Str::slug($id_asignatura) . '.xlsx';
-
-        return Excel::download(new class ($data) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+        $export = new class ($data) implements FromCollection, WithHeadings {
             private $data;
+
             public function __construct($data)
             {
-                $this->data = $data;
+                $this->data = collect($data);
             }
 
             public function collection()
@@ -162,9 +190,13 @@ class ReporteNotasController extends Controller
 
             public function headings(): array
             {
-                return array_keys($this->data->first() ?? []);
+                return $this->data->isNotEmpty()
+                    ? array_keys($this->data->first())
+                    : [];
             }
-        }, $nombreArchivo);
+        };
+
+        return Excel::download($export, 'reporte_notas_' . Str::slug($id_asignatura) . '.xlsx');
     }
 
 }

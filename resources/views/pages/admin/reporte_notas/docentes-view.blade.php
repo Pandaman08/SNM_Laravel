@@ -27,7 +27,7 @@
             <tbody class="text-gray-700 divide-y divide-gray-200">
                 @foreach($reportes as $reporte)
                 <tr>
-                    <td class="py-3 px-4">{{ $reporte->detalleAsignatura->matricula->estudiante->persona->name }}</td>
+                    <td class="py-3 px-4">{{ $reporte->detalleAsignatura->matricula->estudiante->persona->name . ' ' .  $reporte->detalleAsignatura->matricula->estudiante->persona->lastname }}</td>
                     <td class="py-3 px-4">{{ $reporte->tipoCalificacion->codigo }}</td>
                     <td class="py-3 px-4">{{ $reporte->periodo->nombre }}</td>
                     <td class="py-3 px-4">{{ $reporte->observacion }}</td>
