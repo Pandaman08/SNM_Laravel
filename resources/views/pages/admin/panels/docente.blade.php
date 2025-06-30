@@ -28,7 +28,7 @@
                 </div>
                 <div>
                     <p class="text-gray-500 text-sm">Cursos Asignados</p>
-                    <p class="text-2xl font-bold">4</p>
+                    <p class="text-2xl font-bold">{{ $numAsign}}</p>
                 </div>
             </div>
 
