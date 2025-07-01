@@ -11,7 +11,9 @@ class Matricula extends Model
 
     protected $primaryKey = 'codigo_matricula';
 
+    public $incrementing = false; 
     protected $fillable = [
+        'codigo_matricula',
         'codigo_estudiante',
         'id_anio_escolar',
         'id_tipo_matricula',
@@ -20,11 +22,15 @@ class Matricula extends Model
         'fecha'
     ];
 
+    protected $casts = [
+    'codigo_estudiante' => 'integer',
+  
+];
     protected $dates = ['fecha'];
 
     public function estudiante()
     {
-        return $this->hasOne(Estudiante::class, 'codigo_estudiante', 'codigo_estudiante');
+        return $this->belongsTo(Estudiante::class, 'codigo_estudiante', 'codigo_estudiante');
     }
 
     public function anioEscolar()

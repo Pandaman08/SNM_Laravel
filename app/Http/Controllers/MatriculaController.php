@@ -93,10 +93,16 @@ class MatriculaController extends Controller
     {
 
 
-
-        $validated = $request->validate([
+        $baseValidationRules = [
             'id_tipo_matricula' => 'required|exists:tipos_matricula,id_tipo_matricula',
             'id_anio_escolar' => 'required|exists:anios_escolares,id_anio_escolar',
+            'seccion_id' => 'required|exists:secciones,id_seccion',
+            'fecha' => 'required|date',
+            'tutor_id' => 'required|exists:tutores,id_tutor',
+            'tipo_relacion' => 'required|string|max:50',
+        ];
+
+        $newStudentValidationRules = [
             'nombre' => 'required|string|max:255',
             'apellidos' => 'required|string|max:255',
             'dni' => 'required|string|size:8|unique:personas,dni',
@@ -108,58 +114,72 @@ class MatriculaController extends Controller
             'departamento' => 'required|string|max:100',
             'lengua_materna' => 'required|string|max:50',
             'religion' => 'nullable|string|max:50',
-            'seccion_id' => 'required|exists:secciones,id_seccion',
-            'fecha' => 'required|date',
-            'id_tutor' => 'required|exists:tutores,id_tutor',
-            'tipo_relacion' => 'required|string|max:50',
-            'adress' => 'required|string|max:255'
-        ]);
+            'address' => 'nullable|string|max:255',
+        ];
 
         DB::beginTransaction();
 
         try {
 
-            $persona = Persona::create([
-                'name' => $validated['nombre'],
-                'lastname' => $validated['apellidos'],
-                'dni' => $validated['dni'],
-                'sexo' => $validated['sexo'],
-                'fecha_nacimiento' => $validated['fecha_nacimiento'],
-                'address' => $validated['address']
-            ]);
+            $validatedData = $request->validate($baseValidationRules);
 
-            $estudiante = Estudiante::create([
-                'codigo_estudiante' => $this->generarCodigoEstudiante(),
-                'persona_id' => $persona->persona_id,
-                'pais' => $validated['pais'],
-                'provincia' => $validated['provincia'],
-                'distrito' => $validated['distrito'],
-                'departamento' => $validated['departamento'],
-                'lengua_materna' => $validated['lengua_materna'],
-                'religion' => $validated['religion'],
-            ]);
+            $estudiante = null;
+            if (in_array($request->id_tipo_matricula, ['2', '3', '4'])) {
 
-            // Crear matrícula
+                $request->validate([
+                    'dni_busqueda' => 'required|string|size:8|exists:personas,dni',
+                ]);
+
+                $persona = Persona::where('dni', $request->dni_busqueda)->firstOrFail();
+                $estudiante = Estudiante::where('persona_id', $persona->persona_id)->firstOrFail();
+                if (empty($estudiante->codigo_estudiante)) {
+                    throw new \Exception('El estudiante encontrado no tiene un código válido');
+                }
+            } else {
+
+                $validatedData = array_merge(
+                    $validatedData,
+                    $request->validate($newStudentValidationRules)
+                );
+
+                $persona = Persona::create([
+                    'name' => $validatedData['nombre'],
+                    'lastname' => $validatedData['apellidos'],
+                    'dni' => $validatedData['dni'],
+                    'sexo' => $validatedData['sexo'],
+                    'fecha_nacimiento' => $validatedData['fecha_nacimiento'],
+                    'address' => $validatedData['address'] ?? null,
+                ]);
+
+                $estudiante = Estudiante::create([
+                    'persona_id' => $persona->persona_id,
+                    'pais' => $validatedData['pais'],
+                    'provincia' => $validatedData['provincia'],
+                    'distrito' => $validatedData['distrito'],
+                    'departamento' => $validatedData['departamento'],
+                    'lengua_materna' => $validatedData['lengua_materna'],
+                    'religion' => $validatedData['religion'] ?? null,
+                ]);
+            }
+
+            // Create matriculation
             $matricula = Matricula::create([
                 'codigo_matricula' => $this->generarCodigoMatricula(),
                 'codigo_estudiante' => $estudiante->codigo_estudiante,
-                'id_tipo_matricula' => $validated['id_tipo_matricula'],
-                'id_anio_escolar' => $validated['id_anio_escolar'],
-                'seccion_id' => $validated['seccion_id'],
-                'fecha' => $validated['fecha']
+                'id_tipo_matricula' => $validatedData['id_tipo_matricula'],
+                'id_anio_escolar' => $validatedData['id_anio_escolar'],
+                'seccion_id' => $validatedData['seccion_id'],
+                'fecha' => $validatedData['fecha'],
             ]);
 
-            // Crear relación estudiante-tutor
+
             DB::table('estudiantes_tutores')->insert([
                 'codigo_estudiante' => $estudiante->codigo_estudiante,
-                'id_tutor' => $validated['id_tutor'],
-                'tipo_relacion' => $validated['tipo_relacion'],
+                'id_tutor' => $validatedData['tutor_id'],
+                'tipo_relacion' => $validatedData['tipo_relacion'],
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ]);
-
-            // Crear detalles de asignaturas automáticamente
-            $this->crearDetallesAsignaturas($matricula);
 
             DB::commit();
 
@@ -225,7 +245,7 @@ class MatriculaController extends Controller
 
             // Crear matrícula en estado pendiente
             $matricula = Matricula::create([
-                'codigo_matricula' => null, // Se generará cuando se apruebe
+                'codigo_matricula' => $this->generarCodigoMatricula(), // Se generará cuando se apruebe
                 'codigo_estudiante' => $estudiante->codigo_estudiante,
                 'id_tipo_matricula' => $validated['id_tipo_matricula'],
                 'id_anio_escolar' => $validated['id_anio_escolar'],
@@ -299,14 +319,14 @@ class MatriculaController extends Controller
 
             $nivelId = $request->get('nivel_id');
 
-            \Log::info('Buscando grados para nivel ID: ' . $nivelId);
+            // \Log::info('Buscando grados para nivel ID: ' . $nivelId);
 
             // Buscar usando el campo FK correcto según tu migración
             $grados = Grado::where('nivel_educativo_id', $nivelId)
                 ->orderBy('grado')
                 ->get(['id_grado', 'grado']);
 
-            \Log::info('Grados encontrados: ' . $grados->count());
+            // \Log::info('Grados encontrados: ' . $grados->count());
 
             return response()->json([
                 'success' => true,
@@ -353,10 +373,10 @@ class MatriculaController extends Controller
                     'secciones' => [],
                     'message' => 'No hay secciones disponibles para este grado',
                     'debug' => [
-                            'grado_id' => $gradoId,
-                            'total_secciones_bd' => $totalSecciones,
-                            'grado_existe' => $gradoExiste ? true : false
-                        ]
+                        'grado_id' => $gradoId,
+                        'total_secciones_bd' => $totalSecciones,
+                        'grado_existe' => $gradoExiste ? true : false
+                    ]
                 ]);
             }
 
@@ -378,6 +398,65 @@ class MatriculaController extends Controller
 
         } catch (\Exception $e) {
             \Log::error('Error en obtenerSecciones', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Error interno del servidor',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function obtenerEstudiante(Request $request)
+    {
+
+        try {
+            $request->validate([
+                'dni_busqueda' => 'string|max:8'
+            ]);
+
+            $dni = $request->get('dni_busqueda');
+
+
+            // Buscar estudiante
+            $estudiante = Estudiante::whereHas('persona', function ($q) use ($dni) {
+                $q->where('dni', 'like', '%' . $dni . '%');
+            })->first();
+
+
+            if (!$estudiante) {
+
+
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Alumno no encontrado',
+
+                ]);
+            }
+
+            $response = [
+                'success' => true,
+                'estudiante' => $estudiante,
+                'info' => Persona::find($estudiante->persona_id),
+
+            ];
+
+            return response()->json($response);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error de validación',
+                'details' => $e->errors()
+            ], 422);
+
+        } catch (\Exception $e) {
+            \Log::error('Error en obtener estudiante', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
@@ -415,15 +494,25 @@ class MatriculaController extends Controller
     /**
      * Generar código único para estudiante
      */
-    private function generarCodigoEstudiante()
+    private function generarCodigoEstudiante(): int
     {
-        $anio = date('Y');
-        $ultimoNumero = Estudiante::where('codigo_estudiante', 'like', "{$anio}%")
-            ->whereNotNull('codigo_estudiante')
-            ->count();
-        $numero = str_pad($ultimoNumero + 1, 4, '0', STR_PAD_LEFT);
+        do {
+            $code = random_int(1000, 9999);
+        } while (Estudiante::where('codigo_estudiante', $code)->exists());
 
-        return "{$anio}{$numero}";
+        return $code;
+    }
+    private function generarCodigoMatricula()
+    {
+        $currentYear = date('Y');
+        do {
+            $randomNumber = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+            $generatedCode = "{$currentYear}{$randomNumber}";
+
+        } while (Matricula::where('codigo_matricula', $generatedCode)->exists());
+
+        return $generatedCode;
+
     }
 
     public function generarFicha($codigo_matricula)
@@ -457,16 +546,7 @@ class MatriculaController extends Controller
     /**
      * Generar código único para matrícula
      */
-    private function generarCodigoMatricula()
-    {
-        $anio = date('Y');
-        $ultimoNumero = Matricula::where('codigo_matricula', 'like', "MAT{$anio}%")
-            ->whereNotNull('codigo_matricula')
-            ->count();
-        $numero = str_pad($ultimoNumero + 1, 4, '0', STR_PAD_LEFT);
 
-        return "MAT{$anio}{$numero}";
-    }
 
     public function aprobar($codigo_matricula)
     {

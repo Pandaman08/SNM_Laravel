@@ -200,7 +200,7 @@
                                 <tr class="hover:bg-gray-50 matricula-row"
                                     data-estado="{{ $matricula->estado_validacion ? 'activo' : 'pendiente' }}"
                                     data-nivel="{{ strtolower($matricula->seccion->grado->nivelEducativo->nombre) }}"
-                                    data-buscar="{{ strtolower($matricula->estudiante->dni . ' ' . $matricula->estudiante->nombre . ' ' . $matricula->estudiante->apellidos) }}">
+                                    data-buscar="{{ strtolower($matricula->estudiante->persona->dni . ' ' . $matricula->estudiante->persona->name . ' ' . $matricula->estudiante->persona->lastName) }}">
 
                                     <!-- Estudiante -->
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -209,17 +209,17 @@
                                                 <div
                                                     class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
                                                     <span class="text-sm font-medium text-gray-700">
-                                                        {{ substr($matricula->estudiante->nombre, 0, 1) }}{{ substr($matricula->estudiante->apellidos, 0, 1) }}
+                                                        {{ substr($matricula->estudiante->persona->name, 0, 1) }}{{ substr($matricula->estudiante->persona->lastName, 0, 1) }}
                                                     </span>
                                                 </div>
                                             </div>
                                             <div class="ml-4">
                                                 <div class="text-sm font-medium text-gray-900">
-                                                    {{ $matricula->estudiante->nombre }}
-                                                    {{ $matricula->estudiante->apellidos }}
+                                                    {{ $matricula->estudiante->persona->name }}
+                                                    {{ $matricula->estudiante->persona->lastName }}
                                                 </div>
                                                 <div class="text-sm text-gray-500">
-                                                    DNI: {{ $matricula->estudiante->dni }}
+                                                    DNI: {{ $matricula->estudiante->persona->dni }}
                                                 </div>
                                             </div>
                                         </div>
