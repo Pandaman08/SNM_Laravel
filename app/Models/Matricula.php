@@ -17,7 +17,7 @@ class Matricula extends Model
         'codigo_estudiante',
         'id_anio_escolar',
         'id_tipo_matricula',
-        'estado_validacion',
+        'estado',
         'seccion_id', // ← AGREGAR FK a secciones
         'fecha'
     ];

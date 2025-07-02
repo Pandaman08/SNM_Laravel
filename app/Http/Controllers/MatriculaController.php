@@ -534,7 +534,7 @@ class MatriculaController extends Controller
 
 
         // Verificar que la matrícula esté validada y tenga pagos finalizados
-        if (!$matricula->estado_validacion || $matricula->pagos->isEmpty()) {
+        if ($matricula->estado == 'pendiente' || $matricula->pagos->isEmpty()) {
             return back()->with('error', 'La matrícula no está validada o no tiene pagos finalizados');
         }
 
@@ -560,7 +560,7 @@ class MatriculaController extends Controller
 
             // Actualizar estado de la matrícula
             $matricula->update([
-                'estado_validacion' => true,
+                'estado' => 'activo',
                 'motivo_rechazo' => null // Limpiar motivo de rechazo si existía
             ]);
 
@@ -597,7 +597,7 @@ class MatriculaController extends Controller
 
             // Actualizar estado de la matrícula
             $matricula->update([
-                'estado_validacion' => false,
+                'estado' => 'rechazado',
                 'motivo_rechazo' => $request->motivo_rechazo
             ]);
 

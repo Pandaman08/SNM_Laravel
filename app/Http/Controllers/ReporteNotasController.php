@@ -146,6 +146,16 @@ class ReporteNotasController extends Controller
         $detalleIds = $detalles->pluck('id_detalle_asignatura');
 
 
+          $datos = \DB::table('detalles_asignatura as da')
+          ->join('competencias as c', 'c.id_competencias', '=', 'c.id_competencias')
+          ->join('asignaturas as a', 'c.codigo_asignatura', '=', 'a.codigo_asignatura')->where('a.codigo_asignatura', '=', $id_asignatura)->select(
+            'p.idproducto',
+            'p.descripcion',
+            'u.descripcion as unidad',
+            'p.precio',
+            'p.stock'
+        )->get();
+
         $reportes = ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
             ->with([
                 'detalleAsignatura' => function ($query) {

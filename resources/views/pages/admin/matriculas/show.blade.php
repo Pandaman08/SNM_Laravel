@@ -12,13 +12,27 @@
                     <p class="text-gray-600">Código: {{ $matricula->codigo_matricula }}</p>
                 </div>
                 <div class="flex items-center space-x-2">
+                    @php
+                        $color = null;
+
+                        if ($matricula->estado == 'activo') {
+                            $color = 'green';
+                        } elseif ($matricula->estado == 'finalizado') {
+                            $color = 'blue';
+                        } elseif ($matricula->estado == 'rechazado') {
+                            $color = 'red';
+                        } else {
+                            $color = 'orange';
+                        }
+
+                    @endphp
                     <span
                         class="px-3 py-1 text-xs rounded-full 
-                    {{ $matricula->estado_validacion ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                        {{ $matricula->estado_validacion ? 'Validada' : 'Pendiente de validación' }}
+                   bg-{{$color}}-100 text-{{$color}}-800 capitalize">
+                        {{ $matricula->estado  }}
                     </span>
 
-                    @if ($matricula->estado_validacion && $matricula->pagos->where('estado', 'Finalizado')->count() > 0)
+                    @if ($matricula->estado == 'activo' && $matricula->pagos->where('estado', 'Finalizado')->count() > 0)
                         <a href="{{ route('matriculas.ficha', $matricula->codigo_matricula) }}"
                             class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center text-sm"
                             target="_blank">
