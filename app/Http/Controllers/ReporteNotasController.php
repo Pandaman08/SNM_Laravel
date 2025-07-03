@@ -80,10 +80,13 @@ class ReporteNotasController extends Controller
             ->get();
 
         // Flatten the collection of detalles_asignatura
-        $detalles_asignatura = $competencias->flatMap(function ($competencia) {
-            return DetalleAsignatura::where('id_competencias', $competencia->id_competencias)->get();
+        $detalles_asignatura = $competencias->flatMap(function ($competencia) use ($codigo_matricula)  {
+             return DetalleAsignatura::where('id_competencias', $competencia->id_competencias)
+                         ->where('codigo_matricula', $codigo_matricula)   
+                           ->get();
         });
 
+        \Log::info('detalle',$detalles_asignatura->toArray());
 
         return view('pages.admin.reporte_notas.create', compact('matricula', 'detalles_asignatura', 'tipos_cal', 'periodos', 'id_asignatura'));
     }
@@ -94,7 +97,7 @@ class ReporteNotasController extends Controller
             'id_detalle_asignatura' => 'required|exists:detalles_asignatura,id_detalle_asignatura',
             'id_tipo_calificacion' => 'required|exists:tipos_calificacion,id_tipo_calificacion',
             'id_periodo' => 'required|exists:periodos,id_periodo',
-            'observacion' => 'required|string|max:255',
+            'observacion' => 'max:255',
             'fecha_registro' => 'required|date',
             'id_asignatura' => 'required|exists:asignaturas,codigo_asignatura',
         ]);
@@ -135,28 +138,94 @@ class ReporteNotasController extends Controller
             ->get();
     }
 
+
+    public function estudiante_calificaciones($codigo_matricula, $id_asignatura)
+    {
+        $matricula = Matricula::with(['estudiante.persona'])->findOrFail($codigo_matricula);
+        $asignatura = Asignatura::findOrFail($id_asignatura);
+
+       
+        $competencias = Competencia::where('codigo_asignatura', $id_asignatura)->get();
+
+         \Log::info('compes', $competencias->toArray());
+      
+        $competenciaIds = $competencias->pluck('id_competencias');
+          \Log::info('compes',  $competenciaIds->toArray());
+
+        $detalles = DetalleAsignatura::whereIn('id_competencias', $competenciaIds)
+            ->where('codigo_matricula', $codigo_matricula)
+            ->get();
+        \Log::info('DEATLLE', $detalles->toArray());
+
+       
+        $detalleIds = $detalles->pluck('id_detalle_asignatura');
+
+       
+        $reportes = ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
+            ->whereIn('id_periodo', [3, 4, 5])
+            ->with([
+                'detalleAsignatura.competencia',
+                'tipoCalificacion',
+                'periodo'
+            ])
+            ->get();
+        \Log::info('reportes', $reportes->toArray());
+
+
+        $competencias->each(function ($competencia) use ($detalles, $reportes) {
+            $competencia->detallesAsignatura = $detalles->where('id_competencias', $competencia->id_competencias);
+
+            $competencia->detallesAsignatura->each(function ($detalle) use ($reportes) {
+                $detalle->reportesNotas = $reportes->where('id_detalle_asignatura', $detalle->id_detalle_asignatura);
+            });
+        });
+
+        return view('pages.admin.reporte_notas.estudiantes', compact(
+            'matricula',
+            'competencias',
+            'asignatura'
+        ));
+    }
+
     public function docente_view($id_asignatura)
     {
         $asignatura = Asignatura::findOrFail($id_asignatura);
 
-        $competencias = Competencia::where('codigo_asignatura', $id_asignatura)->get();
-        $competenciaIds = $competencias->pluck('id_competencias');
+        /*  $competencias = Competencia::where('codigo_asignatura', $id_asignatura)->get();
+          $competenciaIds = $competencias->pluck('id_competencias');
 
-        $detalles = DetalleAsignatura::whereIn('id_competencias', $competenciaIds)->get();
-        $detalleIds = $detalles->pluck('id_detalle_asignatura');
+          $detalles = DetalleAsignatura::whereIn('id_competencias', $competenciaIds)->get();
+          $detalleIds = $detalles->pluck('id_detalle_asignatura'); */
 
 
-          $datos = \DB::table('detalles_asignatura as da')
-          ->join('competencias as c', 'c.id_competencias', '=', 'c.id_competencias')
-          ->join('asignaturas as a', 'c.codigo_asignatura', '=', 'a.codigo_asignatura')->where('a.codigo_asignatura', '=', $id_asignatura)->select(
-            'p.idproducto',
-            'p.descripcion',
-            'u.descripcion as unidad',
-            'p.precio',
-            'p.stock'
-        )->get();
+        $reportes = \DB::table('matriculas as m')->where('m.estado', '=', 'activo')
+            ->join('estudiantes as e', 'm.codigo_estudiante', '=', 'e.codigo_estudiante')
+            ->join('personas as p', 'e.persona_id', '=', 'p.persona_id')
+            ->leftJoin('detalles_asignatura as da', function ($join) use ($id_asignatura) {
+                $join->on('m.codigo_matricula', '=', 'da.codigo_matricula')
+                    ->whereExists(function ($query) use ($id_asignatura) {
+                        $query->select(\DB::raw(1))
+                            ->from('competencias as c')
+                            ->whereColumn('c.id_competencias', 'da.id_competencias')
+                            ->where('c.codigo_asignatura', $id_asignatura);
+                    });
+            })
+            ->leftJoin('reportes_notas as r', 'da.id_detalle_asignatura', '=', 'r.id_detalle_asignatura')
+            ->leftJoin('periodos as per', 'r.id_periodo', '=', 'per.id_periodo')
+            ->leftJoin('tipos_calificacion as tc', 'r.id_tipo_calificacion', '=', 'tc.id_tipo_calificacion')
+            ->select(
+                'p.persona_id',
+                \DB::raw("CONCAT(p.name, ' ', p.lastname) as estudiante"),
+                \DB::raw("MAX(CASE WHEN per.id_periodo = 1 THEN tc.codigo ELSE NULL END) as periodo1"),
+                \DB::raw("MAX(CASE WHEN per.id_periodo = 2 THEN tc.codigo ELSE NULL END) as periodo2"),
+                \DB::raw("MAX(CASE WHEN per.id_periodo = 3 THEN tc.codigo ELSE NULL END) as periodo3"),
+            )
+            ->groupBy('p.persona_id', 'p.name', 'p.lastname')
+            ->orderBy('p.lastname')
+            ->get();
 
-        $reportes = ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
+
+        /*$reportes = ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
             ->with([
                 'detalleAsignatura' => function ($query) {
                     $query->select('*');
@@ -164,7 +233,7 @@ class ReporteNotasController extends Controller
                 'tipoCalificacion',
                 'periodo'
             ])
-            ->get();
+            ->get(); */
 
         return view('pages.admin.reporte_notas.docentes-view', compact('reportes', 'asignatura'));
     }
