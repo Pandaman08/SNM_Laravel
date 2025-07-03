@@ -135,7 +135,7 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row justify-between items-center mt-8 gap-4">
-                    <a href="/login" class="text-blue-500 hover:underline text-sm">
+                    <a href="{{route('login')}}" class="text-blue-500 hover:underline text-sm">
                         ¿Ya tienes cuenta? Iniciar sesión
                     </a>
                     <button type="submit" 

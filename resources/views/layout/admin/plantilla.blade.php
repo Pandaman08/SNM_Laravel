@@ -53,7 +53,7 @@
                     <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3">Administración general</h4>
 
                     <li class="mb-1 group cursor-pointer">
-                        <a href=""
+                        <a href="{{ route('home.admin') }}"
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md {{ request()->routeIs('admin-principal') ? 'bg-[#98C560]' : 'bg-transparent' }}">
                             <i class="ri-instance-line mr-3 text-lg"></i>
                             <span class="text-sm">Principal</span>
@@ -88,18 +88,27 @@
                         </a>
                         <ul class="pl-7 mt-2 hidden group-[.selected]:block">
                             <li class="mb-4">
-                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                                    <span
-                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('person') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Lista de Usuarios
-                                </a>
-                            </li>
-                            <li class="mb-4">
                                 <a href="{{ route('docentes.buscar') }}"
                                     class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                                     <span
                                         class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
                                     Panel Docentes
+                                </a>
+                            </li>
+                            <li class="mb-4">
+                                <a href="{{ route('secretarias.buscar') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Panel Secretarios
+                                </a>
+                            </li>
+                            <li class="mb-4">
+                                <a href="{{ route('estudiantes.buscar') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Panel Estudiantes
                                 </a>
                             </li>
 
@@ -122,28 +131,24 @@
                         </ul>
                     </li>
 
+
                     <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
                         <a
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
                             <i class="ri-instance-line mr-3 text-lg"></i>
-                            <span class="text-sm">Gestionar Cursos</span>
+                            <span class="text-sm">Gestionar Matriculas</span>
                             <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                         </a>
                         <ul class="pl-7 mt-2 hidden group-[.selected]:block">
                             <li class="mb-4">
-                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                <a href="{{ route('matriculas.index') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                                     <span
                                         class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('person') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Lista de Cursos
+                                    Lista de Matriculas
                                 </a>
                             </li>
-                            <li class="mb-4">
-                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                                    <span
-                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Registrar Curso
-                                </a>
-                            </li>
+
                         </ul>
                     </li>
 
@@ -251,81 +256,50 @@
                                     Registrar Asignatura
                                 </a>
                             </li>
+                            <li class="mb-2">
+                                <a href="{{ route('asignaturas.asignar.docentes') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white hover:bg-[#98C560] {{ request()->routeIs('asignaturas.create') ? 'bg-[#98C560]' : '' }}">
+                                    <span
+                                        class="w-2 h-2 rounded-full mr-3 {{ request()->routeIs('asignaturas.create') ? 'bg-[#98C560]' : 'bg-gray-400' }}"></span>
+                                    Asignar docente
+                                </a>
+                            </li>
                         </ul>
                     </li>
+
+
 
 
 
                     <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
                         <a
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
-                            <i class="ri-instance-line mr-3 text-lg"></i>
-                            <span class="text-sm">Gestionar Grados</span>
-                            <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
-                        </a>
-                        <ul class="pl-7 mt-2 hidden group-[.selected]:block">
-                            <li class="mb-4">
-                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                                    <span
-                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('person') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Lista de Grados
-                                </a>
-                            </li>
-                            <li class="mb-4">
-                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                                    <span
-                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Registrar Grado
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+                            <i class="ri-team-line mr-3 text-lg"></i>
 
-                    <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
-                        <a
-                            class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
-                            <i class="ri-instance-line mr-3 text-lg"></i>
 
                             <span class="text-sm">Gestionar Docentes</span>
 
-                            <span class="text-sm">Gestionar Periodos</span>
+                            <!--    <span class="text-sm">Gestionar Periodos</span>  -->
                             <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                         </a>
                         <ul class="pl-7 mt-2 hidden group-[.selected]:block">
-                            <li class="mb-4">
-                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                                    <span
-                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('person') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Registrar Docente
-                                </a>
-                            </li>
-                            <li class="mb-4">
-                                <a href=" " class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                                    <span
-                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Listar Docente
 
-                                <a href="{{ route('periodos.index') }}"
-                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                                    <span
-                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('person') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Lista de Periodos
-                                </a>
-                            </li>
                             <li class="mb-4">
-                                <a href="{{ route('periodos.create') }}"
+                                <a href=" {{ route('asignaturas.asignar.docentes') }}"
                                     class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                                     <span
                                         class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Registrar Periodo
+                                    Asignar Docente
+
                                 </a>
                             </li>
+
                         </ul>
                     </li>
                     <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
                         <a
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
-                            <i class="ri-instance-line mr-3 text-lg"></i>
+                            <i class="ri-calendar-line mr-3 text-lg"></i>
                             <span class="text-sm">Gestionar Años Escolares</span>
                             <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                         </a>
@@ -351,7 +325,7 @@
                     <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
                         <a
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
-                            <i class="ri-instance-line mr-3 text-lg"></i>
+                            <i class="ri-award-line mr-3 text-lg"></i>
                             <span class="text-sm">Gestionar Tipos Calificaciones</span>
                             <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                         </a>
@@ -374,11 +348,63 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
+                        <a
+                            class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
+                            <i class="ri-timer-line mr-3 text-lg"></i>
+                            <span class="text-sm">Gestionar Periodos</span>
+                            <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
+                        </a>
+                        <ul class="pl-7 mt-2 hidden group-[.selected]:block">
+                            <li class="mb-4">
+                                <a href="{{ route('periodos.index') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('person') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Lista de Periodos
+                                </a>
+                            </li>
+                            <li class="mb-4">
+                                <a href="{{ route('periodos.create') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Registrar Periodo
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
+                        <a
+                            class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
+                            <i class="ri-lightbulb-line mr-3 text-lg"></i>
+                            <span class="text-sm">Gestionar Competencias</span>
+                            <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
+                        </a>
+                        <ul class="pl-7 mt-2 hidden group-[.selected]:block">
+                            <li class="mb-4">
+                                <a href="{{ route('competencias.index') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('person') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Lista de Competencias
+                                </a>
+                            </li>
+                            <li class="mb-4">
+                                <a href="{{ route('competencias.create') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('users') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Registrar Competencia
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 @elseif(auth()->user()->isSecretaria())
                     <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Secretaria</h4>
 
                     <li class="mb-1 group cursor-pointer">
-                        <a href=""
+                        <a href="{{ route('home.secretaria') }}"
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md {{ request()->routeIs('admin-homeSlider') ? 'bg-[#98C560]' : 'bg-transparent' }}">
                             <i class="ri-instance-line mr-3 text-lg"></i>
                             <span class="text-sm">Principal</span>
@@ -391,23 +417,19 @@
                         class="mb-1 group cursor-pointer {{ request()->routeIs(['papers.create', 'papers.index', 'papers.edit']) ? 'active' : '' }}">
                         <a
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
-                            <i class="ri-instance-line mr-3 text-lg"></i>
+                            <i class="ri-contacts-book-line mr-3 text-lg"></i>
                             <span class="text-sm">Gestionar Matricula</span>
                             <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                         </a>
                         <ul class="pl-7 mt-2 hidden group-[.selected]:block">
                             <li class="mb-4">
-                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                <a href="{{ route('matriculas.index') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                                     <span
                                         class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs(['papers.index', 'papers.edit']) ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
                                     Lista de Matricula</a>
                             </li>
-                            <li class="mb-4">
-                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                                    <span
-                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('papers.create') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Validar Matricula</a>
-                            </li>
+
                         </ul>
                     </li>
 
@@ -453,7 +475,7 @@
                     <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Docente</h4>
 
                     <li class="mb-1 group cursor-pointer">
-                        <a href=""
+                        <a href="{{ route('home.docente') }}"
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md {{ request()->routeIs('admin-homeSlider') ? 'bg-[#98C560]' : 'bg-transparent' }}">
                             <i class="ri-instance-line mr-3 text-lg"></i>
                             <span class="text-sm">Principal</span>
@@ -471,23 +493,13 @@
                         </a>
                         <ul class="pl-7 mt-2 hidden group-[.selected]:block">
                             <li class="mb-4">
-                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                <a href="{{ route('docentes.asignaturas') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                                     <span
                                         class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs(['papers.index', 'papers.edit']) ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Lista de Calificaciones</a>
+                                    Asignaturas Asignadas</a>
                             </li>
-                            <li class="mb-4">
-                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                                    <span
-                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('papers.create') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Lista de Estudiantes</a>
-                            </li>
-                            <li class="mb-4">
-                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                                    <span
-                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('papers.create') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Lista de Asignaturas</a>
-                            </li>
+
                         </ul>
                     </li>
 
@@ -520,7 +532,7 @@
                     <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Usuario</h4>
 
                     <li class="mb-1 group cursor-pointer">
-                        <a href=""
+                        <a href="{{ route('home.tutor') }}"
                             class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md {{ request()->routeIs('admin-homeSlider') ? 'bg-[#98C560]' : 'bg-transparent' }}">
                             <i class="ri-instance-line mr-3 text-lg"></i>
                             <span class="text-sm">Principal</span>
@@ -562,17 +574,41 @@
                         </a>
                         <ul class="pl-7 mt-2 hidden group-[.selected]:block">
                             <li class="mb-4">
-                                <a href="{{route('matriculas.create')}}" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                <a href="{{ route('matriculas.create') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                                     <span
                                         class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('capital_index') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
                                     Registrar Matricula
                                 </a>
                             </li>
                             <li class="mb-4">
-                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                <a href="{{ route('matriculas.mis-matriculas') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
                                     <span
                                         class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('direccion_index') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
                                     Mis Matriculas
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li
+                        class="mb-1 group cursor-pointer {{ request()->routeIs(['capital_index', 'direccion_index']) ? 'active' : '' }}">
+                        <a
+                            class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
+                            <i class="ri-instance-line mr-3 text-lg"></i>
+                            <span class="text-sm">Pagos</span>
+                            <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
+                        </a>
+                        <ul class="pl-7 mt-2 hidden group-[.selected]:block">
+                            <li class="mb-4">
+
+                            </li>
+                            <li class="mb-4">
+                                <a href="{{ route('pagos.index') }}"
+                                    class="text-sm flex items-center py-2 px-4 rounded-md text-white">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('direccion_index') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                    Mis pagos
                                 </a>
                             </li>
                         </ul>
@@ -624,12 +660,12 @@
                         <div
                             class="relative inline-block bg-white p-[2.5px] rounded-full border-[1px] border-black group-hover:border-[#98C560]">
                             @if (Auth::check() && Auth::user()->persona->photo)
-                                <img src="{{ Storage::url('' . Auth::user()->persona->photo) }}" alt="Foto de perfil"
-                                    class="w-12 h-12 rounded-full block object-cover">
+                                <img src="{{ Storage::url('' . Auth::user()->persona->photo) }}"
+                                    alt="Foto de perfil" class="w-12 h-12 rounded-full block object-cover">
                             @elseif(Auth::check())
                                 <div
                                     class="w-12 h-12 bg-gray-300 text-gray-700 flex items-center justify-center rounded-full text-xl font-bold uppercase">
-                                    {{ substr(Auth::user()->persona->name, 0, 1) }}                                 
+                                    {{ substr(Auth::user()->persona->name, 0, 1) }}
                                 </div>
                             @endif
                         </div>
@@ -646,7 +682,8 @@
                     <ul
                         class="dropdown-menu shadow-md shadow-black/5 z-30 hidden py-2 rounded-md bg-white border border-gray-100 w-[140px] text-black text-[15px]">
                         <li>
-                            <a href="#" class="flex items-center py-1.5 px-4 hover:text-[#98C560]">Mi Perfil</a>
+                            <a href="{{ route('users.edit_user') }}"
+                                class="flex items-center py-1.5 px-4 hover:text-[#98C560]">Mi Perfil</a>
                         </li>
                         <li>
                             <a href="#" onclick="confirmLogout()"
@@ -664,45 +701,7 @@
     </main>
 
 
-    <li class="dropdown ml-3">
-        <button type="button" class="dropdown-toggle flex items-center gap-x-2 hover:text-[#98C560] group">
-            <div
-                class="relative inline-block bg-white p-[2.5px] rounded-full border-[1px] border-black group-hover:border-[#98C560]">
-                @if (Auth::check() && optional(Auth::user()->persona)->photo)
-                    <img src="{{ asset('storage/' . Auth::user()->persona->photo) }}" alt="Foto de perfil"
-                        class="w-12 h-12 rounded-full block object-cover">
-                @elseif(Auth::check() && optional(Auth::user()->persona)->name)
-                    <div
-                        class="w-12 h-12 bg-gray-300 text-gray-700 flex items-center justify-center rounded-full text-xl font-bold uppercase">
-                        {{ substr(Auth::user()->persona->name, 0, 1) }}
-                    </div>
-                @else
-                    <div
-                        class="w-12 h-12 bg-gray-300 text-gray-700 flex items-center justify-center rounded-full text-xl font-bold uppercase">
-                        ?
-                    </div>
-                @endif
-            </div>
-            @if (Auth::check() && Auth::user()->persona)
-                <div>
-                    <h4 class="text-[14.5px] font-medium">
-                        {{ Auth::user()->persona->name }} {{ Auth::user()->persona->lastname }}
-                    </h4>
-                    <h4 class="text-[12.5px] font-normal uppercase">{{ Auth::user()->rol }}</h4>
-                </div>
-            @endif
-        </button>
-        <ul
-            class="dropdown-menu shadow-md shadow-black/5 z-30 hidden py-2 rounded-md bg-white border border-gray-100 w-[140px] text-black text-[15px]">
-            <li>
-                <a href="#" class="flex items-center py-1.5 px-4 hover:text-[#98C560]">Mi Perfil</a>
-            </li>
-            <li>
-                <a href="#" onclick="confirmLogout()"
-                    class="flex items-center py-1.5 px-4 hover:text-[#98C560]">Cerrar Sesión</a>
-            </li>
-        </ul>
-    </li>
+
 
     <!-- end: Main -->
 

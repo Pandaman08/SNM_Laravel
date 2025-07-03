@@ -1,96 +1,75 @@
 @extends('layout.admin.plantilla')
 
-@section('titulo', 'Gestión de Competencia')
+@section('titulo','Registrar Competencia')
 
 @section('contenido')
-<div class="card shadow-lg rounded border-0">
-        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                <h3 class="card-title m-0">📋 Listado de Competencia</h3>
-                <a href="" class="btn btn-primary">
-                <i class="fas fa-plus-circle"></i> Nuevo Registro
-                </a>
+<div class="max-w-xl mx-auto bg-gradient-to-br from-white to-gray-50 p-8 rounded-3xl shadow-2xl border border-gray-100 animate-fade-in">
+    <h1 class="text-4xl font-extrabold text-gray-900 mb-8 flex items-center justify-center gap-3">
+        <span class="p-3 bg-[#38b2ac] rounded-full text-white shadow-lg">
+            <i class="ri-trophy-line text-2xl"></i>
+        </span>
+        Registrar Competencia
+    </h1>
+
+    <form action="{{ route('competencias.store') }}" method="POST" class="space-y-8">
+        @csrf
+
+        {{-- Asignatura --}}
+        <div class="space-y-1">
+            <label for="codigo_asignatura" class="block text-gray-800 font-medium">Asignatura <span class="text-red-500">*</span></label>
+            <div class="relative">
+                <select id="codigo_asignatura" name="codigo_asignatura"
+                    class="w-full appearance-none rounded-xl border border-gray-300 bg-white px-4 py-3 pr-10 shadow-inner
+                           focus:outline-none focus:ring-2 focus:ring-[#38b2ac] focus:border-transparent transition"
+                    required>
+                    <option value="" disabled selected>Seleccione una asignatura...</option>
+                    @foreach($asignaturas as $asignatura)
+                        <option value="{{ $asignatura->codigo_asignatura }}"
+                            {{ old('codigo_asignatura') == $asignatura->codigo_asignatura ? 'selected' : '' }}>
+                            {{ $asignatura->nombre }} ({{ $asignatura->grado->grado }}° {{ $asignatura->grado->nivelEducativo->nombre }})
+                        </option>
+                    @endforeach
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                    <i class="ri-arrow-down-s-line text-gray-400 text-xl"></i>
+                </div>
+            </div>
+            @error('codigo_asignatura')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
-        <div class="card-body">
-
-                <!-- Buscador -->
-                <div class="row mb-3">
-                <div class="col-md-6">
-                        <form method="GET" class="input-group">
-                        <input class="form-control" type="search" placeholder="🔎 Buscar por descripción" >
-                        <div class="input-group-append">
-                                <button class="btn btn-success" type="submit"><i class="fas fa-search"></i> Buscar</button>
-                        </div>
-                        </form>
+        {{-- Descripción --}}
+        <div class="space-y-1">
+            <label for="descripcion" class="block text-gray-800 font-medium">Descripción <span class="text-red-500">*</span></label>
+            <div class="relative">
+                <textarea id="descripcion" name="descripcion" rows="4"
+                    class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 shadow-inner
+                           focus:outline-none focus:ring-2 focus:ring-[#38b2ac] focus:border-transparent transition"
+                    placeholder="Ingrese la descripción de la competencia..."
+                    required>{{ old('descripcion') }}</textarea>
+                <div class="absolute inset-y-0 right-3 top-3 text-gray-400">
+                    <i class="ri-file-text-line text-lg"></i>
                 </div>
-                </div>
-
-                <!-- Mensajes -->
-                @if (session('datos'))
-                <div id="mensaje" class="alert alert-warning alert-dismissible fade show text-center" role="alert">
-                {{ session('datos') }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                </button>
-                </div>
-                @endif
-
-                <!-- Tabla -->
-                <div class="table-responsive">
-                <table class="table table-bordered table-hover text-center align-middle">
-                        <thead class="thead-dark">
-                        <tr>
-                                <th scope="col">Código</th>
-                                <th scope="col">Especialidad</th>
-                                <th scope="col">Jornada Laboral</th>
-                                <th scope="col">Opciones</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @if (count($docente) <= 0)
-                        <tr>
-                                <td colspan="3" class="text-muted">No hay registros disponibles.</td>
-                        </tr>
-                        @else
-                        @foreach($docente as $itemdocente)
-                        <tr>
-                                <td>{{ $itemdocente->codigo_docente}}</td>
-                                <td>{{ $itemdocente->especialidad}}</td>
-                                <td>{{ $itemdocente->jornada_laboral}}</td>
-                                <td>
-                                <a href=" " class="btn btn-info btn-sm mx-1">
-                                        <i class="fas fa-edit"></i> Editar
-                                </a>
-                                <a href=" " class="btn btn-danger btn-sm mx-1">
-                                        <i class="fas fa-trash-alt"></i> Eliminar
-                                </a>
-                                </td>
-                        </tr>
-                        @endforeach
-                        @endif
-                        </tbody>
-                </table>
-                </div>
-
-                <!-- Paginación -->
-                <div class="d-flex justify-content-center mt-3">
-                        {{ $docente->links() }}
-                </div>
-
+            </div>
+            @error('descripcion')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
-        <div class="card-footer text-muted text-center">
-                © {{ date('Y') }} Sistema de Gestión de Docentes
+        {{-- Botones --}}
+        <div class="flex justify-end items-center gap-4 mt-6">
+            <a href="{{ route('competencias.index') }}"
+               class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl shadow-md transition transform hover:-translate-y-0.5">
+                Cancelar
+            </a>
+            <button type="submit"
+                class="px-6 py-3 bg-gradient-to-r from-[#38b2ac] to-[#2c7a7b]
+                       hover:from-[#2c7a7b] hover:to-[#285e61] text-white font-semibold rounded-xl
+                       shadow-lg transition transform hover:-translate-y-0.5">
+                <i class="ri-save-line mr-2 text-lg"></i> Guardar
+            </button>
         </div>
+    </form>
 </div>
-
-@endsection
-
-@section('script')
-<script>
-        setTimeout(function () {
-                let mensaje = document.querySelector('#mensaje');
-                if (mensaje) mensaje.remove();
-        }, 2500);
-</script>
 @endsection
