@@ -25,9 +25,12 @@ class Asignatura extends Model
         return $this->belongsTo(Grado::class, 'id_grado', 'id_grado');
     }
 
-    public function detallesAsignatura()
+    //
+
+
+     public function asignaturasDocente()
     {
-        return $this->hasMany(DetalleAsignatura::class, 'codigo_asignatura', 'codigo_asignatura');
+        return $this->hasMany(AsignaturaDocente::class, 'codigo_asignatura', 'codigo_asignatura');
     }
 
     public function competencias()
@@ -35,9 +38,14 @@ class Asignatura extends Model
         return $this->hasMany(Competencia::class, 'codigo_asignatura', 'codigo_asignatura');
     }
 
+    //
     public function docentes()
     {
         return $this->belongsToMany(Docente::class, 'asignaturas_docentes', 'codigo_asignatura', 'codigo_docente')
                     ->withPivot('fecha');
     }
+
+    // public function asignaturaDocente(){
+    //     return $this->hasMany(AsignaturaDocente::class, 'codigo_asignatura','codigo_asignatura');
+    // }
 }

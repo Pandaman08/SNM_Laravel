@@ -28,7 +28,7 @@
             <div class="space-y-3">
                 <div>
                     <p class="text-sm text-gray-500">Estudiante</p>
-                    <p class="font-medium">{{ $pago->matricula->estudiante->persona->name }} {{ $pago->matricula->estudiante->persona->lastname }}</p>
+                    <p class="font-medium">{{ $pago->matricula->estudiante->persona->name . ' '. $pago->matricula->estudiante->persona->lastname ?? 'No hay datos estudiante'}}</p>
                 </div>
                 <div>
                     <p class="text-sm text-gray-500">Código de Matrícula</p>

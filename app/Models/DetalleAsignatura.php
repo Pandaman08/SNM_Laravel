@@ -11,18 +11,18 @@ class DetalleAsignatura extends Model
 
     protected $table = 'detalles_asignatura';
     protected $primaryKey = 'id_detalle_asignatura';
-    
+
     protected $fillable = [
-        'codigo_asignatura',
+        'id_competencias',  // Actualizado
         'codigo_matricula',
         'fecha'
     ];
 
     protected $dates = ['fecha'];
 
-    public function asignatura()
+    public function competencia()
     {
-        return $this->belongsTo(Asignatura::class, 'codigo_asignatura', 'codigo_asignatura');
+        return $this->belongsTo(Competencia::class, 'id_competencias', 'id_competencias');
     }
 
     public function matricula()

@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
 
         \App\Models\User::create([
             'persona_id' => $adminPersona->persona_id,
-            'email' => 'admin@school.com',
+            'email' => 'admin@bruning.com',
             'rol' => UserRole::ADMIN->value,
             'estado' => true,
             'password' => Hash::make('password')
@@ -59,7 +59,11 @@ class DatabaseSeeder extends Seeder
             NivelesEducativosSeeder::class,  // 1° Crear niveles educativos
             GradosSeeder::class,      // 2° Crear grados para tu estructura
             SeccionesSeeder::class,          // 3° Crear secciones
+            TipoCalificacionSeeder::class,
+            AniosEscolaresSeeder::class,
+            PeriodosSeeder::class,
+            TiposMatriculaSeeder::class,
         ]);
-    
+
     }
 }

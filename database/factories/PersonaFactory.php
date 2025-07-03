@@ -23,7 +23,7 @@ class PersonaFactory extends Factory
             'phone' => $this->faker->numberBetween(0, 999999999),
             'sexo' => 'M',
             'estado_civil' => 'C',
-            'photo' => $this->faker->optional()->imageUrl(200, 200, 'people'),
+            'photo' => null,
             'address' => $this->faker->address(),
             'fecha_nacimiento' => $this->faker->dateTimeBetween('-50 years', '-18 years')->format('Y-m-d'),
              'created_at' => $this->faker->dateTimeBetween('-2 years', 'now'),

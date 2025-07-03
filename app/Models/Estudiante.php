@@ -14,6 +14,7 @@ class Estudiante extends Model
     protected $table = 'estudiantes';
 
     protected $fillable = [
+        'codigo_estudiante',
         'persona_id',
         'pais',
         'provincia',
@@ -24,7 +25,7 @@ class Estudiante extends Model
         'estado_civil'
     ];
 
-    
+
 
     public function matriculas()
     {
@@ -39,10 +40,31 @@ class Estudiante extends Model
     public function tutores()
     {
         return $this->belongsToMany(Tutor::class, 'estudiantes_tutores', 'codigo_estudiante', 'id_tutor')
-                    ->withPivot('tipo_relacion');
+            ->withPivot('tipo_relacion');
     }
-      public function persona()
+    public function persona()
     {
         return $this->belongsTo(Persona::class, 'persona_id', 'persona_id');
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->codigo_estudiante)) {
+                $model->codigo_estudiante = (new self())->generarCodigoEstudiante();
+            }
+        });
+    }
+
+    public function generarCodigoEstudiante(): int
+    {
+        do {
+            $code = random_int(1000, 9999);
+        } while (self::where('codigo_estudiante', $code)->exists());
+
+        return $code;
+    }
+
 }

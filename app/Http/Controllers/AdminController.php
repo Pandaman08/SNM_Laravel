@@ -6,19 +6,39 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\AsignaturaDocente;
 use App\Enums\UserRole;
 use App\Models\Estudiante;
 use Illuminate\Support\Facades\Storage;
-
+use App\Models\Matricula;
 
 class AdminController extends Controller
 {
-    public function index()
+    public function panel_admin()
     {
         $user = Auth::user();
-        return view("pages.admin.index", compact('user'));
+        $matriculas = Matricula::get();
+        return view("pages.admin.panels.admin", compact('user', 'matriculas'));
     }
 
+    public function panel_docente()
+    {
+        $user = Auth::user();
+        $numAsign= AsignaturaDocente::where('codigo_docente','=',$user->docente->codigo_docente)->get()->count();
+        return view("pages.admin.panels.docente", compact('user','numAsign'));
+    }
+
+    public function panel_secretaria()
+    {
+        $user = Auth::user();
+        $matriculas = Matricula::get();
+        return view("pages.admin.panels.secretaria", compact('user', 'matriculas'));
+    }
+    public function panel_tutor()
+    {
+        $user = Auth::user();
+        return view("pages.admin.panels.tutor", compact('user'));
+    }
     public function index_tutor()
     {
 
@@ -45,22 +65,7 @@ class AdminController extends Controller
         return view('pages.admin.docentes.index', compact('users', 'roles'));
     }
 
-    public function showEstudiante(Request $request)
-    {
-        $query = $request->input('search');
-
-        $users = Estudiante::when($query, function ($queryBuilder) use ($query) {
-            $queryBuilder->where(function ($q) use ($query) {
-                $q->where('name', 'like', '%' . $query . '%')
-                    ->orWhere('lastname', 'like', '%' . $query . '%')
-                    ->orWhere('email', 'like', '%' . $query . '%');
-            });
-        })
-            ->paginate(10);
-        $roles = UserRole::cases();
-
-        return view('pages.admin.estudiantes.index', compact('users', 'roles'));
-    }
+   
 
 
     public function approveUser($id)
