@@ -39,7 +39,7 @@
                     @foreach ($pagos as $pago)
                         <tr class="border-b hover:bg-gray-50">
                             <td class="px-4 py-3">
-                                {{ $pago->matricula->estudiante->nombre_completo ?? 'N/A' }}
+                                {{ $pago->matricula->estudiante->persona->name . ' ' . $pago->matricula->estudiante->persona->lastName  }}
                                 <br>
                                 <span class="text-xs text-gray-500">Matrícula: {{ $pago->codigo_matricula }}</span>
                             </td>

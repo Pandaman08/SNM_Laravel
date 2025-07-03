@@ -94,6 +94,7 @@ Route::patch('/matriculas/{codigo_matricula}/rechazar', [MatriculaController::cl
 
 // Rutas AJAX
 Route::get('/obtener-grados', [MatriculaController::class, 'obtenerGrados'])->name('matriculas.obtener-grados');
+Route::get('/obtener-estudiante', [MatriculaController::class, 'obtenerEstudiante'])->name('matriculas.obtener-estudiante');
 Route::get('/obtener-secciones', [MatriculaController::class, 'obtenerSecciones'])->name('matriculas.obtener-secciones');
 Route::get('/buscar-estudiante', [MatriculaController::class, 'buscarEstudiante'])->name('matriculas.buscar-estudiante');
 

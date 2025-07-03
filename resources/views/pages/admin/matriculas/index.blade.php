@@ -38,7 +38,7 @@
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500">Activas</p>
                             <p class="text-2xl font-semibold text-gray-900">
-                                {{ $matriculas->filter(function ($m) {return $m->estado_validacion;})->count() }}
+                                {{ $matriculas->filter(function ($m) {return $m->estado == 'activo';})->count() }}
                             </p>
                         </div>
                     </div>
@@ -54,7 +54,7 @@
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500">Pendientes</p>
                             <p class="text-2xl font-semibold text-gray-900">
-                                {{ $matriculas->filter(function ($m) {return !$m->estado_validacion;})->count() }}
+                                {{ $matriculas->filter(function ($m) {return $m->estado == 'pendiente';})->count() }}
                             </p>
                         </div>
                     </div>
@@ -135,6 +135,9 @@
                                 <option value="">Todos</option>
                                 <option value="activo">Activos</option>
                                 <option value="pendiente">Pendientes</option>
+                                <option value="rechazado">Rechazados</option>
+                                <option value="finalizado">Finalizados</option>
+
                             </select>
                         </div>
                         <div>
@@ -197,10 +200,9 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @forelse($matriculas as $matricula)
-                                <tr class="hover:bg-gray-50 matricula-row"
-                                    data-estado="{{ $matricula->estado_validacion ? 'activo' : 'pendiente' }}"
+                                <tr class="hover:bg-gray-50 matricula-row" data-estado="{{ $matricula->estado }}"
                                     data-nivel="{{ strtolower($matricula->seccion->grado->nivelEducativo->nombre) }}"
-                                    data-buscar="{{ strtolower($matricula->estudiante->dni . ' ' . $matricula->estudiante->nombre . ' ' . $matricula->estudiante->apellidos) }}">
+                                    data-buscar="{{ strtolower($matricula->estudiante->persona->dni . ' ' . $matricula->estudiante->persona->name . ' ' . $matricula->estudiante->persona->lastName) }}">
 
                                     <!-- Estudiante -->
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -209,17 +211,17 @@
                                                 <div
                                                     class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
                                                     <span class="text-sm font-medium text-gray-700">
-                                                        {{ substr($matricula->estudiante->nombre, 0, 1) }}{{ substr($matricula->estudiante->apellidos, 0, 1) }}
+                                                        {{ substr($matricula->estudiante->persona->name, 0, 1) }}{{ substr($matricula->estudiante->persona->lastName, 0, 1) }}
                                                     </span>
                                                 </div>
                                             </div>
                                             <div class="ml-4">
                                                 <div class="text-sm font-medium text-gray-900">
-                                                    {{ $matricula->estudiante->nombre }}
-                                                    {{ $matricula->estudiante->apellidos }}
+                                                    {{ $matricula->estudiante->persona->name }}
+                                                    {{ $matricula->estudiante->persona->lastName }}
                                                 </div>
                                                 <div class="text-sm text-gray-500">
-                                                    DNI: {{ $matricula->estudiante->dni }}
+                                                    DNI: {{ $matricula->estudiante->persona->dni }}
                                                 </div>
                                             </div>
                                         </div>
@@ -255,19 +257,26 @@
 
                                     <!-- Estado -->
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        @if ($matricula->estado_validacion)
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                <span class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5"></span>
-                                                Activa
-                                            </span>
-                                        @else
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                                                <span class="w-1.5 h-1.5 bg-orange-400 rounded-full mr-1.5"></span>
-                                                Pendiente
-                                            </span>
-                                        @endif
+                                        @php
+                                            $color = null;
+
+                                            if ($matricula->estado == 'activo') {
+                                                $color = 'green';
+                                            } elseif ($matricula->estado == 'finalizado') {
+                                                $color = 'blue';
+                                            } elseif ($matricula->estado == 'rechazado') {
+                                                $color = 'red';
+                                            } else {
+                                                $color = 'orange';
+                                            }
+
+                                        @endphp
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{$color}}-100 text-{{$color}}-800 capitalize">
+                                            <span class="w-1.5 h-1.5 bg-{{$color}}-400 rounded-full mr-1.5"></span>
+                                            {{ $matricula->estado }}
+                                        </span>
+
                                     </td>
 
                                     <!-- Fecha -->
@@ -292,7 +301,7 @@
                                                 <i class="ri-edit-line"></i>
                                             </a>
 
-                                            @if (!$matricula->estado_validacion)
+                                            @if ($matricula->estado== 'pendiente')
                                                 <!-- Aprobar -->
                                                 <form id="aprobar-form-{{ $matricula->codigo_matricula }}"
                                                     action="{{ route('matriculas.aprobar', $matricula->codigo_matricula) }}"
@@ -307,17 +316,17 @@
                                                 </form>
 
 
-                                                @if ($matricula->estado_validacion)
+                                              
                                                     <!-- Rechazar -->
                                                     <button
                                                         onclick="mostrarModalRechazo('{{ $matricula->codigo_matricula }}')"
                                                         class="text-red-600 hover:text-red-900 p-1 rounded">
                                                         <i class="ri-close-line"></i>
                                                     </button>
-                                                @endif
+                                              
                                             @endif
 
-                                           
+
 
                                         </div>
                                     </td>
