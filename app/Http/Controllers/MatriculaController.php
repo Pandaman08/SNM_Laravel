@@ -151,7 +151,9 @@ class MatriculaController extends Controller
                     'address' => $validatedData['address'] ?? null,
                 ]);
 
+                $codigoEstudiante =  Estudiante::generarCodigoEstudiante();
                 $estudiante = Estudiante::create([
+                    'codigo_estudiante' =>   $codigoEstudiante,
                     'persona_id' => $persona->persona_id,
                     'pais' => $validatedData['pais'],
                     'provincia' => $validatedData['provincia'],
@@ -164,8 +166,9 @@ class MatriculaController extends Controller
 
             // Create matriculation
             $matricula = Matricula::create([
-                'codigo_matricula' => $this->generarCodigoMatricula(),
-                'codigo_estudiante' => $estudiante->codigo_estudiante,
+                'codigo_matricula' => Matricula::generarCodigoMatricula(),
+                'codigo_estudiante' =>  $codigoEstudiante,
+                
                 'id_tipo_matricula' => $validatedData['id_tipo_matricula'],
                 'id_anio_escolar' => $validatedData['id_anio_escolar'],
                 'seccion_id' => $validatedData['seccion_id'],
@@ -174,7 +177,7 @@ class MatriculaController extends Controller
 
 
             DB::table('estudiantes_tutores')->insert([
-                'codigo_estudiante' => $estudiante->codigo_estudiante,
+                'codigo_estudiante' => $codigoEstudiante,
                 'id_tutor' => $validatedData['tutor_id'],
                 'tipo_relacion' => $validatedData['tipo_relacion'],
                 'created_at' => now(),
@@ -232,7 +235,7 @@ class MatriculaController extends Controller
             ]);
 
             $estudiante = Estudiante::create([
-                'codigo_estudiante' => $this->generarCodigoEstudiante(),
+                'codigo_estudiante' => Estudiante::generarCodigoEstudiante(),
                 'persona_id' => $persona->persona_id,
                 'pais' => $validated['pais'],
                 'provincia' => $validated['provincia'],
@@ -491,29 +494,8 @@ class MatriculaController extends Controller
         }
     }
 
-    /**
-     * Generar código único para estudiante
-     */
-    private function generarCodigoEstudiante(): int
-    {
-        do {
-            $code = random_int(1000, 9999);
-        } while (Estudiante::where('codigo_estudiante', $code)->exists());
 
-        return $code;
-    }
-    private function generarCodigoMatricula()
-    {
-        $currentYear = date('Y');
-        do {
-            $randomNumber = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
-            $generatedCode = "{$currentYear}{$randomNumber}";
 
-        } while (Matricula::where('codigo_matricula', $generatedCode)->exists());
-
-        return $generatedCode;
-
-    }
 
     public function generarFicha($codigo_matricula)
     {
