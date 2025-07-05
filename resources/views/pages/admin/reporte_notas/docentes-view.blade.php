@@ -18,20 +18,22 @@
             <thead class="bg-gray-100 text-gray-700">
                 <tr>
                     <th class="py-3 px-4 text-left">Estudiante</th>
-                    <th class="py-3 px-4 text-left">Tipo Calificación</th>
-                    <th class="py-3 px-4 text-left">Periodo</th>
-                    <th class="py-3 px-4 text-left">Observación</th>
-                    <th class="py-3 px-4 text-left">Fecha</th>
+                    <th class="py-3 px-4 text-left">Periodo I</th>
+                    <th class="py-3 px-4 text-left">Periodo II</th>
+                    <th class="py-3 px-4 text-left">Periodo III</th>
+
+                  <!--  <th class="py-3 px-4 text-left">Observación</th>
+                    <th class="py-3 px-4 text-left">Fecha</th>  -->
                 </tr>
             </thead>
             <tbody class="text-gray-700 divide-y divide-gray-200">
                 @foreach($reportes as $reporte)
                 <tr>
-                    <td class="py-3 px-4">{{ $reporte->detalleAsignatura->matricula->estudiante->persona->name . ' ' .  $reporte->detalleAsignatura->matricula->estudiante->persona->lastname }}</td>
-                    <td class="py-3 px-4">{{ $reporte->tipoCalificacion->codigo }}</td>
-                    <td class="py-3 px-4">{{ $reporte->periodo->nombre }}</td>
-                    <td class="py-3 px-4">{{ $reporte->observacion }}</td>
-                    <td class="py-3 px-4">{{ \Carbon\Carbon::parse($reporte->fecha_registro)->format('d/m/Y') }}</td>
+                    <td class="py-3 px-4">{{ $reporte->estudiante }}</td>
+                    <td class="py-3 px-4">{{ $dato->periodo1 ?? '-' }}</td>
+                    <td class="py-3 px-4">{{ $dato->periodo2 ?? '-'  }}</td>
+                    <td class="py-3 px-4">{{  $dato->periodo3 ?? '-' }}</td>
+                  
                 </tr>
                 @endforeach
             </tbody>
