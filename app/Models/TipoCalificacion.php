@@ -17,6 +17,7 @@ class TipoCalificacion extends Model
         'nombre',
         'descripcion'
     ];
+    public $timestamps = false;
 
     public function reportesNotas()
     {

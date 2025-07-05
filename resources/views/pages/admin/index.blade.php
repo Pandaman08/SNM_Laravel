@@ -15,7 +15,7 @@
                     <p class="font-medium">Bienvenido, <span class="text-blue-600">{{ Auth::user()->persona->name }}</span></p>
                     <p class="text-sm text-gray-500">{{ now()->format('d M Y, H:i') }}</p>
                 </div>
-                <img class="w-12 h-12 rounded-full border-2 border-white shadow-md" src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=4f46e5&color=fff" alt="Usuario">
+                <img class="w-12 h-12 rounded-full border-2 border-white shadow-md" src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->persona->name) }}&background=4f46e5&color=fff" alt="Usuario">
             </div>
         </div>
 
@@ -77,33 +77,33 @@
                             <div class="p-3 rounded-full bg-blue-100 text-blue-600 mb-2">
                                 <i class="ri-user-add-fill text-xl"></i>
                             </div>
-                            <span class="text-sm font-medium text-center">Nueva Matrícula</span>
+                            <span class="text-sm font-medium text-center">Panel Matrícula</span>
                         </a>
-                        <a href="#" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-green-50 transition-colors">
+                        <a href="{{route('docentes.buscar')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-green-50 transition-colors">
                             <div class="p-3 rounded-full bg-green-100 text-green-600 mb-2">
                                 <i class="ri-file-edit-fill text-xl"></i>
                             </div>
-                            <span class="text-sm font-medium text-center">Registrar Notas</span>
+                            <span class="text-sm font-medium text-center">Panel Docentes</span>
                         </a>
-                        <a href="#" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-purple-50 transition-colors">
+                        <a href="{{route('tesoreros.buscar')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-purple-50 transition-colors">
                             <div class="p-3 rounded-full bg-purple-100 text-purple-600 mb-2">
                                 <i class="ri-line-chart-fill text-xl"></i>
                             </div>
-                            <span class="text-sm font-medium text-center">Reportes</span>
+                            <span class="text-sm font-medium text-center">Panel Tesoreros</span>
                         </a>
-                        <a href="#" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-amber-50 transition-colors">
+                        <a href="{{route('pagos.index')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-amber-50 transition-colors">
                             <div class="p-3 rounded-full bg-amber-100 text-amber-600 mb-2">
                                 <i class="ri-money-dollar-circle-fill text-xl"></i>
                             </div>
                             <span class="text-sm font-medium text-center">Pagos</span>
                         </a>
-                        <a href="#" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-red-50 transition-colors">
+                        <a href="{{route('estudiantes.buscar')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-red-50 transition-colors">
                             <div class="p-3 rounded-full bg-red-100 text-red-600 mb-2">
                                 <i class="ri-notification-3-fill text-xl"></i>
                             </div>
-                            <span class="text-sm font-medium text-center">Comunicados</span>
+                            <span class="text-sm font-medium text-center">Panel estudiantes Matriculados</span>
                         </a>
-                        <a href="#" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-indigo-50 transition-colors">
+                        <a href="{{route('users.edit_user')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-indigo-50 transition-colors">
                             <div class="p-3 rounded-full bg-indigo-100 text-indigo-600 mb-2">
                                 <i class="ri-settings-4-fill text-xl"></i>
                             </div>

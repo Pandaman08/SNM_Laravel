@@ -15,4 +15,14 @@ enum UserRole: string
     {
         return array_column(self::cases(), 'value');
     }
+
+    public function dashboardRoute(): string
+    {
+        return match($this) {
+            self::ADMIN => 'home.admin',
+            self::SECRETARIA => 'home.secretaria',
+            self::DOCENTE => 'home.docente',
+            self::TUTOR => 'home.tutor',
+        };
+    }
 }

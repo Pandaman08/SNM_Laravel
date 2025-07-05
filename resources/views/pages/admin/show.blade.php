@@ -29,8 +29,8 @@
                         <th class="px-4 py-3">Rol</th>
                         <th class="px-4 py-3">Email</th>
                         <th class="px-4 py-3">Teléfono</th>
+                        <th class="px-4 py-3">Fecha Nacimiento</th>
                         <th class="px-4 py-3">Dirección</th>
-
                         <th class="px-4 py-3">Foto</th>
                         <th class="px-4 py-3">Acciones</th>
                     </tr>
@@ -43,6 +43,7 @@
                             <td class="px-4 py-3">{{ $usuario->rol }}</td>
                             <td class="px-4 py-3">{{ $usuario->email }}</td>
                             <td class="px-4 py-3">{{ $usuario->persona->phone }}</td>
+                            <td class="px-4 py-3">{{ $usuario->persona->fecha_nacimiento }}</td>
                             <td class="px-4 py-3">{{ $usuario->persona->address }}</td>
                             <td class="px-4 py-3">
                                 @if ($usuario->persona->photo)
@@ -65,7 +66,6 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 flex items-center justify-center space-x-4">
-
                                 <button type="button" onclick="openEditModal(this)"
                                     data-user='@json($usuario->load('persona'))'
                                     class="text-yellow-500 hover:text-yellow-700 flex items-center justify-center mt-2">
@@ -74,7 +74,6 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 3l3 3-8 8H3v-3l8-8z" />
                                     </svg>
                                 </button>
-
 
                                 <button onclick="openDeleteModal({{ $usuario->user_id }}, '{{ $usuario->persona->name }}')"
                                     class="text-red-500 hover:text-red-700 flex items-center justify-center">
@@ -96,7 +95,7 @@
         </div>
     </div>
 
-
+    <!-- Modal de Creación -->
     <div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white p-4 rounded shadow-lg max-w-5xl w-full max-h-screen overflow-y-auto relative">
             <button class="absolute top-0.5 right-0.5 text-gray-500 hover:text-black text-3xl p-2"
@@ -118,44 +117,27 @@
                             <input type="text" id="lastname" name="lastname" class="w-full px-4 py-2 border rounded"
                                 required>
                         </div>
+                        <div id="email-preview" class="text-sm text-gray-600 mt-2"></div>
                         <div class="mb-4">
-                            <label for="lastname" class="block">DNI</label>
+                            <label for="dni" class="block">DNI</label>
                             <input type="text" id="dni" name="dni" class="w-full px-4 py-2 border rounded"
-                                required>
+                                required maxlength="8" pattern="[0-9]{8}">
                         </div>
                         <div class="mb-4">
-                            <label for="email" class="block">Email</label>
-                            <input type="email" id="email" name="email" class="w-full px-4 py-2 border rounded"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="password" class="block">Contraseña</label>
-                            <div class="relative">
-                                <input type="password" id="password" name="password"
-                                    class="w-full px-4 py-2 border rounded" oninput="validatePassword()" required>
-                                <button type="button" class="absolute inset-y-0 right-0 px-3 text-gray-600"
-                                    onclick="togglePasswordVisibility('password')">
-                                    👁️
-                                </button>
-                            </div>
-                            <div id="password-strength" class="text-sm mt-2"></div>
-
+                            <label for="phone" class="block">Teléfono</label>
+                            <input type="text" id="phone" name="phone" class="w-full px-4 py-2 border rounded"
+                                required maxlength="9" pattern="[0-9]{9}">
                         </div>
                     </div>
 
                     <div class="space-y-4">
-                        <div class="mb-4">
-                            <label for="phone" class="block">Teléfono</label>
-                            <input type="text" id="phone" name="phone" class="w-full px-4 py-2 border rounded"
-                                required>
-                        </div>
                         <div class="mb-4">
                             <label for="address" class="block">Dirección</label>
                             <input type="text" id="address" name="address" class="w-full px-4 py-2 border rounded"
                                 required>
                         </div>
                         <div class="mb-4">
-                            <label for="esexo" class="block text-gray-700">Sexo:</label>
+                            <label for="sexo" class="block text-gray-700">Sexo:</label>
                             <select id="sexo" name="sexo" class="w-full px-4 py-2 border rounded">
                                 <option value="M">Masculino</option>
                                 <option value="F">Femenino</option>
@@ -192,103 +174,88 @@
         </div>
     </div>
 
+    <!-- Modal de Edición -->
     <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 w-full h-full">
         <div class="flex items-center justify-center w-full h-full">
             <div class="bg-white px-8 py-6 rounded-lg shadow-xl max-w-4xl w-full relative max-h-screen overflow-y-auto">
-                <!-- Título centrado -->
                 <div class="text-center mb-8">
                     <h2 class="text-2xl font-semibold text-blue-800">Editar Usuario</h2>
                     <div class="mx-auto mt-2 w-1/5 h-1 bg-green-400"></div>
                 </div>
 
-                <!-- Formulario -->
                 <form id="editForm" action="" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     @method('PUT')
 
-                    <!-- Grid principal: 2 columnas en md+ -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                         <!-- Columna Izquierda -->
                         <div class="space-y-4">
-                            <!-- Nombres -->
                             <div>
                                 <label for="edit_name" class="block text-gray-700">Nombres:</label>
-                                <input type="text" id="edit_name" name="name"
+                                <input type="text" id="edit_name" name="edit_name"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
 
-                            <!-- Apellidos -->
                             <div>
                                 <label for="edit_lastname" class="block text-gray-700">Apellidos:</label>
-                                <input type="text" id="edit_lastname" name="lastname"
+                                <input type="text" id="edit_lastname" name="edit_lastname"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
 
-                            <!-- DNI -->
                             <div>
                                 <label for="edit_dni" class="block text-gray-700">DNI:</label>
-                                <input type="text" id="edit_dni" name="dni"
+                                <input type="text" id="edit_dni" name="edit_dni"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required>
+                    focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required maxlength="8" pattern="[0-9]{8}">
                             </div>
 
-                            <!-- Teléfono -->
                             <div>
                                 <label for="edit_phone" class="block text-gray-700">Teléfono:</label>
-                                <input type="text" id="edit_phone" name="phone"
+                                <input type="text" id="edit_phone" name="edit_phone"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required>
-                            </div>
-
-                            <!-- Sexo -->
-                            <div>
-                                <label for="edit_sexo" class="block text-gray-700">Sexo:</label>
-                                <select id="edit_sexo" name="sexo"
-                                    class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="M">Masculino</option>
-                                    <option value="F">Femenino</option>
-                                </select>
+                    focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required maxlength="9" pattern="[0-9]{9}">
                             </div>
                         </div>
 
                         <!-- Columna Derecha -->
                         <div class="space-y-4">
-                            <!-- Email -->
                             <div>
                                 <label for="edit_email" class="block text-gray-700">Email:</label>
-                                <input type="email" id="edit_email" name="email"
+                                <input type="email" id="edit_email" name="edit_email"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
 
-                            <!-- Rol -->
                             <div>
-                                <label for="edit_rol" class="block text-gray-700">Rol:</label>
-                                <select id="edit_rol" name="rol"
+                                <label for="edit_fecha_nacimiento" class="block text-gray-700">Fecha Nacimiento:</label>
+                                <input type="date" id="edit_fecha_nacimiento" name="edit_fecha_nacimiento"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    @foreach ($roles as $role)
-                                        <option value="{{ $role->value }}">{{ $role->name }}</option>
-                                    @endforeach
+                    focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required>
+                            </div>
+
+                            <div>
+                                <label for="edit_sexo" class="block text-gray-700">Sexo:</label>
+                                <select id="edit_sexo" name="edit_sexo"
+                                    class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
+                    focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="M">Masculino</option>
+                                    <option value="F">Femenino</option>
                                 </select>
                             </div>
 
-
-                            <!-- Estado Civil -->
                             <div>
                                 <label for="edit_estado_civil" class="block text-gray-700">Estado Civil:</label>
-                                <select id="edit_estado_civil" name="estado_civil"
+                                <select id="edit_estado_civil" name="edit_estado_civil"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="S">Soltero/a</option>
                                     <option value="C">Casado/a</option>
                                     <option value="D">Divorciado/a</option>
@@ -296,27 +263,16 @@
                                 </select>
                             </div>
 
-                            <!-- Dirección -->
                             <div>
                                 <label for="edit_address" class="block text-gray-700">Dirección:</label>
-                                <input type="text" id="edit_address" name="address"
+                                <input type="text" id="edit_address" name="edit_address"
                                     class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required>
-                            </div>
-
-                            <!-- Fecha Nacimiento -->
-                            <div>
-                                <label for="edit_fecha_nacimiento" class="block text-gray-700">Fecha Nacimiento:</label>
-                                <input type="date" id="edit_fecha_nacimiento" name="fecha_nacimiento"
-                                    class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md
-                                      focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     required>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Foto de perfil -->
                     <div class="mt-6">
                         <label class="block text-gray-700 mb-1">Foto de Perfil:</label>
                         <div id="edit-image-upload"
@@ -344,10 +300,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0
-                                                                                                                 0116.138 21H7.862a2 2 0
-                                                                                                                 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2
-                                                                                                                 0 00-2-2H9a2 2 0 00-2 2v2m3 0h4" />
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2 0 00-2-2H9a2 2 0 00-2 2v2m3 0h4" />
                                 </svg>
                             </button>
                             <input type="file" id="edit_photo" name="photo" class="hidden"
@@ -355,7 +308,6 @@
                         </div>
                     </div>
 
-                    <!-- Botones de acción -->
                     <div class="flex justify-center gap-4 mt-6">
                         <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-700">
                             Actualizar
@@ -370,6 +322,7 @@
         </div>
     </div>
 
+    <!-- Modal de Eliminación -->
     <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 w-full h-full">
         <div class="flex items-center justify-center w-full h-full">
             <div class="bg-white p-7 rounded shadow-lg max-w-md w-full relative">
@@ -389,7 +342,7 @@
         </div>
     </div>
 
-
+    <!-- Modal para visualizar imágenes -->
     <div id="archivoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white p-7 rounded shadow-lg max-w-7xl w-full relative">
             <button class="absolute top-0.5 right-0.5 text-gray-500 hover:text-black text-3xl p-2"
@@ -446,10 +399,29 @@
         </script>
     @endif
 
-
     <script>
         function openCreateModal() {
             document.getElementById('createModal').classList.remove('hidden');
+
+            // Mostrar cómo se generará el email
+            const nameInput = document.getElementById('name');
+            const lastnameInput = document.getElementById('lastname');
+            const emailPreview = document.getElementById('email-preview');
+
+            const updateEmailPreview = () => {
+                const name = nameInput.value.toLowerCase();
+                const lastname = lastnameInput.value.toLowerCase();
+                if (name && lastname) {
+                    const randomNumbers = Math.floor(1000 + Math.random() * 9000);
+                    emailPreview.textContent =
+                        `Email generado: ${name}${lastname.charAt(0)}_${randomNumbers}@bruning.com`;
+                } else {
+                    emailPreview.textContent = '';
+                }
+            };
+
+            nameInput.addEventListener('input', updateEmailPreview);
+            lastnameInput.addEventListener('input', updateEmailPreview);
         }
 
         function closeCreateModal() {
@@ -467,10 +439,10 @@
             document.getElementById('edit_sexo').value = user.persona.sexo;
             document.getElementById('edit_estado_civil').value = user.persona.estado_civil;
             document.getElementById('edit_address').value = user.persona.address;
-            console.log("fecha nacimiento: ", user.persona.fecha_nacimiento)
-            document.getElementById('edit_fecha_nacimiento').value = user.persona.fecha_nacimiento;
+            const fechaNacimiento = new Date(user.persona.fecha_nacimiento);
+            const formattedDate = fechaNacimiento.toISOString().split('T')[0];
+            document.getElementById('edit_fecha_nacimiento').value = formattedDate;
             document.getElementById('edit_email').value = user.email;
-            document.getElementById('edit_rol').value = user.rol;
 
             // Manejar la foto de perfil
             const previewImg = document.getElementById('previewImg');
@@ -488,7 +460,7 @@
                 editImagePlaceholder.classList.remove('hidden');
                 removeBtn.classList.add('hidden');
             }
-            console.log(`action/users/${user.user_id}`)
+
             // Establecer la acción del formulario
             document.getElementById('editForm').action = `/users/${user.user_id}`;
 
@@ -555,13 +527,10 @@
             }
         }
 
-
         function openDeleteModal(id, firstname) {
             document.getElementById('deleteModal').classList.remove('hidden');
             document.getElementById('usuarioNombre').innerText = firstname;
-            const form = document.getElementById('deleteForm');
-
-
+            document.getElementById('deleteForm').action = `/users/${id}/delete`;
         }
 
         function closeDeleteModal() {
@@ -593,51 +562,6 @@
 
         function closeModal() {
             document.getElementById('archivoModal').classList.add('hidden');
-        }
-
-
-        function togglePasswordVisibility(fieldId) {
-            const inputField = document.getElementById(fieldId);
-            inputField.type = inputField.type === "password" ? "text" : "password";
-        }
-
-
-        function validatePassword() {
-            const password = document.getElementById("password").value;
-            const strengthElement = document.getElementById("password-strength");
-            validateStrength(password, strengthElement);
-        }
-
-        function validateStrength(password, strengthElement) {
-            let strengthMessage = "La contraseña debe tener:";
-            let isValid = true;
-
-            if (!/[A-Z]/.test(password)) {
-                strengthMessage += " una mayúscula,";
-                isValid = false;
-            }
-            if (!/[a-z]/.test(password)) {
-                strengthMessage += " una minúscula,";
-                isValid = false;
-            }
-            if (!/\d/.test(password)) {
-                strengthMessage += " un número,";
-                isValid = false;
-            }
-            if (password.length < 6) {
-                strengthMessage += " al menos 6 caracteres,";
-                isValid = false;
-            }
-
-            if (strengthElement) {
-                if (isValid) {
-                    strengthElement.innerHTML = "<span class='text-green-600'>✔ La contraseña es válida.</span>";
-                } else {
-                    strengthElement.innerHTML = `<span class='text-red-600'>${strengthMessage.slice(0, -1)}.</span>`;
-                }
-            }
-
-            return isValid;
         }
     </script>
 @endsection

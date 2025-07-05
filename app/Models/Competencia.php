@@ -22,4 +22,9 @@ class Competencia extends Model
     {
         return $this->belongsTo(Asignatura::class, 'codigo_asignatura', 'codigo_asignatura');
     }
+
+     public function detallesAsignatura()
+    {
+        return $this->hasMany(DetalleAsignatura::class, 'id_detalle_asignatura', 'id_detalle_asignatura');
+    }
 }

@@ -35,9 +35,9 @@ class AsignaturaController extends Controller
                 'fecha' => now()->toDateString()
             ]);
             
-            return redirect()->route('home')->with('success', 'Docente asignado con éxito');
+            return redirect()->route('asignaturas.asignar.docentes')->with('success', 'Docente asignado con éxito');
         } else {
-            return redirect()->route('home')->with('error', 'El docente ya está asignado a esta asignatura');
+            return redirect()->route('asignaturas.asignar.docentes')->with('error', 'El docente ya está asignado a esta asignatura');
         }
     }
 
@@ -135,7 +135,7 @@ class AsignaturaController extends Controller
     {
         $asignatura = Asignatura::findOrFail($id);
 
-        if ($asignatura->detallesAsignatura()->exists() || $asignatura->competencias()->exists() || $asignatura->docentes()->exists()) {
+        if ( $asignatura->competencias()->exists() ) {
             return redirect()->route('asignaturas.index')->with('error', 'No se puede eliminar la asignatura porque tiene relaciones activas.');
         }
 
