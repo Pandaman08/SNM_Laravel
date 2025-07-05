@@ -279,7 +279,7 @@
                                     *</label>
                                 <input type="text" name="address" id="address"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    value="{{ old('address') }}" >
+                                    value="{{ old('address') }}">
                             </div>
 
                             <!-- Lengua Materna -->
@@ -382,101 +382,181 @@
                                 <select name="estado_matricula" id="estado_matricula"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     required>
-                                    <option value="1" selected>Activo</option>
-                                    <option value="0">Inactivo</option>
+                                    <option value="activo" selected>Activo</option>
+                                    <option value="pendiente">Inactivo</option>
                                 </select>
                             </div>
 
                             <!-- Estado de Pago -->
                             <div>
                                 <label for="estado_pago" class="block text-sm font-medium text-gray-700 mb-2">Estado de
-                                    Pago *</label>
+                                    Concepto Pago *</label>
                                 <select name="estado_pago" id="estado_pago"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     required>
-                                    <option value="Pendiente" selected>Pendiente</option>
-                                    <option value="Finalizado">Finalizado</option>
+                                    <option value="matricula" selected>Matricula</option>
+                                    <option value="mensualidad">Mensualidad</option>
                                 </select>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sección 5: Relación Estudiante-Tutor -->
-                <div id="seccion_tutor" class="bg-white rounded-lg shadow-sm border border-gray-200"
-                    style="display: none;">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h2 class="text-lg font-semibold text-gray-900 flex items-center">
-                            <i class="ri-parent-line text-purple-500 mr-2"></i>
-                            Relación con Tutor
-                        </h2>
-                    </div>
-                    <div class="p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Tutor -->
                             <div>
-                                <label for="tutor_id" class="block text-sm font-medium text-gray-700 mb-2">Tutor *</label>
-                                <select name="tutor_id" id="tutor_id"
+                                <label for="fecha_pago" class="block text-sm font-medium text-gray-700 mb-2">Fecha de
+                                    Pago *</label>
+                                <input type="date" name="fecha_pago" id="fecha_pago"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     required>
-                                    <option value="" disabled selected>Seleccione un tutor</option>
-                                    @foreach ($tutores as $tutor)
-                                        <option value="{{ $tutor->id_tutor }}">
-                                            {{ $tutor->user->persona->name }} {{ $tutor->user->persona->lastname }}
-                                            ({{ $tutor->user->persona->dni }})
-                                        </option>
-                                    @endforeach
-                                </select>
                             </div>
-
-                            <!-- Tipo de Relación -->
                             <div>
-                                <label for="tipo_relacion" class="block text-sm font-medium text-gray-700 mb-2">Tipo de
-                                    Relación *</label>
-                                <select name="tipo_relacion" id="tipo_relacion"
+                                <label for="monto" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Monto</label>
+                                <input type="number" name="monto" id="monto"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     required>
-                                    <option value="" disabled selected>Seleccione</option>
-                                    <option value="Padre">Padre</option>
-                                    <option value="Madre">Madre</option>
-                                    <option value="Tutor Legal">Tutor Legal</option>
-                                    <option value="Abuelo/a">Abuelo/a</option>
-                                    <option value="Tío/a">Tío/a</option>
-                                    <option value="Hermano/a">Hermano/a</option>
-                                    <option value="Otro">Otro</option>
-                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Comprobante Imagen *</label>
+                                <div class="flex items-center space-x-2">
+                                    <!-- Input de archivo oculto -->
+                                    <input type="file" name="comprobante_img" id="comprobante_imagen"
+                                        accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+
+                                    <!-- Botón personalizado para seleccionar archivo -->
+                                    <button type="button" onclick="document.getElementById('comprobante_imagen').click()"
+                                        class="flex-grow px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <span id="file-select-label">Seleccionar archivo...</span>
+                                        <span id="file-selected-name" class="hidden font-medium text-gray-700"></span>
+                                    </button>
+
+                                    <!-- Botón para remover imagen (solo visible cuando hay archivo) -->
+                                    <button type="button" id="remove-file-btn" onclick="resetFileInput()"
+                                        class="hidden p-2 text-gray-400 hover:text-red-600 focus:outline-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+
+
+                                    <!-- Botón para ver la imagen (solo visible cuando hay archivo) -->
+                                    <button type="button" id="view-image-btn" onclick="showImageModal()"
+                                        class="hidden p-2 text-blue-600 hover:text-blue-800 rounded-lg focus:outline-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div id="image-modal"
+                        class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+                        <div class="bg-white rounded-lg max-w-4xl w-full max-h-screen overflow-auto">
+                            <div class="flex justify-between items-center border-b p-4">
+                                <h3 class="text-lg font-medium text-gray-900">Vista previa del comprobante</h3>
+                                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-500">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="p-4 flex justify-center">
+                                <img id="modal-image-preview" src="" alt="Vista previa del comprobante"
+                                    class="max-w-full max-h-[70vh] object-contain">
+                            </div>
+                            <div class="border-t p-4 flex justify-end">
+                                <button onclick="closeModal()"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                    Cerrar
+                                </button>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Botones de Acción -->
-                <div id="seccion_botones" class="bg-white rounded-lg shadow-sm border border-gray-200"
-                    style="display: none;">
-                    <div class="px-6 py-4">
-                        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <a href="{{ route('matriculas.index') }}"
-                                class="w-full sm:w-auto px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-center">
-                                <i class="ri-arrow-left-line mr-2"></i>
-                                Cancelar
-                            </a>
+                    <!-- Sección 5: Relación Estudiante-Tutor -->
+                    <div id="seccion_tutor" class="bg-white rounded-lg shadow-sm border border-gray-200"
+                        style="display: none;">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i class="ri-parent-line text-purple-500 mr-2"></i>
+                                Relación con Tutor
+                            </h2>
+                        </div>
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Tutor -->
+                                <div>
+                                    <label for="tutor_id" class="block text-sm font-medium text-gray-700 mb-2">Tutor
+                                        *</label>
+                                    <select name="tutor_id" id="tutor_id"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        required>
+                                        <option value="" disabled selected>Seleccione un tutor</option>
+                                        @foreach ($tutores as $tutor)
+                                            <option value="{{ $tutor->id_tutor }}">
+                                                {{ $tutor->user->persona->name }} {{ $tutor->user->persona->lastname }}
+                                                ({{ $tutor->user->persona->dni }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
-                            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                                <button type="button"
-                                    class="w-full sm:w-auto px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200">
-                                    <i class="ri-save-line mr-2"></i>
-                                    Guardar Borrador
-                                </button>
-
-                                <button type="submit"
-                                    class="w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 font-semibold">
-                                    <i class="ri-check-line mr-2"></i>
-                                    <span id="texto_boton_submit">Matricular Estudiante</span>
-                                </button>
+                                <!-- Tipo de Relación -->
+                                <div>
+                                    <label for="tipo_relacion" class="block text-sm font-medium text-gray-700 mb-2">Tipo
+                                        de
+                                        Relación *</label>
+                                    <select name="tipo_relacion" id="tipo_relacion"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        required>
+                                        <option value="" disabled selected>Seleccione</option>
+                                        <option value="Padre">Padre</option>
+                                        <option value="Madre">Madre</option>
+                                        <option value="Tutor Legal">Tutor Legal</option>
+                                        <option value="Abuelo/a">Abuelo/a</option>
+                                        <option value="Tío/a">Tío/a</option>
+                                        <option value="Hermano/a">Hermano/a</option>
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+
+                    <!-- Botones de Acción -->
+                    <div id="seccion_botones" class="bg-white rounded-lg shadow-sm border border-gray-200"
+                        style="display: none;">
+                        <div class="px-6 py-4">
+                            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                                <a href="{{ route('matriculas.index') }}"
+                                    class="w-full sm:w-auto px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-center">
+                                    <i class="ri-arrow-left-line mr-2"></i>
+                                    Cancelar
+                                </a>
+
+                                <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                                    <button type="button"
+                                        class="w-full sm:w-auto px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200">
+                                        <i class="ri-save-line mr-2"></i>
+                                        Guardar Borrador
+                                    </button>
+
+                                    <button type="submit"
+                                        class="w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 font-semibold">
+                                        <i class="ri-check-line mr-2"></i>
+                                        <span id="texto_boton_submit">Matricular Estudiante</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
             </form>
         </div>
     </div>
@@ -556,7 +636,7 @@
             fetch(`/obtener-estudiante?dni=${dni}`)
                 .then(response => response.json())
                 .then(data => {
-        
+
                     const estudiante = data.estudiante
                     if (estudiante) {
                         // Estudiante encontrado
@@ -599,7 +679,7 @@
 
         function hacerCamposRequeridos(requeridos) {
             const campos = ['nombre', 'apellidos', 'dni', 'sexo', 'fecha_nacimiento', 'pais', 'provincia', 'distrito',
-                'departamento', 'lengua_materna'
+                'departamento', 'lengua_materna','monto','fecha_pago','comprobante_img'
             ];
             campos.forEach(campo => {
                 const elemento = document.getElementById(campo);
@@ -727,12 +807,86 @@
             });
         }
 
-        // Establecer fecha y hora actual para la matrícula
-        document.addEventListener('DOMContentLoaded', function() {
-            const fechaMatricula = document.getElementById('fecha_matricula');
-            const ahora = new Date();
-            const fechaLocal = new Date(ahora.getTime() - ahora.getTimezoneOffset() * 60000);
-            fechaMatricula.value = fechaLocal.toISOString().slice(0, 16);
+        function handleFileSelect(event) {
+            const input = event.target;
+            const file = input.files[0];
+            const viewBtn = document.getElementById('view-image-btn');
+            const removeBtn = document.getElementById('remove-file-btn');
+            const fileLabel = document.getElementById('file-select-label');
+            const fileNameDisplay = document.getElementById('file-selected-name');
+
+            if (file) {
+                const fileType = file.type;
+
+                // Validaciones
+                if (!fileType.match('image.*')) {
+                    alert('Por favor selecciona un archivo de imagen (PNG, JPG, JPEG)');
+                    resetFileInput();
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) { // 5MB
+                    alert('El archivo es demasiado grande. El tamaño máximo permitido es 5MB.');
+                    resetFileInput();
+                    return;
+                }
+
+                // Mostrar nombre del archivo y botones de acción
+                fileLabel.classList.add('hidden');
+                fileNameDisplay.classList.remove('hidden');
+                const truncateFilename = (name) => {
+                    if (name.length <= 20) return name;
+                    const extensionIndex = name.lastIndexOf('.');
+                    const extension = name.substring(extensionIndex);
+                    const basename = name.substring(0, extensionIndex);
+
+                    if (basename.length <= 3) return name; 
+
+                    const keepChars = 7; 
+                    const start = basename.substring(0, 3); 
+                    const end = basename.substring(basename.length - keepChars); 
+
+                    return `${start}...${end}${extension}`;
+                };
+
+                fileNameDisplay.textContent = truncateFilename(file.name);
+                fileNameDisplay.setAttribute('title', file.name); // Show full name on hover
+
+                viewBtn.classList.remove('hidden');
+                removeBtn.classList.remove('hidden');
+
+                // Cargar vista previa para el modal
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('modal-image-preview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function resetFileInput() {
+            document.getElementById('comprobante_imagen').value = '';
+            document.getElementById('file-select-label').classList.remove('hidden');
+            document.getElementById('file-selected-name').classList.add('hidden');
+            document.getElementById('view-image-btn').classList.add('hidden');
+            document.getElementById('remove-file-btn').classList.add('hidden');
+        }
+
+        function showImageModal() {
+            if (document.getElementById('comprobante_imagen').files.length > 0) {
+                document.getElementById('image-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('image-modal').classList.add('hidden');
+        }
+
+        // Cerrar modal al presionar Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
         });
     </script>
 @endsection

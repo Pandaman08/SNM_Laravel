@@ -131,6 +131,7 @@ Route::resource('tipos-calificacion', TipoCalificacionController::class)->except
 Route::resource('reporte_notas', ReporteNotasController::class)->except(['show','create']);
 // Route::get('/reporte_notas/create/{codigo_matricula}/estudiante', [ReporteNotasController::class, 'create'])->name('reporte_notas.create');
 Route::get('/reporte_notas/{codigo_matricula}/{id_asignatura}/create', [ReporteNotasController::class, 'create'])->name('reporte_notas.create');
+Route::get('/reporte_notas/{codigo_matricula}/{id_asignatura}/show', [ReporteNotasController::class, 'estudiante_calificaciones'])->name('reporte_notas.show');
 Route::get('/reporte_notas/docente/{id_asignatura}', [ReporteNotasController::class, 'docente_view'])->name('reporte_notas.docente');
 Route::get('/reporte_notas/export/{id_asignatura}', [ReporteNotasController::class, 'exportExcel'])->name('reporte_notas.export');
 Route::resource('pagos', PagoController::class)->except(['create']);
