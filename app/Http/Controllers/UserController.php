@@ -356,7 +356,7 @@ class UserController extends Controller
             'address',
         ]);
 
-        if ($request->hasFile('photo')) {
+        if ($request->hasFile('photo') && Storage::disk('public')->exists($user->persona->photo)) {
             if ($user->persona->photo) {
                 Storage::disk('public')->delete($user->persona->photo);
             }

@@ -10,6 +10,7 @@ use App\Models\Tutor;
 use App\Models\Estudiante;
 use App\Models\NivelEducativo;
 use App\Models\Grado;
+use App\Models\Pago;
 use App\Models\Seccion;
 use App\Models\Persona;
 use App\Models\Asignatura;
@@ -117,6 +118,13 @@ class MatriculaController extends Controller
             'address' => 'nullable|string|max:255',
         ];
 
+        $validatedPago = [
+            'concepto' => 'required|string|max:100',
+            'monto' => 'required|numeric|min:0',
+            'fecha_pago' => 'required|date',
+            'comprobante_img' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
+
+        ];
         DB::beginTransaction();
 
         try {
@@ -151,9 +159,9 @@ class MatriculaController extends Controller
                     'address' => $validatedData['address'] ?? null,
                 ]);
 
-                $codigoEstudiante =  Estudiante::generarCodigoEstudiante();
+                $codigoEstudiante = Estudiante::generarCodigoEstudiante();
                 $estudiante = Estudiante::create([
-                    'codigo_estudiante' =>   $codigoEstudiante,
+                    'codigo_estudiante' => $codigoEstudiante,
                     'persona_id' => $persona->persona_id,
                     'pais' => $validatedData['pais'],
                     'provincia' => $validatedData['provincia'],
@@ -167,13 +175,29 @@ class MatriculaController extends Controller
             // Create matriculation
             $matricula = Matricula::create([
                 'codigo_matricula' => Matricula::generarCodigoMatricula(),
-                'codigo_estudiante' =>  $codigoEstudiante,
-                
+                'codigo_estudiante' => $codigoEstudiante,
                 'id_tipo_matricula' => $validatedData['id_tipo_matricula'],
                 'id_anio_escolar' => $validatedData['id_anio_escolar'],
                 'seccion_id' => $validatedData['seccion_id'],
                 'fecha' => $validatedData['fecha'],
             ]);
+
+            if (Auth::user()->isTutor()) {
+                $rutaImagen = null;
+                if ($request->hasFile('comprobante_img')) {
+                    $rutaImagen = $request->file('comprobante_img')->store('comprobantes', 'public');
+                }
+
+                $pago = Pago::create([
+                    'codigo_matricula' => $matricula->codigo_matricula,
+                    'concepto' => $validatedPago['concepto'],
+                    'monto' => $validatedPago['monto'],
+                    'fecha_pago' => $validatedPago['fecha_pago'],
+                    'comprobante_img' => $rutaImagen,
+                    'estado' => 'Finalizado'
+                ]);
+
+            }
 
 
             DB::table('estudiantes_tutores')->insert([
@@ -248,7 +272,7 @@ class MatriculaController extends Controller
 
             // Crear matrícula en estado pendiente
             $matricula = Matricula::create([
-                'codigo_matricula' => $this->generarCodigoMatricula(), // Se generará cuando se apruebe
+                'codigo_matricula' => Matricula::generarCodigoMatricula(), // Se generará cuando se apruebe
                 'codigo_estudiante' => $estudiante->codigo_estudiante,
                 'id_tipo_matricula' => $validated['id_tipo_matricula'],
                 'id_anio_escolar' => $validated['id_anio_escolar'],
@@ -590,9 +614,7 @@ class MatriculaController extends Controller
             }
 
             // Opcional: Desactivar al estudiante si es necesario
-            if ($matricula->estudiante) {
-                $matricula->estudiante->update(['activo' => false]);
-            }
+
 
             return back()->with('success', 'Matrícula rechazada exitosamente');
 
