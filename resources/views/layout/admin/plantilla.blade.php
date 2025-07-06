@@ -517,31 +517,23 @@
                       </ul>
                     </li>
 
-                    <li
-                        class="mb-1 group cursor-pointer {{ request()->routeIs(['capital_index', 'direccion_index']) ? 'active' : '' }}">
-                        <a
-                            class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.active]:bg-[#98C560] group-[.active]:text-white sidebar-dropdown-toggle">
-                            <i class="ri-instance-line mr-3 text-lg"></i>
-                            <span class="text-sm">Registro de información</span>
+                    <li class="mb-1 group cursor-pointer {{ request()->routeIs(['asistencias.*']) ? 'selected' : '' }}">
+                        <a class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md group-[.selected]:bg-[#98C560] group-[.selected]:text-white sidebar-dropdown-toggle">
+                            <i class="ri-calendar-check-line mr-3 text-lg"></i>
+                            <span class="text-sm">Gestionar Asistencia</span>
                             <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
                         </a>
                         <ul class="pl-7 mt-2 hidden group-[.selected]:block">
                             <li class="mb-4">
-                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                                    <span
-                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('capital_index') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
+                                <a href="{{ route('asistencias.index') }}" 
+                                class="text-sm flex items-center py-2 px-4 rounded-md text-white {{ request()->routeIs('asistencias.index') ? 'bg-[#98C560] bg-opacity-20' : '' }}">
+                                    <span class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('asistencias.index') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
                                     Estudiantes
-                                </a>
-                            </li>
-                            <li class="mb-4">
-                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                                    <span
-                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('direccion_index') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Pendientes
                                 </a>
                             </li>
                         </ul>
                     </li>
+
                 @elseif(auth()->user()->isTutor())
                     <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Usuario</h4>
 
