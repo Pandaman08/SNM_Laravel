@@ -385,7 +385,11 @@
         </div>
     </div>
 
-    <script>
+    
+@endsection
+
+@section('scrip')
+<script>
         // Filtros de tabla
         document.getElementById('filtro_estado').addEventListener('change', filtrarTabla);
         document.getElementById('filtro_nivel').addEventListener('change', filtrarTabla);

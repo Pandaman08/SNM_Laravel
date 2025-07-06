@@ -142,8 +142,8 @@ Route::get('/pagos/create/{matricula_id}/matricula', [PagoController::class, 'cr
 Route::get('/asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
 Route::get('/asistencias/create', [AsistenciaController::class, 'create'])->name('asistencias.create');
 Route::post('/asistencias', [AsistenciaController::class, 'store'])->name('asistencias.store');
+Route::get('/asistencias/secciones-por-grado', [AsistenciaController::class, 'obtenerSeccionesPorGrado'])->name('asistencias.secciones-por-grado');
+
 Route::get('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'show'])->name('asistencias.show');
 Route::get('/asistencias/{codigo_estudiante}/edit', [AsistenciaController::class, 'edit'])->name('asistencias.edit');
 Route::put('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'update'])->name('asistencias.update');
-Route::delete('/asistencias/{id_asistencia}', [AsistenciaController::class, 'destroy'])->name('asistencias.destroy');
-

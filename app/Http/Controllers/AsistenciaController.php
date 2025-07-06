@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Http\Response;
 use App\Models\Asistencia;
 use App\Models\Asignatura;
 use App\Models\Grado;
@@ -18,11 +18,9 @@ class AsistenciaController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        
-        // Obtener el registro de docente
+
         $docente = $user->docente;
-        
-        // Si no existe el registro de docente, retornar vista con mensaje
+
         if (!$docente) {
             return view('asistencias.index', [
                 'error' => 'Su usuario no tiene un registro de docente asociado. Por favor, contacte al administrador.',
@@ -37,13 +35,11 @@ class AsistenciaController extends Controller
                 'orderBy' => 'nombre'
             ]);
         }
-        
-        // Obtener secciones del docente con sus grados
+
         $seccionesDocente = $docente->secciones()
             ->with(['grado.nivelEducativo'])
             ->get();
-        
-        // Si no tiene secciones asignadas
+
         if ($seccionesDocente->isEmpty()) {
             return view('asistencias.index', [
                 'error' => 'No tiene secciones asignadas. Por favor, contacte al administrador.',
@@ -58,30 +54,25 @@ class AsistenciaController extends Controller
                 'orderBy' => 'nombre'
             ]);
         }
-        
-        // Obtener grados únicos de las secciones del docente
+
         $grados = Grado::whereIn('id_grado', $seccionesDocente->pluck('id_grado')->unique())->get();
-        
-        // Filtros
+
         $gradoId = $request->get('grado_id');
         $seccionId = $request->get('seccion_id');
         $search = $request->get('search');
         $orderBy = $request->get('order_by', 'nombre');
-        
-        // Obtener secciones si se seleccionó un grado
+
         $secciones = collect();
         if ($gradoId) {
             $secciones = $seccionesDocente->where('id_grado', $gradoId);
         }
-        
-        // Query base para estudiantes - solo de las secciones del docente
+
         $seccionesIds = $seccionesDocente->pluck('id_seccion')->toArray();
         $estudiantesQuery = Matricula::query()
             ->with(['estudiante.persona', 'seccion.grado'])
             ->where('estado', true)
             ->whereIn('seccion_id', $seccionesIds);
-        
-        // Aplicar filtros adicionales
+
         if ($gradoId) {
             $estudiantesQuery->whereHas('seccion', function($q) use ($gradoId) {
                 $q->where('id_grado', $gradoId);
@@ -98,8 +89,7 @@ class AsistenciaController extends Controller
                   ->orWhere('lastname', 'LIKE', "%{$search}%");
             });
         }
-        
-        // Ordenamiento
+
         if ($orderBy === 'apellido') {
             $estudiantesQuery->join('estudiantes', 'matriculas.codigo_estudiante', '=', 'estudiantes.codigo_estudiante')
                 ->join('personas', 'estudiantes.persona_id', '=', 'personas.persona_id')
@@ -112,17 +102,14 @@ class AsistenciaController extends Controller
                 ->orderBy('personas.name')
                 ->select('matriculas.*');
         }
-        
-        // Paginación
+
         $matriculas = $estudiantesQuery->paginate(20)->withQueryString();
-        
-        // Obtener periodos activos
+
         $hoy = Carbon::now();
         $periodos = Periodo::where('fecha_inicio', '<=', $hoy)
             ->orderBy('fecha_inicio')
             ->get();
-        
-        // Obtener asistencias de los estudiantes para los periodos activos
+
         $estudiantesIds = $matriculas->pluck('codigo_estudiante')->toArray();
         $periodosIds = $periodos->pluck('id_periodo')->toArray();
         
@@ -153,19 +140,16 @@ class AsistenciaController extends Controller
             return redirect()->route('asistencias.index')
                 ->with('error', 'No tiene un registro de docente asociado.');
         }
-        
-        // Inicializar variables
+
         $matriculas = collect();
         $asistenciasExistentes = [];
         $mensajePeriodo = null;
         $periodos = Periodo::orderBy('fecha_inicio', 'desc')->get();
-        
-        // Obtener secciones del docente
+
         $seccionesDocente = $docente->secciones()
             ->with(['grado.nivelEducativo'])
             ->get();
-        
-        // Si no tiene secciones asignadas
+
         if ($seccionesDocente->isEmpty()) {
             return view('pages.admin.asistencia.create', [
                 'matriculas' => $matriculas,
@@ -181,22 +165,18 @@ class AsistenciaController extends Controller
                 'periodos' => $periodos
             ]);
         }
-        
-        // Obtener grados únicos del docente
+
         $grados = Grado::whereIn('id_grado', $seccionesDocente->pluck('id_grado')->unique())->get();
-        
-        // Filtros
+
         $gradoId = $request->get('grado_id');
         $seccionId = $request->get('seccion_id');
         $search = $request->get('search');
         $fecha = $request->get('fecha', Carbon::now()->format('Y-m-d'));
-        
-        // Obtener periodo activo según la fecha
+
         $periodo = Periodo::where('fecha_inicio', '<=', $fecha)
             ->where('fecha_fin', '>=', $fecha)
             ->first();
-            
-        // Si no hay periodo activo
+
         if (!$periodo) {
             $mensajePeriodo = 'No hay un periodo activo para la fecha seleccionada.';
             if ($periodos->isEmpty()) {
@@ -205,46 +185,39 @@ class AsistenciaController extends Controller
                 $mensajePeriodo .= ' Seleccione una fecha dentro de un periodo válido.';
             }
         }
-        
-        // Obtener secciones si se seleccionó un grado
+
         $secciones = collect();
         if ($gradoId) {
             $secciones = $seccionesDocente->where('id_grado', $gradoId);
         }
-        
-        // Solo buscar estudiantes si hay grado, sección y periodo
+
         if ($gradoId && $seccionId && $periodo) {
-            // Verificar que el docente tenga acceso a esta sección
+
             if (!$seccionesDocente->pluck('id_seccion')->contains($seccionId)) {
                 return redirect()->route('asistencias.create')
                     ->with('error', 'No tiene acceso a la sección seleccionada.');
             }
-            
-            // Query para estudiantes de la sección
+
             $estudiantesQuery = Matricula::query()
                 ->with(['estudiante.persona', 'seccion.grado'])
                 ->where('estado', true)
                 ->where('seccion_id', $seccionId);
-            
-            // Aplicar búsqueda
+
             if ($search) {
                 $estudiantesQuery->whereHas('estudiante.persona', function($q) use ($search) {
                     $q->where('name', 'LIKE', "%{$search}%")
                       ->orWhere('lastname', 'LIKE', "%{$search}%");
                 });
             }
-            
-            // Ordenar por apellido y nombre
+
             $estudiantesQuery->join('estudiantes', 'matriculas.codigo_estudiante', '=', 'estudiantes.codigo_estudiante')
                 ->join('personas', 'estudiantes.persona_id', '=', 'personas.persona_id')
                 ->orderBy('personas.lastname')
                 ->orderBy('personas.name')
                 ->select('matriculas.*');
-            
-            // Paginación
+
             $matriculas = $estudiantesQuery->paginate(20)->withQueryString();
-            
-            // Verificar si ya existen asistencias para esta fecha
+
             $estudiantesIds = $matriculas->pluck('codigo_estudiante')->toArray();
             $asistenciasExistentes = Asistencia::whereIn('codigo_estudiante', $estudiantesIds)
                 ->where('fecha', $fecha)
@@ -270,45 +243,275 @@ class AsistenciaController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'fecha' => 'required|date',
-            'id_periodo' => 'required|exists:periodos,id_periodo',
-            'asistencias' => 'required|array',
-            'asistencias.*.codigo_estudiante' => 'required|exists:estudiantes,codigo_estudiante',
-            'asistencias.*.estado' => 'required|in:Presente,Ausente,Justificado,Tarde',
-        ]);
+       $fecha = $request->input('fecha');
+        $periodo = Periodo::findOrFail($request->input('id_periodo'));
 
-        $fecha = $request->fecha;
-        $idPeriodo = $request->id_periodo;
-        $asistencias = $request->asistencias;
+        if (Carbon::parse($fecha)->isWeekend()) {
+            return back()
+                ->withInput()
+                ->with('error', 'No puedes registrar asistencia en sábado ni domingo.');
+        }
 
-        // Verificar que no existan asistencias duplicadas
-        foreach ($asistencias as $asistencia) {
-            $existe = Asistencia::where('codigo_estudiante', $asistencia['codigo_estudiante'])
+        if (Carbon::parse($fecha)->lt($periodo->fecha_inicio) 
+            || Carbon::parse($fecha)->gt($periodo->fecha_fin)) {
+            return back()
+                ->withInput()
+                ->with('error', 'La fecha está fuera del rango del periodo seleccionado.');
+        }
+
+        foreach ($request->asistencias as $asis) {
+            $existe = Asistencia::where('codigo_estudiante', $asis['codigo_estudiante'])
                 ->where('fecha', $fecha)
-                ->where('id_periodo', $idPeriodo)
+                ->where('id_periodo', $periodo->id_periodo)
                 ->exists();
 
-            if (!$existe) {
+            if (! $existe) {
                 Asistencia::create([
-                    'codigo_estudiante' => $asistencia['codigo_estudiante'],
-                    'fecha' => $fecha,
-                    'id_periodo' => $idPeriodo,
-                    'estado' => $asistencia['estado'],
-                    'observacion' => $asistencia['observacion'] ?? null,
-                    'justificacion' => $asistencia['justificacion'] ?? null,
+                    'codigo_estudiante' => $asis['codigo_estudiante'],
+                    'fecha'             => $fecha,
+                    'id_periodo'        => $periodo->id_periodo,
+                    'estado'            => $asis['estado'],
+                    'observacion'       => $asis['observacion'] ?? null,
+                    'justificacion'     => $asis['justificacion'] ?? null,
                 ]);
             }
         }
 
         return redirect()->route('asistencias.index')
-            ->with('success', 'Asistencias registradas correctamente.');
+                        ->with('success', 'Asistencias registradas correctamente.');
     }
 
     public function edit($codigo_estudiante)
     {
-        // Este método se puede implementar para editar asistencias individuales
-        // Por ahora redirigimos al index
-        return redirect()->route('asistencias.index');
+        $user = Auth::user();
+        $docente = $user->docente;
+        
+        if (!$docente) {
+            return redirect()->route('asistencias.index')
+                ->with('error', 'No tiene un registro de docente asociado.');
+        }
+
+        $matricula = Matricula::with('estudiante.persona', 'seccion.grado')
+            ->where('codigo_estudiante', $codigo_estudiante)
+            ->where('estado', true)
+            ->first();
+
+        if (!$matricula) {
+            return redirect()->route('asistencias.index')
+                ->with('error', 'Estudiante no encontrado o no matriculado.');
+        }
+
+        if (!$docente->secciones->pluck('id_seccion')->contains($matricula->seccion_id)) {
+            return redirect()->route('asistencias.index')
+                ->with('error', 'No tiene permiso para editar las asistencias de este estudiante.');
+        }
+
+        $periodos = Periodo::orderBy('fecha_inicio')->get();
+
+        $asistencias = Asistencia::where('codigo_estudiante', $codigo_estudiante)
+            ->orderBy('fecha', 'desc')
+            ->get()
+            ->groupBy('id_periodo');
+
+        $asistenciasPorPeriodo = [];
+        foreach ($periodos as $periodo) {
+            $asistenciasPeriodo = $asistencias->get($periodo->id_periodo, collect());
+
+            $estadisticas = [
+                'Presente' => $asistenciasPeriodo->where('estado', 'Presente')->count(),
+                'Ausente' => $asistenciasPeriodo->where('estado', 'Ausente')->count(),
+                'Justificado' => $asistenciasPeriodo->where('estado', 'Justificado')->count(),
+                'Tarde' => $asistenciasPeriodo->where('estado', 'Tarde')->count(),
+                'total' => $asistenciasPeriodo->count()
+            ];
+
+            $asistenciasPorPeriodo[] = [
+                'periodo' => $periodo,
+                'asistencias' => $asistenciasPeriodo,
+                'estadisticas' => $estadisticas
+            ];
+        }
+
+        return view('pages.admin.asistencia.edit', compact(
+            'matricula',
+            'asistenciasPorPeriodo'
+        ));
+    }
+
+    public function update(Request $request, $codigo_estudiante)
+    {
+        $user = Auth::user();
+        $docente = $user->docente;
+        
+        if (!$docente) {
+            return redirect()->route('asistencias.index')
+                ->with('error', 'No tiene un registro de docente asociado.');
+        }
+
+        $matricula = Matricula::where('codigo_estudiante', $codigo_estudiante)
+            ->where('estado', true)
+            ->first();
+
+        if (!$matricula || !$docente->secciones->pluck('id_seccion')->contains($matricula->seccion_id)) {
+            return redirect()->route('asistencias.index')
+                ->with('error', 'No tiene permiso para editar las asistencias de este estudiante.');
+        }
+
+        $request->validate([
+            'asistencias' => 'required|array',
+            'asistencias.*.id_asistencia' => 'required|exists:asistencias,id_asistencia',
+            'asistencias.*.estado' => 'required|in:Presente,Ausente,Justificado,Tarde',
+            'asistencias.*.observacion' => 'nullable|string|max:255',
+            'asistencias.*.justificacion' => 'nullable|string|max:255'
+        ]);
+
+        foreach ($request->asistencias as $asistenciaData) {
+            $asistencia = Asistencia::find($asistenciaData['id_asistencia']);
+
+            if ($asistencia && $asistencia->codigo_estudiante == $codigo_estudiante) {
+                $asistencia->update([
+                    'estado' => $asistenciaData['estado'],
+                    'observacion' => $asistenciaData['observacion'] ?? null,
+                    'justificacion' => $asistenciaData['justificacion'] ?? null
+                ]);
+            }
+        }
+
+        return redirect()->route('asistencias.index', $codigo_estudiante)
+            ->with('success', 'Asistencias actualizadas correctamente.');
+    }
+
+    public function show($codigo_estudiante)
+    {
+        $user = Auth::user();
+        $docente = $user->docente;
+        if (!$docente) {
+            return redirect()->route('asistencias.index')
+                ->with('error', 'No tiene un registro de docente asociado.');
+        }
+        $matricula = Matricula::with('estudiante.persona', 'seccion.grado')
+            ->where('codigo_estudiante', $codigo_estudiante)
+            ->firstOrFail();
+
+        if (!$docente->secciones->pluck('id_seccion')->contains($matricula->seccion_id)) {
+            return redirect()->route('asistencias.index')
+                ->with('error', 'No tienes permiso para ver este estudiante.');
+        }
+
+        $hoy = Carbon::today();
+        
+        $periodos = Periodo::orderBy('fecha_inicio')->get();
+
+        if ($periodos->isEmpty()) {
+            return redirect()->route('asistencias.index')
+                ->with('error', 'No hay periodos registrados en el sistema.');
+        }
+
+        $asistencias = Asistencia::where('codigo_estudiante', $codigo_estudiante)
+            ->get()
+            ->groupBy('id_periodo');
+
+        $statsPorPeriodo = [];
+        foreach ($periodos as $periodo) {
+            $asisPeriodo = $asistencias->get($periodo->id_periodo, collect());
+
+            $inicio = Carbon::parse($periodo->fecha_inicio);
+            $fin = Carbon::parse($periodo->fecha_fin);
+
+            $diasClases = 0;
+            
+            if ($inicio->greaterThanOrEqualTo($hoy)) {
+
+                $estadoPeriodo = 'futuro';
+                $diasClases = 0;
+            } elseif ($fin->lt($hoy)) {
+
+                $estadoPeriodo = 'pasado';
+
+                for ($d = $inicio->copy(); $d->lte($fin); $d->addDay()) {
+                    if (!$d->isWeekend()) {
+                        $diasClases++;
+                    }
+                }
+            } else {
+
+                $estadoPeriodo = 'actual';
+
+                for ($d = $inicio->copy(); $d->lte($hoy); $d->addDay()) {
+                    if (!$d->isWeekend()) {
+                        $diasClases++;
+                    }
+                }
+            }
+
+            $totales = [
+                'Presente'    => 0,
+                'Ausente'     => 0,
+                'Justificado' => 0,
+                'Tarde'       => 0,
+            ];
+
+            foreach ($asisPeriodo as $a) {
+                if (isset($totales[$a->estado->value])) {
+                    $totales[$a->estado->value]++;
+                }
+            }
+
+            $porcentajes = [];
+            foreach ($totales as $estado => $count) {
+                $porcentajes[$estado] = $diasClases > 0
+                    ? round($count / $diasClases * 100)
+                    : 0;
+            }
+
+            $diasTotalesPeriodo = 0;
+            for ($d = $inicio->copy(); $d->lte($fin); $d->addDay()) {
+                if (!$d->isWeekend()) {
+                    $diasTotalesPeriodo++;
+                }
+            }
+
+            $statsPorPeriodo[] = [
+                'periodo'          => $periodo,
+                'estadoPeriodo'    => $estadoPeriodo,
+                'diasClases'       => $diasClases,
+                'diasTotalesPeriodo' => $diasTotalesPeriodo,
+                'totales'          => $totales,
+                'porcentajes'      => $porcentajes,
+                'asistenciasCount' => $asisPeriodo->count()
+            ];
+        }
+
+        return view('pages.admin.asistencia.show', compact(
+            'matricula', 'statsPorPeriodo'
+        ));
+    }
+
+
+    public function obtenerSeccionesPorGrado(Request $request)
+    {
+        $response = null;
+        try {
+            $user = Auth::user();
+            if (!$user || !$user->docente) {
+                $response = response()->json(['error' => 'No tiene registro de docente'], 403);
+            } else {
+                $gradoId = $request->get('grado_id');
+                if (!$gradoId) {
+                    $response = response()->json(['secciones' => []]);
+                } else {
+                    $secciones = $user->docente
+                        ->secciones()
+                        ->where('secciones.id_grado', $gradoId)
+                        ->select('secciones.id_seccion', 'secciones.seccion')
+                        ->get();
+                    $response = response()->json(['secciones' => $secciones]);
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Error AJAX secciones-por-grado: '.$e->getMessage());
+            $response = response()->json(['error' => 'Error interno'], 500);
+        }
+        return $response;
     }
 }
