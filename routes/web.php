@@ -111,6 +111,12 @@ Route::post('/docentes', [DocenteController::class, 'store'])->name('docentes.st
 Route::put('/docentes/{user_id}', [DocenteController::class, 'update'])->name('docentes.update');
 Route::get('/docentes/{user_id}/edit', [DocenteController::class, 'edit'])->name('docentes.edit');
 Route::delete('/docentes/{user_id}/delete', [DocenteController::class, 'destroy'])->name('docentes.destroy');
+
+Route::get('docente/mis-estudiantes', [DocenteController::class, 'misEstudiantes'])->name('docente.mis_estudiantes');
+Route::get('docente/ver-estudiantes/{grado_id}', [DocenteController::class, 'verEstudiantesPorGrado'])
+    ->name('docente.ver_estudiantes');
+
+
 // ------------------------ tesoreros -------------------------
 Route::get('/secretarias/buscar', [SecretariaController::class, 'showTesoreros'])->name('secretarias.buscar');
 Route::post('/secretarias', [SecretariaController::class, 'store'])->name('secretarias.store');
@@ -138,6 +144,7 @@ Route::resource('pagos', PagoController::class)->except(['create']);
 
 Route::get('/pagos/create/{matricula_id}/matricula', [PagoController::class, 'create'])->name('pagos.create');
 
+
 //----------Asistencia-----------------------
 Route::get('/asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
 Route::get('/asistencias/create', [AsistenciaController::class, 'create'])->name('asistencias.create');
@@ -146,4 +153,5 @@ Route::get('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'sh
 Route::get('/asistencias/{codigo_estudiante}/edit', [AsistenciaController::class, 'edit'])->name('asistencias.edit');
 Route::put('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'update'])->name('asistencias.update');
 Route::delete('/asistencias/{id_asistencia}', [AsistenciaController::class, 'destroy'])->name('asistencias.destroy');
+
 

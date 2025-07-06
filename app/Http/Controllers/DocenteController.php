@@ -14,6 +14,8 @@ use App\Models\TipoCalificacion;
 use App\Models\Matricula;
 use App\Enums\UserRole;
 use App\Models\Periodo;
+use App\Models\Grado;
+use App\Models\Seccion;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -239,5 +241,45 @@ class DocenteController extends Controller
             return back()->with('error', 'No se pudo eliminar el docente: ' . $e->getMessage());
         }
     }
+
+
+public function misEstudiantes()
+{
+    $user = Auth::user();
+
+    $asignaciones = AsignaturaDocente::with('asignatura.grado')
+        ->where('codigo_docente', $user->docente->codigo_docente)
+        ->get()
+        ->filter(function ($item) {
+            return optional($item->asignatura)->id_grado;
+        })
+        ->unique(fn($item) => $item->asignatura->id_grado)
+        ->values();
+
+    return view('pages.admin.docentes.mis-estudiantes', compact('asignaciones'));
+}
+
+public function verEstudiantesPorGrado(Request $request, $grado_id)
+{
+    $seccionId = $request->input('seccion_id');
+
+    // Obtener las secciones del grado
+    $secciones = Seccion::where('id_grado', $grado_id)->get();
+    $seccionIds = $secciones->pluck('id_seccion')->toArray();
+
+    // Consultar las matrículas usando seccion_id
+    $matriculas = Matricula::with(['estudiante.persona'])
+        ->whereIn('seccion_id', $seccionIds)
+        ->when($seccionId, function ($query) use ($seccionId) {
+            $query->where('seccion_id', $seccionId);
+        })
+        ->get();
+
+    $grado = Grado::find($grado_id);
+    $gradoNombre = $grado?->nombre_completo ?? 'Sin grado';
+
+    return view('pages.admin.docentes.estudiantes-por-grado', compact('matriculas', 'gradoNombre', 'secciones'));
+}
+
 
 }
