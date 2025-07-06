@@ -9,10 +9,6 @@
                 <p class="text-sm mt-1 opacity-90">Registros de asistencia del estudiante</p>
             </div>
             <div class="flex gap-3">
-                <a href="{{ route('asistencias.edit', $matricula->codigo_estudiante) }}" 
-                   class="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-md transition duration-200">
-                    <i class="ri-edit-line mr-1"></i> Editar
-                </a>
                 <a href="{{ route('asistencias.index') }}" 
                     class="bg-green-500 bg-opacity-80 hover:bg-opacity-30 px-4 py-2 rounded-md transition duration-200">
                     <i class="ri-arrow-left-line mr-1"></i> Volver

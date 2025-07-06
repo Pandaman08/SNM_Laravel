@@ -18,7 +18,6 @@ class AsistenciaController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-
         $docente = $user->docente;
 
         if (!$docente) {
