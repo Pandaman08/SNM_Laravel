@@ -26,7 +26,6 @@ class Estudiante extends Model
     ];
 
 
-
     public function matriculas()
     {
         return $this->hasMany(Matricula::class, 'codigo_estudiante', 'codigo_estudiante');
@@ -47,8 +46,6 @@ class Estudiante extends Model
         return $this->belongsTo(Persona::class, 'persona_id', 'persona_id');
     }
 
-    
-    
 
     public function generarCodigoEstudiante(): int
     {

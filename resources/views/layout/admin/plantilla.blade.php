@@ -11,6 +11,7 @@
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/admin/dist/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://unpkg.com/alpinejs" defer></script>
     <title>@yield('titulo')</title>
 </head>
 
@@ -222,6 +223,7 @@
                             </li>
                         </ul>
                     </li>
+                    
 
 
                     @php
@@ -266,10 +268,6 @@
                             </li>
                         </ul>
                     </li>
-
-
-
-
 
                     <li class="mb-1 group cursor-pointer {{ request()->routeIs(['person', 'users']) ? 'active' : '' }}">
                         <a
@@ -471,6 +469,7 @@
                             </li>
                         </ul>
                     </li>
+
                 @elseif(auth()->user()->isDocente())
                     <h4 class="text-[#98C560] text-sm font-bold uppercase mb-3 mt-8">Docente</h4>
 
@@ -499,8 +498,23 @@
                                         class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs(['papers.index', 'papers.edit']) ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
                                     Asignaturas Asignadas</a>
                             </li>
+                           <!-- Sección: DOCENTE -->
+                            <li class="mb-1 group cursor-pointer {{ request()->routeIs(['docente.mis_estudiantes', 'docente.ver_estudiantes']) ? 'active' : '' }}">
+                              <a class="flex items-center py-2 px-4 text-white hover:bg-[#98C560] rounded-md sidebar-dropdown-toggle">
+                                 <i class="ri-group-line mr-3 text-lg"></i>
+                                  <span class="text-sm">Estudiantes</span>
+                                   <i class="ri-arrow-right-s-line ml-auto"></i>
+                                </a>
 
-                        </ul>
+                                <ul class="pl-7 mt-2 hidden group-[.selected]:block">
+                                     <li class="mb-2">
+                                        <a href="{{ route('docente.mis_estudiantes') }}"
+                                         class="text-sm flex items-center py-2 px-4 rounded-md text-white hover:bg-[#98C560] {{ request()->routeIs('docente.mis_estudiantes') ? 'bg-[#98C560]' : '' }}">
+                                          <span class="w-2 h-2 rounded-full mr-3 {{ request()->routeIs('docente.mis_estudiantes') ? 'bg-white' : 'bg-gray-400' }}"></span>
+                                          Mis Grados </a>     
+                                         </li>
+                                        </ul></li>
+                      </ul>
                     </li>
 
                     <li
@@ -699,9 +713,6 @@
         </section>
 
     </main>
-
-
-
 
     <!-- end: Main -->
 

@@ -495,8 +495,6 @@ class MatriculaController extends Controller
     }
 
 
-
-
     public function generarFicha($codigo_matricula)
     {
         $matricula = Matricula::with([

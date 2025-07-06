@@ -24,6 +24,7 @@ class Seccion extends Model
     {
         return $this->belongsTo(Grado::class, 'id_grado', 'id_grado');
     }
+    
 
     // Relación: Sección tiene muchas matrículas
     public function matriculas()
@@ -43,7 +44,6 @@ class Seccion extends Model
             'id_nivel_educativo'     // FK local en tabla grados
         );
     }
-
     // Scope: Secciones de un grado específico
     public function scopeDeGrado($query, $gradoId)
     {
