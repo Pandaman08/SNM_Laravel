@@ -137,3 +137,13 @@ Route::get('/reporte_notas/export/{id_asignatura}', [ReporteNotasController::cla
 Route::resource('pagos', PagoController::class)->except(['create']);
 
 Route::get('/pagos/create/{matricula_id}/matricula', [PagoController::class, 'create'])->name('pagos.create');
+
+//----------Asistencia-----------------------
+Route::get('/asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
+Route::get('/asistencias/create', [AsistenciaController::class, 'create'])->name('asistencias.create');
+Route::post('/asistencias', [AsistenciaController::class, 'store'])->name('asistencias.store');
+Route::get('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'show'])->name('asistencias.show');
+Route::get('/asistencias/{codigo_estudiante}/edit', [AsistenciaController::class, 'edit'])->name('asistencias.edit');
+Route::put('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'update'])->name('asistencias.update');
+Route::delete('/asistencias/{id_asistencia}', [AsistenciaController::class, 'destroy'])->name('asistencias.destroy');
+

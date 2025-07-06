@@ -3,9 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Grado; 
 
 class Seccion extends Model
 {
@@ -15,8 +13,8 @@ class Seccion extends Model
     protected $primaryKey = 'id_seccion';
 
     protected $fillable = [
-        'id_grado',  // Tu FK
-        'seccion'    // Tu campo nombre de sección
+        'id_grado',
+        'seccion'
     ];
 
     // Relación: Sección pertenece a un grado
@@ -29,6 +27,31 @@ class Seccion extends Model
     public function matriculas()
     {
         return $this->hasMany(Matricula::class, 'seccion_id', 'id_seccion');
+    }
+
+    // Relación con docentes (solo activos)
+    public function docentes()
+    {
+        return $this->belongsToMany(Docente::class, 'secciones_docentes', 'id_seccion', 'codigo_docente')
+                    ->using(SeccionDocente::class)
+                    ->withPivot('estado')
+                    ->withTimestamps()
+                    ->wherePivot('estado', true);
+    }
+    
+    // Relación para obtener TODOS los docentes (activos e inactivos)
+    public function todosLosDocentes()
+    {
+        return $this->belongsToMany(Docente::class, 'secciones_docentes', 'id_seccion', 'codigo_docente')
+                    ->using(SeccionDocente::class)
+                    ->withPivot('estado')
+                    ->withTimestamps();
+    }
+    
+    // Relación directa con la tabla pivot
+    public function asignacionesDocentes()
+    {
+        return $this->hasMany(SeccionDocente::class, 'id_seccion', 'id_seccion');
     }
 
     // Relación: Obtener el nivel educativo a través del grado

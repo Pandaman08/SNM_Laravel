@@ -46,7 +46,6 @@ class Estudiante extends Model
     {
         return $this->belongsTo(Persona::class, 'persona_id', 'persona_id');
     }
-
     
     
 
