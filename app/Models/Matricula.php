@@ -24,6 +24,7 @@ class Matricula extends Model
 
     protected $casts = [
         'codigo_estudiante' => 'integer',
+        'estado' => 'boolean',
 
     ];
     protected $dates = ['fecha'];

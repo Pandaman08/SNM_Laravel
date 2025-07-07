@@ -111,6 +111,12 @@ Route::post('/docentes', [DocenteController::class, 'store'])->name('docentes.st
 Route::put('/docentes/{user_id}', [DocenteController::class, 'update'])->name('docentes.update');
 Route::get('/docentes/{user_id}/edit', [DocenteController::class, 'edit'])->name('docentes.edit');
 Route::delete('/docentes/{user_id}/delete', [DocenteController::class, 'destroy'])->name('docentes.destroy');
+
+Route::get('docente/mis-estudiantes', [DocenteController::class, 'misEstudiantes'])->name('docente.mis_estudiantes');
+Route::get('docente/ver-estudiantes/{grado_id}', [DocenteController::class, 'verEstudiantesPorGrado'])
+    ->name('docente.ver_estudiantes');
+
+
 // ------------------------ tesoreros -------------------------
 Route::get('/secretarias/buscar', [SecretariaController::class, 'showTesoreros'])->name('secretarias.buscar');
 Route::post('/secretarias', [SecretariaController::class, 'store'])->name('secretarias.store');
@@ -128,12 +134,27 @@ Route::resource('anios-escolares', AnioEscolarController::class);
 Route::resource('competencias', CompetenciaController::class);
 
 Route::resource('tipos-calificacion', TipoCalificacionController::class)->except(['show']);
-Route::resource('reporte_notas', ReporteNotasController::class)->except(['show','create']);
+Route::resource('reporte_notas', ReporteNotasController::class)->except(['show']);
+// Route::get('/reporte_notas/{reporteId}/update', [ReporteNotasController::class, 'update'])->name('reporte_notas.update');
 // Route::get('/reporte_notas/create/{codigo_matricula}/estudiante', [ReporteNotasController::class, 'create'])->name('reporte_notas.create');
-Route::get('/reporte_notas/{codigo_matricula}/{id_asignatura}/create', [ReporteNotasController::class, 'create'])->name('reporte_notas.create');
+// Route::get('/reporte_notas/{codigo_matricula}/{id_asignatura}/create', [ReporteNotasController::class, 'create'])->name('reporte_notas.create');
 Route::get('/reporte_notas/{codigo_matricula}/{id_asignatura}/show', [ReporteNotasController::class, 'estudiante_calificaciones'])->name('reporte_notas.show');
 Route::get('/reporte_notas/docente/{id_asignatura}', [ReporteNotasController::class, 'docente_view'])->name('reporte_notas.docente');
-Route::get('/reporte_notas/export/{id_asignatura}', [ReporteNotasController::class, 'exportExcel'])->name('reporte_notas.export');
+Route::get('/reporte_notas/tutor/estudiantes', [ReporteNotasController::class, 'index_estudiantes_tutor'])->name('reporte_notas.tutor');
+Route::get('/reporte_notas/tutor/estudiantes/{id_asignatura}', [ReporteNotasController::class, 'verNotasEstudiante'])->name('reporte_notas.tutor.estudiante');
+Route::get('/reporte-notas/pdf/{codigo_matricula}', [ReporteNotasController::class, 'generarReportePdf'])->name('reporte.notas.pdf');
 Route::resource('pagos', PagoController::class)->except(['create']);
 
 Route::get('/pagos/create/{matricula_id}/matricula', [PagoController::class, 'create'])->name('pagos.create');
+
+
+//----------Asistencia-----------------------
+Route::get('/asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
+Route::get('/asistencias/create', [AsistenciaController::class, 'create'])->name('asistencias.create');
+Route::post('/asistencias', [AsistenciaController::class, 'store'])->name('asistencias.store');
+Route::get('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'show'])->name('asistencias.show');
+Route::get('/asistencias/{codigo_estudiante}/edit', [AsistenciaController::class, 'edit'])->name('asistencias.edit');
+Route::put('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'update'])->name('asistencias.update');
+Route::delete('/asistencias/{id_asistencia}', [AsistenciaController::class, 'destroy'])->name('asistencias.destroy');
+
+
