@@ -24,7 +24,7 @@ use App\Models\AsignaturaDocente;
 class MatriculaController extends Controller
 {
     /**
-     * Lista de todas las matrículas (admin/secretaria)
+     * Lista de todas las matrículas (admin/secretaria) 
      */
     public function index()
     {
@@ -87,10 +87,74 @@ class MatriculaController extends Controller
         ));
     }
 
+    public function buscarEstudiante(Request $request){
+        try {
+            $request->validate([
+                'dni' => 'required|string|size:8',
+            ]);
+
+            $dni = $request->input('dni');
+
+            // Buscar estudiante a través de la relación con Persona
+            $estudiante = Estudiante::with('persona')
+                ->whereHas('persona', function ($query) use ($dni) {
+                    $query->where('dni', $dni);
+                })->first();
+
+            if (!$estudiante) {
+                return response()->json([
+                    'found' => false,
+                    'success' => true,
+                    'message' => 'No se encontró ningún estudiante con ese DNI.'
+                ]);
+            }
+
+            return response()->json([
+                'found' => true,
+                'success' => true,
+                'estudiante' => [
+                    'nombre' => $estudiante->persona->name,
+                    'apellidos' => $estudiante->persona->lastname,
+                    'dni' => $estudiante->persona->dni,
+                    'sexo' => $estudiante->persona->sexo,
+                    'fecha_nacimiento' => $estudiante->persona->fecha_nacimiento->format('Y-m-d'),
+                    'pais' => $estudiante->pais,
+                    'provincia' => $estudiante->provincia,
+                    'distrito' => $estudiante->distrito,
+                    'departamento' => $estudiante->departamento,
+                    'lengua_materna' => $estudiante->lengua_materna,
+                    'religion' => $estudiante->religion,
+                    'address' => $estudiante->persona->address
+                ]
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error de validación',
+                'details' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Error en buscarEstudiante', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Error interno del servidor',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
     /**
      * Guardar matrícula desde admin/secretaria
      */
-    public function store(Request $request)
+    /**
+ * Guardar solicitud de matrícula desde tutor
+ */
+        public function store(Request $request)
     {
 
 
@@ -159,7 +223,8 @@ class MatriculaController extends Controller
                     'address' => $validatedData['address'] ?? null,
                 ]);
 
-                $codigoEstudiante = Estudiante::generarCodigoEstudiante();
+                $codigoEstudiante = Estudiante::generarCodigoEstudiante(); 
+                
                 $estudiante = Estudiante::create([
                     'codigo_estudiante' => $codigoEstudiante,
                     'persona_id' => $persona->persona_id,
@@ -219,10 +284,10 @@ class MatriculaController extends Controller
                 ->withInput();
         }
     }
-
     /**
      * Guardar solicitud de matrícula desde tutor
      */
+    // |unique:personas,dni'
     public function storeTutor(Request $request)
     {
         $validated = $request->validate([
@@ -230,7 +295,7 @@ class MatriculaController extends Controller
             'id_anio_escolar' => 'required|exists:anios_escolares,id_anio_escolar',
             'nombre' => 'required|string|max:255',
             'apellidos' => 'required|string|max:255',
-            'dni' => 'required|string|size:8|unique:personas,dni',
+            'dni' => 'required|string|size:8',
             'sexo' => 'required|in:M,F',
             'fecha_nacimiento' => 'required|date',
             'pais' => 'required|string|max:100',
@@ -300,7 +365,7 @@ class MatriculaController extends Controller
                 ->withInput();
         }
     }
-
+    
     /**
      * Ver matrículas del tutor logueado
      */
