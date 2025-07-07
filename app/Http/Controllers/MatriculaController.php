@@ -287,6 +287,7 @@ class MatriculaController extends Controller
     /**
      * Guardar solicitud de matrícula desde tutor
      */
+    // |unique:personas,dni'
     public function storeTutor(Request $request)
     {
         $validated = $request->validate([
@@ -294,7 +295,7 @@ class MatriculaController extends Controller
             'id_anio_escolar' => 'required|exists:anios_escolares,id_anio_escolar',
             'nombre' => 'required|string|max:255',
             'apellidos' => 'required|string|max:255',
-            'dni' => 'required|string|size:8|unique:personas,dni',
+            'dni' => 'required|string|size:8',
             'sexo' => 'required|in:M,F',
             'fecha_nacimiento' => 'required|date',
             'pais' => 'required|string|max:100',
