@@ -134,12 +134,15 @@ Route::resource('anios-escolares', AnioEscolarController::class);
 Route::resource('competencias', CompetenciaController::class);
 
 Route::resource('tipos-calificacion', TipoCalificacionController::class)->except(['show']);
-Route::resource('reporte_notas', ReporteNotasController::class)->except(['show','create']);
+Route::resource('reporte_notas', ReporteNotasController::class)->except(['show']);
+// Route::get('/reporte_notas/{reporteId}/update', [ReporteNotasController::class, 'update'])->name('reporte_notas.update');
 // Route::get('/reporte_notas/create/{codigo_matricula}/estudiante', [ReporteNotasController::class, 'create'])->name('reporte_notas.create');
-Route::get('/reporte_notas/{codigo_matricula}/{id_asignatura}/create', [ReporteNotasController::class, 'create'])->name('reporte_notas.create');
+// Route::get('/reporte_notas/{codigo_matricula}/{id_asignatura}/create', [ReporteNotasController::class, 'create'])->name('reporte_notas.create');
 Route::get('/reporte_notas/{codigo_matricula}/{id_asignatura}/show', [ReporteNotasController::class, 'estudiante_calificaciones'])->name('reporte_notas.show');
 Route::get('/reporte_notas/docente/{id_asignatura}', [ReporteNotasController::class, 'docente_view'])->name('reporte_notas.docente');
-Route::get('/reporte_notas/export/{id_asignatura}', [ReporteNotasController::class, 'exportExcel'])->name('reporte_notas.export');
+Route::get('/reporte_notas/tutor/estudiantes', [ReporteNotasController::class, 'index_estudiantes_tutor'])->name('reporte_notas.tutor');
+Route::get('/reporte_notas/tutor/estudiantes/{id_asignatura}', [ReporteNotasController::class, 'verNotasEstudiante'])->name('reporte_notas.tutor.estudiante');
+Route::get('/reporte-notas/pdf/{codigo_matricula}', [ReporteNotasController::class, 'generarReportePdf'])->name('reporte.notas.pdf');
 Route::resource('pagos', PagoController::class)->except(['create']);
 
 Route::get('/pagos/create/{matricula_id}/matricula', [PagoController::class, 'create'])->name('pagos.create');
