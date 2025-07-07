@@ -62,19 +62,26 @@
                                     </svg>
                                     Pendiente de pago
                                 </a>
-                            @elseif($pago && $matricula->estado !=='pendiente')
+                            @elseif($pago && $pago->estado ==='Pendiente')
                                 <span class="px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 flex items-center justify-center">
                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                     Pendiente de validación
                                 </span>
-                            @else
+                            @elseif ($pago && $matricula->estado ==='activo'  && $pago->estado ==='Finalizado')
                                 <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 flex items-center justify-center">
                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                     </svg>
                                     Validado y finalizado
+                                </span>
+                             @elseif ($pago && $matricula->estado ==='rechazado' && $pago->estado ==='Rechazado')
+                                <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 flex items-center justify-center">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                  Rechazado
                                 </span>
                             @endif
                         </td>

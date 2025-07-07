@@ -628,12 +628,7 @@
                                         class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs(['papers.index', 'papers.edit']) ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
                                     Visualizar Calificaciones</a>
                             </li>
-                            <li class="mb-4">
-                                <a href="" class="text-sm flex items-center py-2 px-4 rounded-md text-white">
-                                    <span
-                                        class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('papers.create') ? 'bg-[#98C560]' : 'bg-gray-300' }}"></span>
-                                    Lista de Asignaturas</a>
-                            </li>
+                           
                         </ul>
                     </li>
 
