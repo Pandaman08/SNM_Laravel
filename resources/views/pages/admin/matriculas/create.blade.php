@@ -249,29 +249,69 @@
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             </div>
 
-                            <!-- Provincia -->
-                            <div>
-                                <label for="provincia" class="block text-sm font-medium text-gray-700 mb-2">Provincia
-                                    *</label>
-                                <input type="text" name="provincia" id="provincia"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-
-                            <!-- Distrito -->
-                            <div>
-                                <label for="distrito" class="block text-sm font-medium text-gray-700 mb-2">Distrito
-                                    *</label>
-                                <input type="text" name="distrito" id="distrito"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-
-                            <!-- Departamento -->
+                               <!-- Departamento -->
                             <div>
                                 <label for="departamento"
                                     class="block text-sm font-medium text-gray-700 mb-2">Departamento *</label>
-                                <input type="text" name="departamento" id="departamento"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <select name="departamento" id="departamento"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    onchange="cargarProvincias()" required>
+                                    <option value="" disabled selected>Seleccione departamento</option>
+                                    <option value="Amazonas">Amazonas</option>
+                                    <option value="Ancash">Áncash</option>
+                                    <option value="Apurimac">Apurímac</option>
+                                    <option value="Arequipa">Arequipa</option>
+                                    <option value="Ayacucho">Ayacucho</option>
+                                    <option value="Cajamarca">Cajamarca</option>
+                                    <option value="Callao">Callao</option>
+                                    <option value="Cusco">Cusco</option>
+                                    <option value="Huancavelica">Huancavelica</option>
+                                    <option value="Huanuco">Huánuco</option>
+                                    <option value="Ica">Ica</option>
+                                    <option value="Junin">Junín</option>
+                                    <option value="La Libertad">La Libertad</option>
+                                    <option value="Lambayeque">Lambayeque</option>
+                                    <option value="Lima">Lima</option>
+                                    <option value="Loreto">Loreto</option>
+                                    <option value="Madre de Dios">Madre de Dios</option>
+                                    <option value="Moquegua">Moquegua</option>
+                                    <option value="Pasco">Pasco</option>
+                                    <option value="Piura">Piura</option>
+                                    <option value="Puno">Puno</option>
+                                    <option value="San Martin">San Martín</option>
+                                    <option value="Tacna">Tacna</option>
+                                    <option value="Tumbes">Tumbes</option>
+                                    <option value="Ucayali">Ucayali</option>
+                                </select>
                             </div>
+
+                              <!-- Provincia -->
+                            <div>
+                                <label for="provincia" class="block text-sm font-medium text-gray-700 mb-2">Provincia
+                                    *</label>
+                                <select name="provincia" id="provincia"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    onchange="cargarDistritos()" disabled required>
+                                    <option value="" disabled selected>Primero seleccione un departamento</option>
+                                </select>
+                            </div>
+
+                             <!-- Distrito -->
+                            <div>
+                                <label for="distrito" class="block text-sm font-medium text-gray-700 mb-2">Distrito
+                                    *</label>
+                                <select name="distrito" id="distrito"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    disabled required>
+                                    <option value="" disabled selected>Primero seleccione una provincia</option>
+                                </select>
+                            </div>
+
+                          
+
+                           
+
+                         
 
                             <!-- Dirección -->
                             <div>
@@ -389,9 +429,9 @@
 
                             <!-- Estado de Pago -->
                             <div>
-                                <label for="estado_pago" class="block text-sm font-medium text-gray-700 mb-2">Estado de
+                                <label for="concepto" class="block text-sm font-medium text-gray-700 mb-2">Estado de
                                     Concepto Pago *</label>
-                                <select name="estado_pago" id="estado_pago"
+                                <select name="concepto" id="estado_pago"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     required>
                                     <option value="matricula" selected>Matricula</option>
@@ -408,7 +448,7 @@
                             <div>
                                 <label for="monto" class="block text-sm font-medium text-gray-700 mb-2">
                                     Monto</label>
-                                <input type="number" name="monto" id="monto"
+                                <input type="number" step="0.01" name="monto" id="monto"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     required>
                             </div>
@@ -679,7 +719,7 @@
 
         function hacerCamposRequeridos(requeridos) {
             const campos = ['nombre', 'apellidos', 'dni', 'sexo', 'fecha_nacimiento', 'pais', 'provincia', 'distrito',
-                'departamento', 'lengua_materna','monto','fecha_pago','comprobante_img'
+                'departamento', 'lengua_materna', 'monto', 'fecha_pago', 'comprobante_img'
             ];
             campos.forEach(campo => {
                 const elemento = document.getElementById(campo);
@@ -791,7 +831,7 @@
 
         function hacerCamposReadonly(readonly) {
             const campos = ['nombre', 'apellidos', 'dni', 'sexo', 'fecha_nacimiento', 'pais', 'provincia', 'distrito',
-                'departamento', 'lengua_materna', 'religion'
+                'departamento', 'lengua_materna', 'religion',
             ];
             campos.forEach(campo => {
                 const elemento = document.getElementById(campo);
@@ -840,11 +880,11 @@
                     const extension = name.substring(extensionIndex);
                     const basename = name.substring(0, extensionIndex);
 
-                    if (basename.length <= 3) return name; 
+                    if (basename.length <= 3) return name;
 
-                    const keepChars = 7; 
-                    const start = basename.substring(0, 3); 
-                    const end = basename.substring(basename.length - keepChars); 
+                    const keepChars = 7;
+                    const start = basename.substring(0, 3);
+                    const end = basename.substring(basename.length - keepChars);
 
                     return `${start}...${end}${extension}`;
                 };
@@ -888,5 +928,137 @@
                 closeModal();
             }
         });
+
+        // Datos de provincias por departamento (enfoque norte)
+        const provinciasPorDepartamento = {
+            "Amazonas": ["Chachapoyas", "Bagua", "Bongará", "Condorcanqui", "Luya", "Rodríguez de Mendoza",
+                "Utcubamba"],
+            "Ancash": ["Huaraz", "Aija", "Antonio Raymondi", "Asunción", "Bolognesi", "Carhuaz",
+                "Carlos Fermín Fitzcarrald",
+                "Casma", "Corongo", "Huari", "Huarmey", "Huaylas", "Mariscal Luzuriaga", "Ocros", "Pallasca",
+                "Pomabamba", "Recuay", "Santa", "Sihuas", "Yungay"
+            ],
+            "Cajamarca": ["Cajamarca", "Cajabamba", "Celendín", "Chota", "Contumazá", "Cutervo", "Hualgayoc",
+                "Jaén", "San Ignacio", "San Marcos", "San Miguel", "San Pablo", "Santa Cruz"
+            ],
+            "La Libertad": ["Trujillo", "Ascope", "Bolívar", "Chepén", "Gran Chimú", "Julcán", "Otuzco",
+                "Pacasmayo", "Pataz", "Sánchez Carrión", "Santiago de Chuco", "Virú"
+            ],
+            "Lambayeque": ["Chiclayo", "Ferreñafe", "Lambayeque"],
+            "Piura": ["Piura", "Ayabaca", "Huancabamba", "Morropón", "Paita", "Sechura", "Sullana", "Talara"],
+            "Tumbes": ["Tumbes", "Contralmirante Villar", "Zarumilla"],
+            "San Martin": ["Moyobamba", "Bellavista", "El Dorado", "Huallaga", "Lamas", "Mariscal Cáceres",
+                "Picota", "Rioja", "San Martín", "Tocache"
+            ]
+        };
+
+        // Datos de distritos por provincia (ejemplos para provincias del norte)
+        const distritosPorProvincia = {
+            // Amazonas
+            "Chachapoyas": ["Chachapoyas", "Asunción", "Balsas", "Cheto", "Chiliquín", "Chuquibamba",
+                "Granada", "Huancas", "La Jalca", "Leimebamba", "Levanto", "Magdalena",
+                "Mariscal Castilla", "Molinopampa", "Montevideo", "Olleros", "Quinjalca",
+                "San Francisco de Daguas", "San Isidro de Maino", "Soloco", "Sonche"
+            ],
+            "Bagua": ["Bagua", "Aramango", "Copallín", "El Parco", "Imaza", "La Peca"],
+
+            // Ancash
+            "Huaraz": ["Huaraz", "Cochabamba", "Colcabamba", "Huanchay", "Independencia", "Jangas",
+                "La Libertad", "Olleros", "Pampas Grande", "Pariacoto", "Pira", "Tarica"
+            ],
+            "Santa": ["Chimbote", "Cáceres del Perú", "Coishco", "Macate", "Moro", "Nepeña",
+                "Samanco", "Santa", "Nuevo Chimbote"
+            ],
+
+            // Cajamarca
+            "Cajamarca": ["Cajamarca", "Asunción", "Chetilla", "Cospán", "Encañada", "Jesús",
+                "Llacanora", "Los Baños del Inca", "Magdalena", "Matara", "Namora",
+                "San Juan"
+            ],
+            "Jaén": ["Jaén", "Bellavista", "Chontali", "Colasay", "Huabal", "Las Pirias",
+                "Pomahuaca", "Pucará", "Sallique", "San Felipe", "San José del Alto", "Santa Rosa"
+            ],
+
+            // La Libertad
+            "Trujillo": ["Trujillo", "El Porvenir", "Florencia de Mora", "Huanchaco", "La Esperanza",
+                "Laredo", "Moche", "Poroto", "Salaverry", "Simbal", "Victor Larco Herrera"
+            ],
+            "Chepén": ["Chepén", "Pacanga", "Pueblo Nuevo"],
+
+            // Lambayeque
+            "Chiclayo": ["Chiclayo", "Chongoyape", "Eten", "Eten Puerto", "José Leonardo Ortiz",
+                "La Victoria", "Lagunas", "Monsefú", "Nueva Arica", "Oyotún", "Picsi",
+                "Pimentel", "Reque", "Santa Rosa", "Saña", "Cayaltí", "Patapo",
+                "Pomalca", "Pucalá", "Tumán"
+            ],
+
+            // Piura
+            "Piura": ["Piura", "Castilla", "Catacaos", "Cura Mori", "El Tallán", "La Arena",
+                "La Unión", "Las Lomas", "Tambo Grande", "Veintiséis de Octubre"
+            ],
+            "Sullana": ["Sullana", "Bellavista", "Ignacio Escudero", "Lancones", "Marcavelica",
+                "Miguel Checa", "Querecotillo", "Salitral"
+            ],
+
+            // Tumbes
+            "Tumbes": ["Tumbes", "Corrales", "La Cruz", "Pampas de Hospital", "San Jacinto",
+                "San Juan de la Virgen"
+            ],
+
+            // San Martín
+            "Moyobamba": ["Moyobamba", "Calzada", "Habana", "Jepelacio", "Soritor", "Yantalo"],
+            "Rioja": ["Rioja", "Awajún", "Elías Soplín Vargas", "Nueva Cajamarca", "Pardo Miguel",
+                "Posic", "San Fernando", "Yorongos", "Yuracyacu"
+            ]
+        };
+
+        function cargarProvincias() {
+            const departamentoSelect = document.getElementById('departamento');
+            const provinciaSelect = document.getElementById('provincia');
+            const distritoSelect = document.getElementById('distrito');
+
+            const departamento = departamentoSelect.value;
+
+            // Limpiar y deshabilitar selects dependientes
+            provinciaSelect.innerHTML = '<option value="" disabled selected>Seleccione provincia</option>';
+            provinciaSelect.disabled = true;
+
+            distritoSelect.innerHTML = '<option value="" disabled selected>Primero seleccione una provincia</option>';
+            distritoSelect.disabled = true;
+
+            if (departamento && provinciasPorDepartamento[departamento]) {
+                // Cargar provincias del departamento seleccionado
+                provinciasPorDepartamento[departamento].forEach(provincia => {
+                    const option = document.createElement('option');
+                    option.value = provincia;
+                    option.textContent = provincia;
+                    provinciaSelect.appendChild(option);
+                });
+
+                provinciaSelect.disabled = false;
+            }
+        }
+
+        function cargarDistritos() {
+            const provinciaSelect = document.getElementById('provincia');
+            const distritoSelect = document.getElementById('distrito');
+            const provincia = provinciaSelect.value;
+
+            // Limpiar select de distritos
+            distritoSelect.innerHTML = '<option value="" disabled selected>Seleccione distrito</option>';
+            distritoSelect.disabled = true;
+
+            if (provincia && distritosPorProvincia[provincia]) {
+                // Cargar distritos de la provincia seleccionada
+                distritosPorProvincia[provincia].forEach(distrito => {
+                    const option = document.createElement('option');
+                    option.value = distrito;
+                    option.textContent = distrito;
+                    distritoSelect.appendChild(option);
+                });
+
+                distritoSelect.disabled = false;
+            }
+        }
     </script>
 @endsection
