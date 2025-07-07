@@ -182,7 +182,7 @@ class MatriculaController extends Controller
             'address' => 'nullable|string|max:255',
         ];
 
-        $validatedPago = [
+        $pagoValidationRules = [
             'concepto' => 'required|string|max:100',
             'monto' => 'required|numeric|min:0',
             'fecha_pago' => 'required|date',
@@ -196,6 +196,7 @@ class MatriculaController extends Controller
             $validatedData = $request->validate($baseValidationRules);
 
             $estudiante = null;
+            $codigoEstudiante = null;
             if (in_array($request->id_tipo_matricula, ['2', '3', '4'])) {
 
                 $request->validate([
@@ -235,8 +236,11 @@ class MatriculaController extends Controller
                     'lengua_materna' => $validatedData['lengua_materna'],
                     'religion' => $validatedData['religion'] ?? null,
                 ]);
+
             }
 
+            $estadoMat = !Auth::user()->isTutor() ?  'activo':'pendiente';
+            $codigoEstudiante = $estudiante->codigo_estudiante;
             // Create matriculation
             $matricula = Matricula::create([
                 'codigo_matricula' => Matricula::generarCodigoMatricula(),
@@ -245,13 +249,16 @@ class MatriculaController extends Controller
                 'id_anio_escolar' => $validatedData['id_anio_escolar'],
                 'seccion_id' => $validatedData['seccion_id'],
                 'fecha' => $validatedData['fecha'],
+                'estado' => $estadoMat,
             ]);
 
-            if (Auth::user()->isTutor()) {
+            if (!Auth::user()->isTutor()) {
+                $validatedPago = $request->validate($pagoValidationRules);
                 $rutaImagen = null;
                 if ($request->hasFile('comprobante_img')) {
                     $rutaImagen = $request->file('comprobante_img')->store('comprobantes', 'public');
                 }
+
 
                 $pago = Pago::create([
                     'codigo_matricula' => $matricula->codigo_matricula,
