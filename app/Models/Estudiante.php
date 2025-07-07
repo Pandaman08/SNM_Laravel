@@ -11,6 +11,7 @@ class Estudiante extends Model
     use HasFactory;
 
     protected $primaryKey = 'codigo_estudiante';
+    public $incrementing = false;
     protected $table = 'estudiantes';
 
     protected $fillable = [
@@ -50,7 +51,7 @@ class Estudiante extends Model
     
     
 
-    public function generarCodigoEstudiante(): int
+    public static function generarCodigoEstudiante(): int
     {
         do {
             $code = random_int(1000, 9999);

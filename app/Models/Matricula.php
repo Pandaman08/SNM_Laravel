@@ -62,7 +62,7 @@ class Matricula extends Model
     {
         return $this->hasMany(Pago::class, 'codigo_matricula', 'codigo_matricula');
     }
-    private function generarCodigoMatricula()
+    public static function generarCodigoMatricula()
     {
         $currentYear = date('Y');
         do {

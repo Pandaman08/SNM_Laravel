@@ -74,7 +74,7 @@ Route::get('/tutor/register', [TutorController::class, 'create'])->name('tutor.r
 Route::post('/tutor/register', [TutorController::class, 'store'])->name('tutor.store');
 //-------------------------Matriculas-----------------------------------
 
-// Rutas principales
+// Rutas principales 
 Route::get('/matriculas', [MatriculaController::class, 'index'])->name('matriculas.index');
 Route::get('/matriculas/crear', [MatriculaController::class, 'create'])->name('matriculas.create');
 Route::post('/matriculas', [MatriculaController::class, 'store'])->name('matriculas.store');

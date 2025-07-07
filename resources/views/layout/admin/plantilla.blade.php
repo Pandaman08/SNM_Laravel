@@ -571,7 +571,7 @@
                             <i class="ri-instance-line mr-3 text-lg"></i>
                             <span class="text-sm">Matriculas</span>
                             <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
-                        </a>
+                        </a> 
                         <ul class="pl-7 mt-2 hidden group-[.selected]:block">
                             <li class="mb-4">
                                 <a href="{{ route('matriculas.create') }}"
