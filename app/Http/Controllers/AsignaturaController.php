@@ -135,7 +135,7 @@ class AsignaturaController extends Controller
     {
         $asignatura = Asignatura::findOrFail($id);
 
-        if ($asignatura->detallesAsignatura()->exists() || $asignatura->competencias()->exists() || $asignatura->docentes()->exists()) {
+        if ( $asignatura->competencias()->exists() ) {
             return redirect()->route('asignaturas.index')->with('error', 'No se puede eliminar la asignatura porque tiene relaciones activas.');
         }
 

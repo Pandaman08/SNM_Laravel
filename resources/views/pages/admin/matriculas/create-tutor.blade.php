@@ -399,6 +399,7 @@
     // Variables globales
     let tipoMatriculaSeleccionado = '';
     let esMatriculaIngreso = false;
+    //esMatriculaIngreso es true se crea un estudiante nuevo; si "false" requiere buscar el estudiante
 
     // Función para manejar el cambio de tipo de matrícula
     function manejarTipoMatricula() {
@@ -502,6 +503,9 @@
                     // Llenar formulario con datos del estudiante
                     llenarFormularioEstudiante(data.estudiante);
                     
+                    //#2
+                    //agregarCampoDniBusqueda(data.estudiante.dni);
+
                     // Hacer campos solo lectura (no editables para estudiante existente)
                     habilitarCamposEstudiante(false);
                     
@@ -511,6 +515,8 @@
                         '❌ No se encontró ningún estudiante con ese DNI. Verifique el número o contacte con la administración.');
                     
                     limpiarFormularioEstudiante();
+                    //#2
+                    //removerCampoDniBusqueda();
                     habilitarCamposEstudiante(false);
                 }
             })
@@ -518,6 +524,8 @@
                 console.error('Error en búsqueda:', error);
                 mostrarResultadoBusqueda('error', 'Error al buscar el estudiante. Intente nuevamente.');
                 limpiarFormularioEstudiante();
+                //#2
+                //removerCampoDniBusqueda();
                 habilitarCamposEstudiante(false);
             });
     }
@@ -560,12 +568,13 @@
         document.getElementById('departamento').value = estudiante.departamento || '';
         document.getElementById('lengua_materna').value = estudiante.lengua_materna || '';
         document.getElementById('religion').value = estudiante.religion || '';
+        document.getElementById('address').value = estudiante.address || '';
     }
 
     // Función para limpiar formulario del estudiante
     function limpiarFormularioEstudiante() {
         const campos = ['nombre', 'apellidos', 'dni', 'sexo', 'fecha_nacimiento', 
-                       'pais', 'provincia', 'distrito', 'departamento', 'lengua_materna', 'religion'];
+                       'pais', 'provincia', 'distrito', 'departamento', 'lengua_materna', 'religion', 'address'];
         
         campos.forEach(campo => {
             const elemento = document.getElementById(campo);
@@ -580,19 +589,22 @@
     // Función para habilitar/deshabilitar campos del estudiante
     function habilitarCamposEstudiante(habilitar) {
         const campos = ['nombre', 'apellidos', 'dni', 'sexo', 'fecha_nacimiento', 
-                       'pais', 'provincia', 'distrito', 'departamento', 'lengua_materna', 'religion'];
+                       'pais', 'provincia', 'distrito', 'departamento', 'lengua_materna', 'religion', 'address'];
         
         campos.forEach(campo => {
             const elemento = document.getElementById(campo);
             elemento.readOnly = !habilitar;
-            elemento.disabled = !habilitar;
+            //#2
+            //elemento.disabled = !habilitar;
             
             if (habilitar) {
                 elemento.style.backgroundColor = '';
                 elemento.style.cursor = '';
+                
             } else {
                 elemento.style.backgroundColor = '#f9fafb';
                 elemento.style.cursor = 'not-allowed';
+                
             }
         });
     }

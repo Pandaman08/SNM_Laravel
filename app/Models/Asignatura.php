@@ -25,11 +25,12 @@ class Asignatura extends Model
         return $this->belongsTo(Grado::class, 'id_grado', 'id_grado');
     }
 
+    public function seccion()
+{
+    return $this->belongsTo(Seccion::class, 'seccion_id');
+}
     //
-    public function detallesAsignatura()
-    {
-        return $this->hasMany(DetalleAsignatura::class, 'codigo_asignatura', 'codigo_asignatura');
-    }
+
 
      public function asignaturasDocente()
     {

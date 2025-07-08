@@ -11,20 +11,28 @@ class Matricula extends Model
 
     protected $primaryKey = 'codigo_matricula';
 
+    public $incrementing = false;
     protected $fillable = [
+        'codigo_matricula',
         'codigo_estudiante',
         'id_anio_escolar',
         'id_tipo_matricula',
-        'estado_validacion',
+        'estado',
         'seccion_id', // ← AGREGAR FK a secciones
         'fecha'
     ];
 
+    protected $casts = [
+        'codigo_estudiante' => 'integer',
+        'estado' => 'string',
+        
+
+    ];
     protected $dates = ['fecha'];
 
     public function estudiante()
     {
-        return $this->hasOne(Estudiante::class, 'codigo_estudiante', 'codigo_estudiante');
+        return $this->belongsTo(Estudiante::class, 'codigo_estudiante', 'codigo_estudiante');
     }
 
     public function anioEscolar()
@@ -53,7 +61,19 @@ class Matricula extends Model
         return $this->belongsTo(Pago::class, 'id_pago', 'id_pago');
     }
     public function pagos()
-{
-    return $this->hasMany(Pago::class, 'codigo_matricula', 'codigo_matricula');
-}
+    {
+        return $this->hasMany(Pago::class, 'codigo_matricula', 'codigo_matricula');
+    }
+    public static function generarCodigoMatricula()
+    {
+        $currentYear = date('Y');
+        do {
+            $randomNumber = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+            $generatedCode = "{$currentYear}{$randomNumber}";
+
+        } while (Matricula::where('codigo_matricula', $generatedCode)->exists());
+
+        return $generatedCode;
+
+    }
 }

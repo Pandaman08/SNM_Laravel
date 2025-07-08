@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\AsignaturaDocente;
 use App\Enums\UserRole;
 use App\Models\Estudiante;
 use Illuminate\Support\Facades\Storage;
@@ -23,7 +24,8 @@ class AdminController extends Controller
     public function panel_docente()
     {
         $user = Auth::user();
-        return view("pages.admin.panels.docente", compact('user'));
+        $numAsign= AsignaturaDocente::where('codigo_docente','=',$user->docente->codigo_docente)->get()->count();
+        return view("pages.admin.panels.docente", compact('user','numAsign'));
     }
 
     public function panel_secretaria()
@@ -63,22 +65,7 @@ class AdminController extends Controller
         return view('pages.admin.docentes.index', compact('users', 'roles'));
     }
 
-    public function showEstudiante(Request $request)
-    {
-        $query = $request->input('search');
-
-        $users = Estudiante::when($query, function ($queryBuilder) use ($query) {
-            $queryBuilder->where(function ($q) use ($query) {
-                $q->where('name', 'like', '%' . $query . '%')
-                    ->orWhere('lastname', 'like', '%' . $query . '%')
-                    ->orWhere('email', 'like', '%' . $query . '%');
-            });
-        })
-            ->paginate(10);
-        $roles = UserRole::cases();
-
-        return view('pages.admin.estudiantes.index', compact('users', 'roles'));
-    }
+   
 
 
     public function approveUser($id)
