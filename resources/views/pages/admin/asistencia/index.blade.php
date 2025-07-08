@@ -2,12 +2,41 @@
 
 @section('contenido')
 <div class="container mx-auto px-4 py-6">
+    {{-- Mensajes de éxito/error --}}
+    @if(session('success'))
+        <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline">{{ session('success') }}</span>
+        </div>
+    @endif
+    
+    @if(session('error'))
+        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline">{{ session('error') }}</span>
+        </div>
+    @endif
+
     <div class="bg-white rounded-lg shadow-md">
         {{-- Header --}}
         <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-t-lg">
             <h1 class="text-2xl font-bold">Gestión de Asistencias</h1>
             <p class="text-sm mt-1 opacity-90">Control de asistencia de estudiantes por periodo</p>
         </div>
+
+        @if(isset($error))
+            {{-- Mensaje de error cuando no hay registro de docente --}}
+            <div class="p-8">
+                <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+                    <div class="flex items-center">
+                        <i class="ri-error-warning-line text-red-500 text-3xl mr-4"></i>
+                        <div>
+                            <h3 class="text-red-800 font-semibold text-lg">Error de configuración</h3>
+                            <p class="text-red-600 mt-1">{{ $error }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @else
+            {{-- Contenido normal cuando todo está bien --}}
 
         {{-- Filtros --}}
         <div class="p-6 border-b">
@@ -79,7 +108,7 @@
                     </div>
                     
                     @if($gradoId && $seccionId)
-                    <a href="{{ route('asistencias.create', ['grado_id' => $gradoId, 'seccion_id' => $seccionId]) }}" 
+                    <a href="{{ route('asistencias.create', ['grado_id' => $gradoId, 'seccion_id' => $seccionId, 'fecha' => date('Y-m-d')]) }}" 
                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-200">
                         <i class="ri-add-line mr-1"></i> Registrar Asistencia
                     </a>
@@ -103,14 +132,15 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Grado/Sección
                             </th>
-                            @foreach($periodos as $periodo)
+                                @php
+                                    $ultimo = $periodos->sortByDesc('fecha_inicio')->first();
+                                @endphp
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ $periodo->nombre }}
+                                    {{ $ultimo->nombre }}
                                     <div class="text-xs font-normal">
                                         P | A | J | T
                                     </div>
                                 </th>
-                            @endforeach
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Acciones
                             </th>
@@ -135,10 +165,11 @@
                                     {{ $matricula->seccion->grado->nombre_completo }} - 
                                     Sección {{ $matricula->seccion->seccion }}
                                 </td>
-                                @foreach($periodos as $periodo)
-                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">   
                                         @php
-                                            $asistenciasPeriodo = $asistencias[$matricula->codigo_estudiante][$periodo->id_periodo] ?? collect();
+                                            $ultimo = $periodos->sortByDesc('fecha_inicio')->first();
+                                            $asistenciasPeriodo = $asistencias[$matricula->codigo_estudiante][$ultimo->id_periodo] ?? collect();
                                             $conteo = [
                                                 'Presente' => 0,
                                                 'Ausente' => 0,
@@ -163,7 +194,6 @@
                                             <span class="text-yellow-600 font-semibold">{{ $conteo['Tarde'] }}</span>
                                         </div>
                                     </td>
-                                @endforeach
                                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                     <a href="{{ route('asistencias.show', $matricula->codigo_estudiante) }}" 
                                        class="text-indigo-600 hover:text-indigo-900 mr-2">
@@ -222,23 +252,66 @@
             </div>
         </div>
     </div>
+        @endif {{-- Cierre del if(isset($error)) --}}
+    </div>
 </div>
-
-@push('scripts')
+@endsection
+@section('script')
 <script>
     function loadSecciones() {
         const gradoId = document.getElementById('grado_id').value;
         const seccionSelect = document.getElementById('seccion_id');
+        const seccionIdActual = "{{ $seccionId }}";
         
         // Limpiar secciones
-        seccionSelect.innerHTML = '<option value="">Todas las secciones</option>';
+        seccionSelect.innerHTML = '<option value="">Cargando...</option>';
+        seccionSelect.disabled = true;
         
-        if (gradoId) {
-            // Aquí podrías hacer una petición AJAX para cargar las secciones
-            // Por ahora, el formulario se enviará para recargar la página
-            document.getElementById('filterForm').submit();
+        if (!gradoId) {
+            seccionSelect.innerHTML = '<option value="">Todas las secciones</option>';
+            seccionSelect.disabled = false;
+            return;
         }
+        
+        // Hacer petición AJAX
+        fetch(`{{ route('asistencias.secciones-por-grado') }}?grado_id=${gradoId}`)
+            .then(response => response.json())
+            .then(data => {
+                seccionSelect.innerHTML = '<option value="">Todas las secciones</option>';
+                
+                if (data.secciones && data.secciones.length > 0) {
+                    data.secciones.forEach(seccion => {
+                        const option = document.createElement('option');
+                        option.value = seccion.id_seccion;
+                        option.textContent = `Sección ${seccion.seccion}`;
+                        
+                        // Mantener la selección actual si existe
+                        if (seccionIdActual && seccion.id_seccion == seccionIdActual) {
+                            option.selected = true;
+                        }
+                        
+                        seccionSelect.appendChild(option);
+                    });
+                } else {
+                    seccionSelect.innerHTML = '<option value="">No hay secciones asignadas en este grado</option>';
+                }
+                
+                seccionSelect.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                seccionSelect.innerHTML = '<option value="">Error al cargar secciones</option>';
+                seccionSelect.disabled = false;
+            });
     }
+    
+    // Cargar secciones al inicio si hay un grado seleccionado
+    document.addEventListener('DOMContentLoaded', function() {
+        const gradoId = document.getElementById('grado_id').value;
+        if (gradoId) {
+            // No llamamos loadSecciones() aquí porque las secciones ya vienen del servidor
+            // Esto evita una petición AJAX innecesaria al cargar la página
+        }
+    });
 </script>
-@endpush
 @endsection
