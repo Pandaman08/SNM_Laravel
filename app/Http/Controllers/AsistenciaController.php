@@ -12,6 +12,8 @@ use App\Models\Estudiante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class AsistenciaController extends Controller
 {
@@ -76,10 +78,22 @@ class AsistenciaController extends Controller
         
         // Query base para estudiantes - solo de las secciones del docente
         $seccionesIds = $seccionesDocente->pluck('id_seccion')->toArray();
-        $estudiantesQuery = Matricula::query()
-            ->with(['estudiante.persona', 'seccion.grado'])
-            ->where('estado', true)
-            ->whereIn('seccion_id', $seccionesIds);
+        $estudiantesQuery = Matricula::where('estado', 'activo')
+            ->whereIn('seccion_id', $seccionesIds)
+            ->whereHas('estudiante.persona', function ($q) use ($search) {
+                if ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('lastname', 'LIKE', "%{$search}%");
+                }
+            })
+            ->with(['estudiante.persona', 'seccion.grado']);
+
+        
+        $matriculasSample = Matricula::whereIn('seccion_id', $seccionesIds)
+            ->take(5)
+            ->get(['codigo_matricula', 'seccion_id', 'estado']);
+        
+        \Log::info('Muestra de matrículas: ' . $matriculasSample->toJson());
         
         // Aplicar filtros adicionales
         if ($gradoId) {
@@ -114,8 +128,28 @@ class AsistenciaController extends Controller
         }
         
         // Paginación
-        $matriculas = $estudiantesQuery->paginate(20)->withQueryString();
-        
+        $matriculasSinPaginar = $estudiantesQuery->get()->sortBy(function ($matricula) use ($orderBy) {
+    $persona = $matricula->estudiante->persona;
+    return $orderBy === 'apellido'
+        ? $persona->lastname . ' ' . $persona->name
+        : $persona->name . ' ' . $persona->lastname;
+})->values();
+
+// Paginación manual
+$page = request()->get('page', 1);
+$perPage = 20;
+$offset = ($page - 1) * $perPage;
+
+$matriculas = new LengthAwarePaginator(
+    $matriculasSinPaginar->slice($offset, $perPage)->values(),
+    $matriculasSinPaginar->count(),
+    $perPage,
+    $page,
+    ['path' => request()->url(), 'query' => request()->query()]
+);
+
+        \Log::info('Total de matrículas encontradas después de filtros: ' . $matriculas->total());
+
         // Obtener periodos activos
         $hoy = Carbon::now();
         $periodos = Periodo::where('fecha_inicio', '<=', $hoy)
@@ -223,7 +257,7 @@ class AsistenciaController extends Controller
             // Query para estudiantes de la sección
             $estudiantesQuery = Matricula::query()
                 ->with(['estudiante.persona', 'seccion.grado'])
-                ->where('estado', true)
+                ->where('estado', 'activo')
                 ->where('seccion_id', $seccionId);
             
             // Aplicar búsqueda
