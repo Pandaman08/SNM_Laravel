@@ -24,7 +24,8 @@ class Matricula extends Model
 
     protected $casts = [
         'codigo_estudiante' => 'integer',
-        'estado' => 'boolean',
+        'estado' => 'string',
+        
 
     ];
     protected $dates = ['fecha'];
@@ -63,7 +64,7 @@ class Matricula extends Model
     {
         return $this->hasMany(Pago::class, 'codigo_matricula', 'codigo_matricula');
     }
-    private function generarCodigoMatricula()
+    public static function generarCodigoMatricula()
     {
         $currentYear = date('Y');
         do {

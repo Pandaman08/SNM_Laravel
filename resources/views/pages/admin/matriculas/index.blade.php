@@ -201,7 +201,7 @@
                         <tbody class="bg-white divide-y divide-gray-200">
                             @forelse($matriculas as $matricula)
                                 <tr class="hover:bg-gray-50 matricula-row" data-estado="{{ $matricula->estado }}"
-                                    data-nivel="{{ strtolower($matricula->seccion->grado->nivelEducativo->nombre) }}"
+                                    data-nivel="{{ strtolower($matricula->seccion->grado->nivelEducativo->nombre  ?? 'NA')  }}"
                                     data-buscar="{{ strtolower($matricula->estudiante->persona->dni . ' ' . $matricula->estudiante->persona->name . ' ' . $matricula->estudiante->persona->lastName) }}">
 
                                     <!-- Estudiante -->
@@ -240,11 +240,11 @@
                                     <!-- Nivel/Grado/Sección -->
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900">
-                                            {{ $matricula->seccion->grado->nivelEducativo->nombre }}
+                                            {{ $matricula->seccion->grado->nivelEducativo->nombre  ?? 'NA' }}
                                         </div>
                                         <div class="text-sm text-gray-500">
-                                            {{ $matricula->seccion->grado->grado }}° - Sección
-                                            {{ $matricula->seccion->seccion }}
+                                            {{ $matricula->seccion->grado->grado ?? 'NA' }}° - Sección
+                                            {{ $matricula->seccion->seccion   ?? 'NA'}}
                                         </div>
                                     </td>
 

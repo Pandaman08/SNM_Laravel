@@ -21,7 +21,7 @@ class AsistenciaController extends Controller
         $docente = $user->docente;
 
         if (!$docente) {
-            return view('asistencias.index', [
+            return view('pages.admin.asistencia.index', [
                 'error' => 'Su usuario no tiene un registro de docente asociado. Por favor, contacte al administrador.',
                 'matriculas' => collect(),
                 'grados' => collect(),
@@ -40,7 +40,7 @@ class AsistenciaController extends Controller
             ->get();
 
         if ($seccionesDocente->isEmpty()) {
-            return view('asistencias.index', [
+            return view('pages.admin.asistencia.index', [
                 'error' => 'No tiene secciones asignadas. Por favor, contacte al administrador.',
                 'matriculas' => collect(),
                 'grados' => collect(),
