@@ -7,21 +7,22 @@
             <h1 class="text-2xl font-bold">Registrar Asistencia</h1>
             <p class="text-sm mt-1 opacity-90">Marque la asistencia de los estudiantes para el día {{ \Carbon\Carbon::parse($fecha)->format('d/m/Y') }}</p>
         </div>
-
+        @if(session('error'))
+            <div class="mt-6 mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                <strong>¡Atención!</strong> {{ session('error') }}
+            </div>
+        @endif
         {{-- Filtros --}}
         <div class="p-6 border-b bg-gray-50">
             <form method="GET" action="{{ route('asistencias.create') }}" id="filterForm">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     {{-- Selector de Fecha --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Fecha</label>
-                        <input type="date" name="fecha" id="fecha" 
-                               value="{{ $fecha }}"
-                               max="{{ date('Y-m-d') }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               onchange="this.form.submit()">
+                        <p class="text-sm text-gray-600 mb-1">Fecha</p>
+                        <p class="font-semibold">{{ \Carbon\Carbon::parse($fecha)->format('d/m/Y') }}</p>
+                        {{-- Campo oculto para que llegue al controller --}}
+                        <input type="hidden" name="fecha" value="{{ $fecha }}">
                     </div>
-
                     {{-- Filtro por Grado --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Grado</label>
@@ -81,12 +82,27 @@
                             {{ \Carbon\Carbon::parse($periodo->fecha_fin)->format('d/m/Y') }})
                         </p>
                     </div>
+                @elseif(isset($mensajePeriodo))
+                    <div class="mt-4 p-3 bg-yellow-50 rounded-md">
+                        <p class="text-sm text-yellow-800">
+                            <i class="ri-alert-line mr-1"></i>
+                            {{ $mensajePeriodo }}
+                        </p>
+                        @if(isset($periodos) && $periodos->count() > 0)
+                            <p class="text-xs text-yellow-700 mt-2">Periodos disponibles:</p>
+                            <ul class="text-xs text-yellow-700 ml-4">
+                                @foreach($periodos as $p)
+                                    <li>• {{ $p->nombre }}: {{ \Carbon\Carbon::parse($p->fecha_inicio)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($p->fecha_fin)->format('d/m/Y') }}</li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </div>
                 @endif
             </form>
         </div>
 
         {{-- Formulario de Asistencias --}}
-        @if($matriculas->count() > 0 && $gradoId && $seccionId)
+        @if($matriculas && $matriculas->count() > 0 && $gradoId && $seccionId && $periodo)
             <form method="POST" action="{{ route('asistencias.store') }}" id="asistenciaForm">
                 @csrf
                 <input type="hidden" name="fecha" value="{{ $fecha }}">
@@ -220,7 +236,9 @@
                     <i class="ri-user-search-line"></i>
                 </div>
                 <p class="text-gray-500 text-lg">
-                    @if(!$gradoId || !$seccionId)
+                    @if(!$periodo && (!$gradoId || !$seccionId))
+                        Seleccione una fecha válida dentro de un periodo activo
+                    @elseif(!$gradoId || !$seccionId)
                         Seleccione un grado y sección para registrar asistencias
                     @else
                         No se encontraron estudiantes con los filtros aplicados
@@ -230,19 +248,54 @@
         @endif
     </div>
 </div>
-
-@push('scripts')
+@endsection
+@section('script')
 <script>
     function loadSecciones() {
         const gradoId = document.getElementById('grado_id').value;
         const seccionSelect = document.getElementById('seccion_id');
+        const seccionIdActual = "{{ $seccionId }}";
         
         // Limpiar secciones
-        seccionSelect.innerHTML = '<option value="">Seleccione una sección</option>';
+        seccionSelect.innerHTML = '<option value="">Cargando...</option>';
+        seccionSelect.disabled = true;
         
-        if (gradoId) {
-            document.getElementById('filterForm').submit();
+        if (!gradoId) {
+            seccionSelect.innerHTML = '<option value="">Seleccione una sección</option>';
+            seccionSelect.disabled = false;
+            return;
         }
+        
+        // Hacer petición AJAX
+        fetch(`{{ route('asistencias.secciones-por-grado') }}?grado_id=${gradoId}`)
+            .then(response => response.json())
+            .then(data => {
+                seccionSelect.innerHTML = '<option value="">Seleccione una sección</option>';
+                
+                if (data.secciones && data.secciones.length > 0) {
+                    data.secciones.forEach(seccion => {
+                        const option = document.createElement('option');
+                        option.value = seccion.id_seccion;
+                        option.textContent = `Sección ${seccion.seccion}`;
+                        
+                        // Mantener la selección actual si existe
+                        if (seccionIdActual && seccion.id_seccion == seccionIdActual) {
+                            option.selected = true;
+                        }
+                        
+                        seccionSelect.appendChild(option);
+                    });
+                } else {
+                    seccionSelect.innerHTML = '<option value="">No tiene secciones asignadas en este grado</option>';
+                }
+                
+                seccionSelect.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                seccionSelect.innerHTML = '<option value="">Error al cargar secciones</option>';
+                seccionSelect.disabled = false;
+            });
     }
 
     function confirmarCancelar() {
@@ -259,6 +312,15 @@
             this.submit();
         }
     });
+    
+    // Cargar secciones al inicio si hay un grado seleccionado
+    document.addEventListener('DOMContentLoaded', function() {
+        const gradoId = document.getElementById('grado_id').value;
+        if (gradoId) {
+            // No llamamos loadSecciones() aquí porque las secciones ya vienen del servidor
+            // Esto evita una petición AJAX innecesaria al cargar la página
+        }
+    });
+    
 </script>
-@endpush
 @endsection
