@@ -42,19 +42,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-                    <i class="ri-medal-fill text-2xl"></i>
-                </div>
-              
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                <div class="p-3 rounded-full bg-amber-100 text-amber-600 mr-4">
-                    <i class="ri-alarm-warning-fill text-2xl"></i>
-                </div>
-                
-            </div>
+          
         </div>
 
         <!-- Contenido Principal -->
