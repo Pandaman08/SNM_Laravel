@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <title>Ficha de Matrícula - {{ $matricula->codigo_matricula }}</title>
     <style>
-        body { font-family: Arial, sans-serif; }
+         body {
+            font-family: "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 40px;
+            color: #100f0fff;
+            background-color: #f9fafb;
+        }
         .header { text-align: center; margin-bottom: 20px; }
         .logo { width: 150px; height: auto; }
         .title { font-size: 24px; font-weight: bold; margin: 10px 0; }
