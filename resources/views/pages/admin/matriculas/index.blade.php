@@ -17,7 +17,7 @@
                             <span class="text-sm text-gray-500">Total de matrículas:</span>
                             <span class="font-semibold text-blue-600">{{ $matriculas->count() }}</span>
                             <a href="{{ route('matriculas.create') }}"
-                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl flex items-center text-sm font-medium shadow-md transition duration-300 ease-in-out">
                                 <i class="ri-add-line mr-2"></i>
                                 Nueva Matrícula
                             </a>
@@ -167,7 +167,7 @@
             </div>
 
             <!-- Tabla de Matrículas -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="bg-white/90 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h2 class="text-lg font-semibold text-gray-900">Lista de Matrículas</h2>
                 </div>
@@ -209,7 +209,7 @@
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-10 w-10">
                                                 <div
-                                                    class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                                   class="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-400 to-blue-500 text-white flex items-center justify-center font-semibold shadow">
                                                     <span class="text-sm font-medium text-gray-700">
                                                         {{ substr($matricula->estudiante->persona->name, 0, 1) }}{{ substr($matricula->estudiante->persona->lastName, 0, 1) }}
                                                     </span>
@@ -250,7 +250,7 @@
 
                                     <!-- Tipo Matrícula -->
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">
+                                        <div class="px-2 py-1 bg-purple-100 text-blue-700 text-xs font-medium rounded-lg">
                                             {{ $matricula->tipoMatricula->nombre }}
                                         </div>
                                     </td>
