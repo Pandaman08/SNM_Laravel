@@ -309,10 +309,10 @@
                                             </a>
 
                                             <!-- Editar -->
-                                            <a href="" class="text-indigo-600 hover:text-indigo-900 p-1 rounded">
-                                                <i class="ri-edit-line"></i>
-                                            </a>
-
+                                          <a href="{{ route('matriculas.editar', $matricula->codigo_matricula) }}"
+                                           class="text-indigo-600 hover:text-indigo-900 p-1 rounded">
+                                           <i class="ri-edit-line"></i>
+                                        </a>
                                             @if ($matricula->estado== 'pendiente')
                                                 <!-- Aprobar -->
                                                 <form id="aprobar-form-{{ $matricula->codigo_matricula }}"
@@ -326,8 +326,6 @@
                                                         <i class="ri-check-line"></i>
                                                     </button>
                                                 </form>
-
-
                                               
                                                     <!-- Rechazar -->
                                                     <button
@@ -335,11 +333,7 @@
                                                         class="text-red-600 hover:text-red-900 p-1 rounded">
                                                         <i class="ri-close-line"></i>
                                                     </button>
-                                              
                                             @endif
-
-
-
                                         </div>
                                     </td>
                                 </tr>
@@ -400,7 +394,7 @@
     
 @endsection
 
-@section('scrip')
+@section('script')
 <script>
         // Filtros de tabla
         document.getElementById('filtro_estado').addEventListener('change', filtrarTabla);

@@ -78,11 +78,20 @@ Route::post('/tutor/register', [TutorController::class, 'store'])->name('tutor.s
 Route::get('/matriculas', [MatriculaController::class, 'index'])->name('matriculas.index');
 Route::get('/matriculas/crear', [MatriculaController::class, 'create'])->name('matriculas.create');
 Route::post('/matriculas', [MatriculaController::class, 'store'])->name('matriculas.store');
-Route::get('/matriculas/{codigo_matricula}', [MatriculaController::class, 'show'])->name('matriculas.show');
 
+
+Route::get('/matriculas/reporte', [MatriculaController::class, 'reporte'])
+    ->name('matriculas.reporte');
 Route::get('/matriculas/{matricula}/ficha', [MatriculaController::class, 'generarFicha'])
-     ->name('matriculas.ficha');
-     
+    ->name('matriculas.ficha');
+
+// Mostrar matrícula (vista detalle)
+Route::get('/matriculas/{codigo_matricula}/editar', [MatriculaController::class, 'edit'])->name('matriculas.editar');
+Route::put('/matriculas/{codigo_matricula}', [MatriculaController::class, 'update'])
+    ->name('matriculas.update');
+Route::get('/matriculas/{codigo_matricula}', [MatriculaController::class, 'show'])
+    ->name('matriculas.show');
+
 // Rutas para tutores
 Route::get('/mis-matriculas', [MatriculaController::class, 'misMatriculas'])->name('matriculas.mis-matriculas');
 Route::get('/solicitar-matricula', [MatriculaController::class, 'createTutor'])->name('matriculas.create-tutor');
@@ -157,4 +166,7 @@ Route::get('/asistencias/secciones-por-grado', [AsistenciaController::class, 'ob
 Route::get('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'show'])->name('asistencias.show');
 Route::get('/asistencias/{codigo_estudiante}/edit', [AsistenciaController::class, 'edit'])->name('asistencias.edit');
 Route::put('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'update'])->name('asistencias.update');
+
+
+
 

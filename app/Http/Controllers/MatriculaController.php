@@ -623,6 +623,46 @@ class MatriculaController extends Controller
      * Generar código único para matrícula
      */
 
+    
+    public function edit($codigo_matricula)
+    {
+    $matricula = Matricula::with(['estudiante.persona', 'seccion.grado'])->where('codigo_matricula', $codigo_matricula)->firstOrFail();
+    $aniosEscolares = AnioEscolar::all();
+    $tiposMatricula = TipoMatricula::all();
+    $secciones = Seccion::with('grado')->get();
+
+    return view('pages.admin.matriculas.edit', compact('matricula', 'aniosEscolares', 'tiposMatricula', 'secciones'));
+    }
+
+
+    public function update(Request $request, $codigo_matricula)
+    {
+    $request->validate([
+        'id_tipo_matricula' => 'required|exists:tipos_matricula,id_tipo_matricula',
+        'id_anio_escolar' => 'required|exists:anios_escolares,id_anio_escolar',
+        'seccion_id' => 'required|exists:secciones,id_seccion',
+        'estado' => 'required|in:pendiente,activo,rechazado,finalizado',
+    ]);
+
+    try {
+        $matricula = Matricula::where('codigo_matricula', $codigo_matricula)->firstOrFail();
+
+        $matricula->update([
+            'id_tipo_matricula' => $request->id_tipo_matricula,
+            'id_anio_escolar' => $request->id_anio_escolar,
+            'seccion_id' => $request->seccion_id,
+            'estado' => $request->estado,
+        ]);
+
+        return redirect()->route('matriculas.index', $codigo_matricula)
+                         ->with('success', '¡La matrícula se actualizó correctamente!');
+    } catch (\Exception $e) {
+        return back()->with('error', 'Error al actualizar la matrícula: ' . $e->getMessage());
+      }
+    }
+
+
+    
 
     public function aprobar($codigo_matricula)
     {
@@ -662,6 +702,9 @@ class MatriculaController extends Controller
         }
     }
 
+
+
+    
     public function rechazar(Request $request, $codigo_matricula)
     {
         $request->validate([
@@ -692,4 +735,37 @@ class MatriculaController extends Controller
             return back()->with('error', 'Error al rechazar la matrícula: ' . $e->getMessage());
         }
     }
+
+
+
+    // Aceptar matrícula (cambiar estado a 'activo')
+
+    public function destroy($codigo_matricula)
+    {
+    $matricula = Matricula::where('codigo_matricula', $codigo_matricula)->firstOrFail();
+    $matricula->delete();
+
+    return redirect()->route('matriculas.reporte')->with('success', 'Matrícula eliminada.');
+  
+}
+
+    public function reporte()
+    {
+        // Traemos las matrículas con relaciones
+        $matriculas = Matricula::with(['estudiante.persona', 'seccion.grado.nivelEducativo'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Agrupamos por estado (activo, pendiente, inactivo)
+        $estadisticas = $matriculas->groupBy('estado')->map->count();
+
+        ##dd($estadisticas, $matriculas);
+
+
+        return view('pages.admin.matriculas.reporte', [
+            'matriculas' => $matriculas,
+            'estadisticas' => $estadisticas
+        ]);
+    }
+
 }
