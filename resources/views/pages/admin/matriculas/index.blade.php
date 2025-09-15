@@ -3,7 +3,7 @@
 @section('title', 'Gestión de Matrículas')
 
 @section('contenido')
-    <div class="min-h-screen bg-gray-50 py-8">
+            <div class="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 p-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
@@ -166,6 +166,7 @@
                 </div>
             </div>
 
+            
             <!-- Tabla de Matrículas -->
             <div class="bg-white/90 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
@@ -229,23 +230,29 @@
 
                                     <!-- Código -->
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            {{ $matricula->codigo_matricula ?? 'Sin asignar' }}
-                                        </div>
-                                        <div class="text-sm text-gray-500">
-                                            Est: {{ $matricula->estudiante->codigo_estudiante ?? 'Pendiente' }}
-                                        </div>
+                                        <div class="flex flex-col">
+                                            <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700 shadow-sm">
+                                                <i class="ri-hashtag text-xs mr-1"></i>
+                                                 {{ $matricula->codigo_matricula ?? 'Sin asignar' }}
+                                                 </span>
+                                                 <span class="mt-1 text-[11px] text-gray-500 tracking-wide">
+                                                    <i class="ri-id-card-line mr-1 text-gray-400"></i>
+                                                    Est: {{ $matricula->estudiante->codigo_estudiante ?? 'Pendiente' }}
+                                                </span>
+                                            </div>
                                     </td>
 
                                     <!-- Nivel/Grado/Sección -->
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            {{ $matricula->seccion->grado->nivelEducativo->nombre  ?? 'NA' }}
-                                        </div>
-                                        <div class="text-sm text-gray-500">
-                                            {{ $matricula->seccion->grado->grado ?? 'NA' }}° - Sección
-                                            {{ $matricula->seccion->seccion   ?? 'NA'}}
-                                        </div>
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-semibold text-gray-900 flex items-center">
+                                                  <i class="ri-graduation-cap-line mr-2 text-blue-500"></i>
+                                                  {{ $matricula->seccion->grado->nivelEducativo->nombre ?? 'NA' }}
+                                                </span>
+                                                 <span class="mt-1 inline-flex items-center px-2 py-0.5 text-xs rounded-lg bg-gray-100 text-gray-700">
+                                                      {{ $matricula->seccion->grado->grado ?? 'NA' }}° • Sección {{ $matricula->seccion->seccion ?? 'NA' }}
+                                                    </span>
+                                                </div>
                                     </td>
 
                                     <!-- Tipo Matrícula -->
@@ -281,10 +288,15 @@
 
                                     <!-- Fecha -->
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $matricula->fecha }}
-                                        <div class="text-xs text-gray-500">
-                                            {{ $matricula->fecha }}
-                                        </div>
+                                        <div class="flex flex-col">
+                                            <span class="flex items-center font-medium text-gray-800">
+                                                 <i class="ri-calendar-line text-blue-500 mr-2"></i>
+                                                 {{ \Carbon\Carbon::parse($matricula->fecha)->format('d/m/Y') }}
+                                                </span>
+                                                <span class="text-xs text-gray-500 ml-6">
+                                                    {{ \Carbon\Carbon::parse($matricula->fecha)->format('h:i A') }}
+                                                </span>
+                                            </div>
                                     </td>
 
                                     <!-- Acciones -->
