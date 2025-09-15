@@ -17,13 +17,34 @@ class PagoController extends Controller
     public function index(Request $request)
     {
         $searchTerm = $request->input('buscarpor');
-
-        $pagos = Pago::with('matricula.estudiante')
+        $userId = auth()->user()->user_id; // Obtener el ID del usuario autenticado
+        
+        // Obtener el tutor autenticado
+        $tutor = \App\Models\Tutor::where('user_id', $userId)->first();
+        
+        if (!$tutor) {
+            // Si no es un tutor, redirigir o mostrar error
+            return redirect()->back()->with('error', 'No tienes permisos para ver esta página');
+        }
+        
+        // Obtener los códigos de estudiantes asociados a este tutor
+        $codigosEstudiantes = \App\Models\EstudianteTutor::where('id_tutor', $tutor->id_tutor)
+            ->pluck('codigo_estudiante')
+            ->toArray();
+        
+        // Obtener las matrículas de estos estudiantes
+        $codigosMatriculas = \App\Models\Matricula::whereIn('codigo_estudiante', $codigosEstudiantes)
+            ->pluck('codigo_matricula')
+            ->toArray();
+        
+        // Filtrar pagos solo de las matrículas de los estudiantes del tutor
+        $pagos = Pago::with('matricula.estudiante.persona')
+            ->whereIn('codigo_matricula', $codigosMatriculas)
             ->when($searchTerm, function ($query) use ($searchTerm) {
                 $query->where('concepto', 'like', '%' . $searchTerm . '%')
-                    ->orWhereHas('matricula.estudiante', function ($q) use ($searchTerm) {
-                        $q->where('nombre', 'like', '%' . $searchTerm . '%')
-                            ->orWhere('apellido', 'like', '%' . $searchTerm . '%');
+                    ->orWhereHas('matricula.estudiante.persona', function ($q) use ($searchTerm) {
+                        $q->where('name', 'like', '%' . $searchTerm . '%')
+                            ->orWhere('lastName', 'like', '%' . $searchTerm . '%');
                     });
             })
             ->orderBy('fecha_pago', 'desc')

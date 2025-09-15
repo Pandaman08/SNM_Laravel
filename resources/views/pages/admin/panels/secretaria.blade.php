@@ -22,15 +22,7 @@
         <!-- Dashboard Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <!-- Estadísticas rápidas -->
-            <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
-                    <i class="ri-money-dollar-circle-fill text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Ingresos Hoy</p>
-                    <p class="text-2xl font-bold">S/ 8,450</p>
-                </div>
-            </div>
+          
 
             <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
                 <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
@@ -42,25 +34,6 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-                    <i class="ri-alarm-warning-fill text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Pagos Pendientes</p>
-                    <p class="text-2xl font-bold">24</p>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                <div class="p-3 rounded-full bg-amber-100 text-amber-600 mr-4">
-                    <i class="ri-refund-2-fill text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Devoluciones Hoy</p>
-                    <p class="text-2xl font-bold">2</p>
-                </div>
-            </div>
         </div>
 
         <!-- Contenido Principal -->

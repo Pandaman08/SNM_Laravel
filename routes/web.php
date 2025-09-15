@@ -69,6 +69,7 @@ Route::get('/estudiantes-matriculado/{id_asignatura}/asignatura', [DocenteContro
 // Route::get('tutores', [TutorController::class, 'indexTutores'])->name('tutores.index');
 Route::get('/tutores/aprobar', [AdminController::class, 'index_tutor'])->name('tutores.panel-aprobar');
 Route::post('/tutores/{id}/approve', [AdminController::class, 'approveUser'])->name('person.approve');
+Route::post('/tutores/{id}/reject', [AdminController::class, 'rejectUser'])->name('person.reject');
 Route::delete('tutores/tutor/{id}', [AdminController::class, 'destroy_person'])->name('person.destroy_person');
 Route::get('/tutor/register', [TutorController::class, 'create'])->name('tutor.register');
 Route::post('/tutor/register', [TutorController::class, 'store'])->name('tutor.store');
