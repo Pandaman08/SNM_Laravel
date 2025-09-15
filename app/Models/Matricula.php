@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Matricula extends Model
 {
     use HasFactory;
-
+    protected $table = 'matriculas';
     protected $primaryKey = 'codigo_matricula';
 
     public $incrementing = false;
@@ -25,7 +25,7 @@ class Matricula extends Model
     protected $casts = [
         'codigo_estudiante' => 'integer',
         'estado' => 'string',
-        
+         'fecha' => 'datetime',
 
     ];
     protected $dates = ['fecha'];

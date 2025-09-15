@@ -26,7 +26,6 @@
             </div>
         </div>
 
-        <!-- Navigation Menu -->
        <!-- Navigation Menu -->
 <nav class="space-y-2">
     @auth
@@ -146,6 +145,15 @@
                                 Registrar Matrícula
                             </a>
                         </li>
+
+                        <li>
+                            <a href="{{ route('matriculas.reporte') }}" 
+                            class="flex items-center py-2 px-3 text-gray-300 hover:text-[#98C560] hover:bg-white/5 rounded-md transition-all duration-200 text-sm {{ request()->routeIs('matriculas.reporte') ? 'text-[#98C560] bg-white/5' : '' }}">
+                            <div class="w-2 h-2 bg-green-400 rounded-full mr-3 opacity-60"></div>
+                             Reporte Matrícula
+                            </a>
+                        </li>
+
                     </ul>
                 </div>
 
