@@ -12,6 +12,8 @@ use App\Models\Estudiante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class AsistenciaController extends Controller
 {
@@ -71,7 +73,8 @@ class AsistenciaController extends Controller
             ->with(['estudiante.persona', 'seccion.grado'])
             ->where('estado', true)
             ->whereIn('seccion_id', $seccionesIds);
-
+        
+        // Aplicar filtros adicionales
         if ($gradoId) {
             $estudiantesQuery->whereHas('seccion', function($q) use ($gradoId) {
                 $q->where('id_grado', $gradoId);
@@ -101,9 +104,11 @@ class AsistenciaController extends Controller
                 ->orderBy('personas.name')
                 ->select('matriculas.*');
         }
-
+        
+        // Paginación
         $matriculas = $estudiantesQuery->paginate(20)->withQueryString();
-
+        
+        // Obtener periodos activos
         $hoy = Carbon::now();
         $periodos = Periodo::where('fecha_inicio', '<=', $hoy)
             ->orderBy('fecha_inicio')
@@ -199,7 +204,7 @@ class AsistenciaController extends Controller
 
             $estudiantesQuery = Matricula::query()
                 ->with(['estudiante.persona', 'seccion.grado'])
-                ->where('estado', true)
+                ->where('estado', 'activo')
                 ->where('seccion_id', $seccionId);
 
             if ($search) {

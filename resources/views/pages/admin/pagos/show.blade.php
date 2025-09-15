@@ -94,7 +94,7 @@
     @endif
 
     <!-- Acciones -->
-    <div class="bg-white rounded-lg shadow-md p-6">
+ <!--   <div class="bg-white rounded-lg shadow-md p-6">
         <div class="flex justify-between">
             <a href="{{ route('pagos.index') }}" 
                class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg flex items-center">
@@ -106,6 +106,6 @@
             
            
         </div>
-    </div>
+    </div> -->
 </div>
 @endsection

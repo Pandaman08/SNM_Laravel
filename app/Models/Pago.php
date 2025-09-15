@@ -24,7 +24,7 @@ class Pago extends Model
 
     public function matricula()
     {
-        return $this->hasOne(Matricula::class, 'codigo_matricula');
+        return $this->belongsTo(Matricula::class, 'codigo_matricula');
     }
 
 }
