@@ -13,6 +13,7 @@
     <script src="/admin/dist/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
     <script src="https://unpkg.com/alpinejs" defer></script>
     <title>@yield('titulo')</title>
+    <link rel="icon" href="/images/logo-bruning1.png" type="image/png">
 </head>
 
 <body class="text-gray-800 font-inter">

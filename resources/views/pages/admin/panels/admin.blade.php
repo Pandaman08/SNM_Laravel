@@ -50,15 +50,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-                    <i class="ri-book-2-fill text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Notas Pendientes</p>
-                    <p class="text-2xl font-bold">56</p>
-                </div>
-            </div>
+          
 
           
         </div>

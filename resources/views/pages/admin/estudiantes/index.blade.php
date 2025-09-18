@@ -3,86 +3,223 @@
 @section('title', 'Gestión de Estudiantes')
 
 @section('contenido')
-<div class="max-w-screen-2xl mx-auto my-8 px-4">
-    <div class="text-center mb-6">
-        <h1 class="text-2xl font-bold text-[#2e5382]">Estudiantes</h1>
-        <div class="w-1/4 mx-auto h-0.5 bg-[#64d423]"></div>
-    </div>
+    <div class="max-w-screen-2xl mx-auto my-8 px-4">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-[#2e5382] mb-2">Gestión de Estudiantes</h1>
+            <div class="w-24 mx-auto h-1 bg-[#64d423] rounded-full"></div>
+            <p class="text-gray-600 mt-3">Administra todos los estudiantes del sistema</p>
+        </div>
 
-    <div class="flex justify-between mb-6">
-        <div class="flex space-x-4">
-            <input type="text" id="search" placeholder="Buscar por nombre o DNI" class="px-4 py-2 border rounded"
-                oninput="buscarEstudiantes(this.value)">
+        <!-- Controls Section -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-md">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input type="text" id="search" placeholder="Buscar por nombre o DNI..."
+                            class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent transition-all duration-200"
+                            oninput="buscarEstudiantes(this.value)">
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center space-x-3">
+                    <div class="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                        <span class="font-medium">Total: {{ $estudiantes->total() }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    <span>Estudiante</span>
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    <span>Información Personal</span>
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    <span>Ubicación</span>
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>Cultural</span>
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Foto
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach ($estudiantes as $estudiante)
+                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                <!-- Estudiante Info -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            @if ($estudiante->persona->photo)
+                                                <img class="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
+                                                    src="{{ Storage::url($estudiante->persona->photo) }}"
+                                                    alt="{{ $estudiante->persona->name }}">
+                                            @else
+                                                <div
+                                                    class="h-12 w-12 rounded-full bg-[#2e5382] flex items-center justify-center text-white font-semibold">
+                                                    {{ strtoupper(substr($estudiante->persona->name, 0, 1)) }}{{ strtoupper(substr($estudiante->persona->lastname, 0, 1)) }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-semibold text-gray-900">
+                                                {{ $estudiante->persona->name }} {{ $estudiante->persona->lastname }}
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                DNI: {{ $estudiante->persona->dni ?? 'N/A' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Información Personal -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="space-y-1">
+                                        <div class="text-sm text-gray-900">
+                                            {{ $estudiante->persona->fecha_nacimiento ? \Carbon\Carbon::parse($estudiante->persona->fecha_nacimiento)->format('d/m/Y') : 'N/A' }}
+                                        </div>
+                                        @if ($estudiante->persona->address)
+                                            <div class="text-sm text-gray-500 truncate max-w-xs">
+                                                {{ $estudiante->persona->address }}
+                                            </div>
+                                        @endif
+                                        <div class="flex items-center space-x-2">
+                                            @if ($estudiante->persona->sexo)
+                                                <span
+                                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                                    {{ $estudiante->persona->sexo === 'M' ? 'Masculino' : 'Femenino' }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Ubicación -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="space-y-1">
+                                        <div class="text-sm text-gray-900">
+                                            <span class="font-medium">País:</span> {{ $estudiante->pais ?? 'N/A' }}
+                                        </div>
+                                        <div class="text-sm text-gray-900">
+                                            <span class="font-medium">Departamento:</span> {{ $estudiante->departamento ?? 'N/A' }}
+                                        </div>
+                                        <div class="text-sm text-gray-900">
+                                            <span class="font-medium">Provincia:</span> {{ $estudiante->provincia ?? 'N/A' }}
+                                        </div>
+                                        <div class="text-sm text-gray-900">
+                                            <span class="font-medium">Distrito:</span> {{ $estudiante->distrito ?? 'N/A' }}
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Cultural -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="space-y-1">
+                                        <div class="text-sm text-gray-900">
+                                            <span class="font-medium">Lengua materna:</span> {{ $estudiante->lengua_materna ?? 'N/A' }}
+                                        </div>
+                                        <div class="text-sm text-gray-900">
+                                            <span class="font-medium">Religión:</span> {{ $estudiante->religion ?? 'N/A' }}
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Foto -->
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    @if ($estudiante->persona->photo)
+                                        <button
+                                            class="inline-flex items-center justify-center w-8 h-8 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-150"
+                                            onclick="openModal('{{ Storage::url($estudiante->persona->photo) }}', 'image')"
+                                            title="Ver foto">
+                                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                    @else
+                                        <span class="text-sm text-gray-400">Sin foto</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-between items-center mt-6">
+            <div class="text-sm text-gray-600">
+                Mostrando {{ $estudiantes->firstItem() ?? 0 }} a {{ $estudiantes->lastItem() ?? 0 }} de {{ $estudiantes->total() }}
+                resultados
+            </div>
+            <div class="flex justify-end">
+                {{ $estudiantes->links('pagination::tailwind') }}
+            </div>
         </div>
     </div>
 
-    <div class="overflow-x-auto bg-white rounded-lg shadow">
-        <table class="min-w-full text-sm text-left text-gray-600">
-            <thead class="bg-gray-200 text-gray-700 uppercase">
-                <tr>
-                    <th class="px-4 py-3">Nombre</th>
-                    <th class="px-4 py-3">Apellido</th>
-                    <th class="px-4 py-3">DNI</th>
-                    <th class="px-4 py-3">Dirección</th>
-                    <th class="px-4 py-3">País</th>
-                    <th class="px-4 py-3">Provincia</th>
-                    <th class="px-4 py-3">Distrito</th>
-                    <th class="px-4 py-3">Departamento</th>
-                    <th class="px-4 py-3">Lengua Materna</th>
-                    <th class="px-4 py-3">Religión</th>
-                    <th class="px-4 py-3">Foto</th>
-                 <!--   <th class="px-4 py-3">Acciones</th>  -->
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($estudiantes as $estudiante)
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="px-4 py-3">{{ $estudiante->persona->name }}</td>
-                    <td class="px-4 py-3">{{ $estudiante->persona->lastname }}</td>
-                    <td class="px-4 py-3">{{ $estudiante->persona->dni }}</td>
-                    <td class="px-4 py-3">{{ $estudiante->persona->address }}</td>
-                    <td class="px-4 py-3">{{ $estudiante->pais }}</td>
-                    <td class="px-4 py-3">{{ $estudiante->provincia }}</td>
-                    <td class="px-4 py-3">{{ $estudiante->distrito }}</td>
-                    <td class="px-4 py-3">{{ $estudiante->departamento }}</td>
-                    <td class="px-4 py-3">{{ $estudiante->lengua_materna }}</td>
-                    <td class="px-4 py-3">{{ $estudiante->religion }}</td>
-                    <td class="px-4 py-3">
-                        @if ($estudiante->persona->photo)
-                            <button class="w-8 h-8 flex items-center justify-center rounded shadow cursor-pointer"
-                                onclick="openModal('{{ Storage::url($estudiante->persona->photo) }}', 'image')">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2"
-                                    class="w-6 h-6" viewBox="0 0 24 24">
-                                    <path d="M18 22H4a2 2 0 0 1-2-2V6" />
-                                    <path d="m22 13-1.296-1.296a2.41 2.41 0 0 0-3.408 0L11 18" />
-                                    <circle cx="12" cy="8" r="2" />
-                                    <rect width="16" height="16" x="6" y="2" rx="2" />
-                                </svg>
-                            </button>
-                        @else
-                            <span>No hay foto</span>
-                        @endif
-                    </td>
-                 <!-- <td class="px-4 py-3 flex items-center justify-center space-x-4">
-                        <button type="button" onclick="openEditModal(this)"
-                            data-estudiante='@json($estudiante->load("persona"))'
-                            class="text-yellow-500 hover:text-yellow-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                        </button>
-                    </td> -->
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+    <!-- Modal para visualizar imágenes -->
+    <div id="archivoModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-4xl max-h-[90vh] overflow-hidden mx-4">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Foto de Perfil</h3>
+                <button class="text-gray-400 hover:text-gray-600 transition-colors" onclick="closeModal()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+            <div id="modalContent" class="p-4"></div>
+        </div>
     </div>
-
-    <div class="flex justify-end text-sm mt-4">
-        {{ $estudiantes->links('pagination::tailwind') }}
-    </div>
-</div>
 
 <!-- Modal de Edición -->
 <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 w-full h-full">
@@ -187,14 +324,7 @@
     </div>
 </div>
 
-<!-- Modal para visualizar imágenes -->
-<div id="archivoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white p-7 rounded shadow-lg max-w-7xl w-full relative">
-        <button class="absolute top-2 right-2 text-gray-500 hover:text-black text-3xl p-2"
-            onclick="closeModal()">×</button>
-        <div id="modalContent"></div>
-    </div>
-</div>
+
 
 @if (session('success'))
     <script>

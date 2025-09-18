@@ -22,6 +22,8 @@ use App\Http\Controllers\CompetenciaController;
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
 Route::post('/', [UserController::class, 'login'])->name('login');
+
+Route::middleware('auth')->group(function () {
 Route::get('/panel/admin', [AdminController::class, 'panel_admin'])->name('home.admin');
 Route::get('/panel/docente', [AdminController::class, 'panel_docente'])->name('home.docente');
 Route::get('/panel/tesorero', [AdminController::class, 'panel_secretaria'])->name('home.secretaria');
@@ -170,4 +172,4 @@ Route::put('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'up
 
 
 
-
+ });
