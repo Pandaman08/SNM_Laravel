@@ -18,6 +18,7 @@ use App\Http\Controllers\AnioEscolarController;
 use App\Http\Controllers\TipoCalificacionController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\CompetenciaController;
+use App\Http\Controllers\ReporteController;
 
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
@@ -83,8 +84,11 @@ Route::get('/matriculas/crear', [MatriculaController::class, 'create'])->name('m
 Route::post('/matriculas', [MatriculaController::class, 'store'])->name('matriculas.store');
 
 
-Route::get('/matriculas/reporte', [MatriculaController::class, 'reporte'])
+
+Route::get('/reportes/matriculados', [ReporteController::class, 'matriculados'])
     ->name('matriculas.reporte');
+
+    
 Route::get('/matriculas/{matricula}/ficha', [MatriculaController::class, 'generarFicha'])
     ->name('matriculas.ficha');
 
