@@ -98,7 +98,7 @@
                             <div class="p-3 rounded-full bg-red-100 text-red-600 mb-2">
                                 <i class="ri-notification-3-fill text-xl"></i>
                             </div>
-                            <span class="text-sm font-medium text-center">Panel estudiantes Matriculados</span>
+                            <span class="text-sm font-medium text-center">Panel estudiantes </span>
                         </a>
                         <a href="{{ route('users.edit_user') }}"
                             class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-indigo-50 transition-colors">
