@@ -18,8 +18,7 @@ use App\Http\Controllers\AnioEscolarController;
 use App\Http\Controllers\TipoCalificacionController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\CompetenciaController;
-use App\Http\Controllers\ReporteController;
-
+use App\Http\Controllers\AsistenciaQRController;
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
 Route::post('/', [UserController::class, 'login'])->name('login');
@@ -179,4 +178,4 @@ Route::put('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'up
 
 
 
- });
+
