@@ -18,10 +18,15 @@ use App\Http\Controllers\AnioEscolarController;
 use App\Http\Controllers\TipoCalificacionController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\CompetenciaController;
+use App\Http\Controllers\ReporteController;
 
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
 Route::post('/', [UserController::class, 'login'])->name('login');
+Route::get('/tutor/register', [TutorController::class, 'create'])->name('tutor.register');
+Route::post('/tutor/register', [TutorController::class, 'store'])->name('tutor.store');
+
+Route::middleware('auth')->group(function () {
 Route::get('/panel/admin', [AdminController::class, 'panel_admin'])->name('home.admin');
 Route::get('/panel/docente', [AdminController::class, 'panel_docente'])->name('home.docente');
 Route::get('/panel/tesorero', [AdminController::class, 'panel_secretaria'])->name('home.secretaria');
@@ -60,6 +65,8 @@ Route::delete('/asignaturas/{id}', [AsignaturaController::class, 'destroy'])->na
 Route::get('/asignaturas/asignar-docentes',[AsignaturaController::class, 'show'])->name('asignaturas.asignar.docentes');
 Route::get('/asignaturas/asignar/{id}', [AsignaturaController::class, 'asignar'])->name('asignaturas.asignar');
 Route::post('/asignaturas/asignar', [AsignaturaController::class, 'storeAsignacion'])->name('asignaturas.storeAsignacion');
+Route::put('/actualizar-asignacion', [AsignaturaController::class, 'updateAsignacion'])->name('asignaturas.updateAsignacion');
+Route::delete('/remover-asignacion', [AsignaturaController::class, 'removeAsignacion'])->name('asignaturas.removeAsignacion');
 Route::get('cancelar', function () { 
      return redirect()->route('asignaturas.asignar.docentes'); 
 })->name('ruta.cancelar'); 
@@ -71,8 +78,7 @@ Route::get('/tutores/aprobar', [AdminController::class, 'index_tutor'])->name('t
 Route::post('/tutores/{id}/approve', [AdminController::class, 'approveUser'])->name('person.approve');
 Route::post('/tutores/{id}/reject', [AdminController::class, 'rejectUser'])->name('person.reject');
 Route::delete('tutores/tutor/{id}', [AdminController::class, 'destroy_person'])->name('person.destroy_person');
-Route::get('/tutor/register', [TutorController::class, 'create'])->name('tutor.register');
-Route::post('/tutor/register', [TutorController::class, 'store'])->name('tutor.store');
+
 //-------------------------Matriculas-----------------------------------
 
 // Rutas principales 
@@ -81,8 +87,11 @@ Route::get('/matriculas/crear', [MatriculaController::class, 'create'])->name('m
 Route::post('/matriculas', [MatriculaController::class, 'store'])->name('matriculas.store');
 
 
-Route::get('/matriculas/reporte', [MatriculaController::class, 'reporte'])
+
+Route::get('/reportes/matriculados', [ReporteController::class, 'matriculados'])
     ->name('matriculas.reporte');
+
+    
 Route::get('/matriculas/{matricula}/ficha', [MatriculaController::class, 'generarFicha'])
     ->name('matriculas.ficha');
 
@@ -170,4 +179,4 @@ Route::put('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'up
 
 
 
-
+ });

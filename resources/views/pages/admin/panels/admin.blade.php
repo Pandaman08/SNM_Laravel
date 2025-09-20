@@ -50,17 +50,9 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-                    <i class="ri-book-2-fill text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Notas Pendientes</p>
-                    <p class="text-2xl font-bold">56</p>
-                </div>
-            </div>
 
-          
+
+
         </div>
 
         <!-- Contenido Principal -->
@@ -73,7 +65,7 @@
                         <h2 class="text-xl font-bold">Acciones Rápidas</h2>
                     </div>
                     <div class="p-6 grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <a href="{{route('matriculas.index')}}"
+                        <a href="{{ route('matriculas.index') }}"
                             class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-blue-50 transition-colors">
                             <div class="p-3 rounded-full bg-blue-100 text-blue-600 mb-2">
                                 <i class="ri-user-add-fill text-xl"></i>
@@ -83,7 +75,7 @@
                         <a href="{{ route('docentes.buscar') }}"
                             class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-green-50 transition-colors">
                             <div class="p-3 rounded-full bg-green-100 text-green-600 mb-2">
-                                  <i class="ri-user-add-fill text-xl"></i>
+                                <i class="ri-user-add-fill text-xl"></i>
                             </div>
                             <span class="text-sm font-medium text-center">Panel Docentes</span>
                         </a>
@@ -106,7 +98,7 @@
                             <div class="p-3 rounded-full bg-red-100 text-red-600 mb-2">
                                 <i class="ri-notification-3-fill text-xl"></i>
                             </div>
-                            <span class="text-sm font-medium text-center">Panel estudiantes Matriculados</span>
+                            <span class="text-sm font-medium text-center">Panel estudiantes </span>
                         </a>
                         <a href="{{ route('users.edit_user') }}"
                             class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-indigo-50 transition-colors">
@@ -121,46 +113,23 @@
                 <!-- Últimas Actividades -->
                 <div class="bg-white rounded-xl shadow-md overflow-hidden">
                     <div class="bg-gradient-to-r from-gray-700 to-gray-900 p-4 text-white">
-                        <h2 class="text-xl font-bold">Actividad Reciente</h2>
+                        <h2 class="text-xl font-bold">Grafico Matriculas</h2>
                     </div>
-                    <div class="p-4 space-y-4">
-                        <div class="flex items-start border-b border-gray-100 pb-4">
-                            <div class="p-2 rounded-full bg-blue-100 text-blue-600 mr-3">
-                                <i class="ri-user-add-line"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium">Nueva matrícula registrada</p>
-                                <p class="text-sm text-gray-500">María Pérez en 3ro "A" - 10:45 AM</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start border-b border-gray-100 pb-4">
-                            <div class="p-2 rounded-full bg-green-100 text-green-600 mr-3">
-                                <i class="ri-file-edit-line"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium">Notas actualizadas</p>
-                                <p class="text-sm text-gray-500">Matemáticas 4to "B" - 09:30 AM</p>
+                    <div class="row g-4 mb-4">
+                        <!-- Gráfico por Sección -->
+                        <div class="col-md-6">
+                            <div class="card shadow-sm rounded-4">
+                                <div class="card-body">
+                                    <h5 class="card-title text-center mb-3 fw-semibold">Matriculados por Grado y Sección
+                                    </h5>
+                                    <div id="chartSeccion" style="height: 400px;"></div>
+                                </div>
                             </div>
                         </div>
-                        <div class="flex items-start border-b border-gray-100 pb-4">
-                            <div class="p-2 rounded-full bg-purple-100 text-purple-600 mr-3">
-                                <i class="ri-printer-line"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium">Reporte generado</p>
-                                <p class="text-sm text-gray-500">Lista de estudiantes - 08:15 AM</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start">
-                            <div class="p-2 rounded-full bg-amber-100 text-amber-600 mr-3">
-                                <i class="ri-money-dollar-circle-line"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium">Pago registrado</p>
-                                <p class="text-sm text-gray-500">Familia Rodríguez - $350.00 - Ayer</p>
-                            </div>
-                        </div>
+
                     </div>
+
+
                 </div>
             </div>
 
@@ -252,37 +221,17 @@
                 <!-- Accesos Directos -->
                 <div class="bg-white rounded-xl shadow-md overflow-hidden">
                     <div class="bg-gradient-to-r from-teal-600 to-teal-800 p-4 text-white">
-                        <h2 class="text-xl font-bold">Accesos Directos</h2>
+                        <h2 class="text-xl font-bold">Estado Matriculas</h2>
                     </div>
                     <div class="p-4 space-y-3">
-                        <a href="#" class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                            <div class="p-2 rounded-full bg-blue-100 text-blue-600 mr-3">
-                                <i class="ri-team-fill"></i>
+                        <!-- Gráfico por Estado -->
+                        <div class="col-md-6">
+                            <div class="card shadow-sm rounded-4">
+                                <div class="card-body">
+                                    <div id="chartEstado" style="height: 380px;"></div>
+                                </div>
                             </div>
-                            <span>Lista de Estudiantes</span>
-                            <i class="ri-arrow-right-s-line ml-auto text-gray-400"></i>
-                        </a>
-                        <a href="#" class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                            <div class="p-2 rounded-full bg-purple-100 text-purple-600 mr-3">
-                                <i class="ri-file-chart-fill"></i>
-                            </div>
-                            <span>Boletines de Notas</span>
-                            <i class="ri-arrow-right-s-line ml-auto text-gray-400"></i>
-                        </a>
-                        <a href="#" class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                            <div class="p-2 rounded-full bg-green-100 text-green-600 mr-3">
-                                <i class="ri-money-dollar-circle-fill"></i>
-                            </div>
-                            <span>Estado de Pagos</span>
-                            <i class="ri-arrow-right-s-line ml-auto text-gray-400"></i>
-                        </a>
-                        <a href="#" class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                            <div class="p-2 rounded-full bg-amber-100 text-amber-600 mr-3">
-                                <i class="ri-megaphone-fill"></i>
-                            </div>
-                            <span>Comunicados</span>
-                            <i class="ri-arrow-right-s-line ml-auto text-gray-400"></i>
-                        </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -294,4 +243,67 @@
             <p class="mt-1">Versión 2.1.0 </p>
         </div>
     </div>
+@endsection
+
+@section('script')
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        // Gráfico por sección (Grafico de barras)
+        var optionsSeccion = {
+            chart: {
+                type: 'bar',
+                height: 400
+            },
+            series: [{
+                name: 'Cantidad de Alumnos',
+                data: {!! json_encode($matriculasPorSeccion->isNotEmpty() ? $matriculasPorSeccion->pluck('total') : []) !!}
+            }],
+
+
+            xaxis: {
+                categories: {!! json_encode(
+                    $matriculasPorSeccion->isNotEmpty()
+                        ? $matriculasPorSeccion->map(fn($m) => $m->seccion?->nombre_completo ?? 'Sin sección')
+                        : [],
+                ) !!},
+                labels: {
+                    style: {
+                        fontSize: '10px',
+                        fontWeight: 500
+                    },
+                    rotate: -25,
+                    trim: false // evita que se recorten
+                }
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: 6,
+                    columnWidth: '50%',
+                    distributed: true
+                }
+            },
+            colors: ['#1E90FF', '#FF7F50', '#32CD32', '#FFD700', '#8A2BE2', '#FF69B4'],
+            legend: {
+                show: false
+            }
+        };
+
+
+        new ApexCharts(document.querySelector("#chartSeccion"), optionsSeccion).render();
+
+        // Gráfico por estado 
+        var optionsEstado = {
+            chart: {
+                type: 'donut',
+                height: 380
+            },
+            series: {!! json_encode($matriculasPorEstado->isNotEmpty() ? $matriculasPorEstado->pluck('total') : []) !!},
+            labels: {!! json_encode($matriculasPorEstado->isNotEmpty() ? $matriculasPorEstado->pluck('estado') : []) !!},
+            colors: ['#e15f0eff', '#26cd00ff', '#FFCE56', '#C9CBCE'],
+            legend: {
+                position: 'bottom'
+            }
+        };
+        new ApexCharts(document.querySelector("#chartEstado"), optionsEstado).render();
+    </script>
 @endsection

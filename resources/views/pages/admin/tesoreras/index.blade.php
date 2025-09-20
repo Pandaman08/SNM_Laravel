@@ -3,91 +3,257 @@
 @section('title', 'Gestión de Secretarias')
 
 @section('contenido')
-<div class="max-w-screen-2xl mx-auto my-8 px-4">
-    <div class="text-center mb-6">
-        <h1 class="text-2xl font-bold text-[#2e5382]">Secretarias</h1>
-        <div class="w-1/4 mx-auto h-0.5 bg-[#64d423]"></div>
-    </div>
-
-    <div class="flex justify-between mb-6">
-        <div class="flex space-x-4">
-            <input type="text" id="search" placeholder="Buscar por nombre o email" class="px-4 py-2 border rounded"
-                oninput="buscarSecretarias(this.value)" maxlength="8">
+    <div class="max-w-screen-2xl mx-auto my-8 px-4">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-[#2e5382] mb-2">Gestión de Secretarias</h1>
+            <div class="w-24 mx-auto h-1 bg-[#64d423] rounded-full"></div>
+            <p class="text-gray-600 mt-3">Administra todas las secretarias del sistema</p>
         </div>
-        <button class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-700" onclick="openCreateModal()">
-            Registrar Secretaria
-        </button>
+
+        <!-- Controls Section -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-md">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input type="text" id="search" placeholder="Buscar por nombre o email..." maxlength="8"
+                            class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent transition-all duration-200"
+                            oninput="buscarSecretarias(this.value)">
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center space-x-3">
+                    <div class="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                        <span class="font-medium">Total: {{ $users->total() }}</span>
+                    </div>
+                    <button
+                        class="bg-[#2e5382] text-white px-5 py-2.5 rounded-lg hover:bg-[#1e3a5f] transition-all duration-200 flex items-center space-x-2"
+                        onclick="openCreateModal()">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span>Registrar Secretaria</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    <span>Secretaria</span>
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                    <span>Contacto</span>
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>Información</span>
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Foto</th>
+                            <th class="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <div class="flex items-center justify-center space-x-2">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                        </path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    <span>Acciones</span>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach ($users as $user)
+                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                <!-- Secretaria Info -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            @if ($user->persona->photo)
+                                                <img class="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
+                                                    src="{{ Storage::url($user->persona->photo) }}"
+                                                    alt="{{ $user->persona->name }}">
+                                            @else
+                                                <div
+                                                    class="h-12 w-12 rounded-full bg-[#2e5382] flex items-center justify-center text-white font-semibold">
+                                                    {{ strtoupper(substr($user->persona->name, 0, 1)) }}{{ strtoupper(substr($user->persona->lastname, 0, 1)) }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-semibold text-gray-900">
+                                                {{ $user->persona->name }} {{ $user->persona->lastname }}
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                DNI: {{ $user->persona->dni ?? 'N/A' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Contacto -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="space-y-1">
+                                        <div class="flex items-center text-sm text-gray-900">
+                                            <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                                </path>
+                                            </svg>
+                                            <span class="truncate max-w-xs">{{ $user->email }}</span>
+                                        </div>
+                                        @if ($user->persona->phone)
+                                            <div class="flex items-center text-sm text-gray-500">
+                                                <svg class="w-4 h-4 mr-2 text-gray-400" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
+                                                    </path>
+                                                </svg>
+                                                {{ $user->persona->phone }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </td>
+
+                                <!-- Información -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="space-y-1">
+                                        <div class="text-sm text-gray-900">
+                                            {{ $user->persona->fecha_nacimiento ? \Carbon\Carbon::parse($user->persona->fecha_nacimiento)->format('d/m/Y') : 'N/A' }}
+                                        </div>
+                                        @if ($user->persona->address)
+                                            <div class="text-sm text-gray-500 truncate max-w-xs">
+                                                {{ $user->persona->address }}
+                                            </div>
+                                        @endif
+                                        <div class="flex items-center space-x-2">
+                                            @if ($user->persona->sexo)
+                                                <span
+                                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                                    {{ $user->persona->sexo === 'M' ? 'Masculino' : 'Femenino' }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Foto -->
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    @if ($user->persona->photo)
+                                        <button
+                                            class="inline-flex items-center justify-center w-8 h-8 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-150"
+                                            onclick="openModal('{{ Storage::url($user->persona->photo) }}', 'image')"
+                                            title="Ver foto">
+                                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                    @else
+                                        <span class="text-sm text-gray-400">Sin foto</span>
+                                    @endif
+                                </td>
+
+                                <!-- Acciones -->
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button type="button" onclick="openEditModal(this)"
+                                            data-user='@json($user->load(["persona", "secretaria"]))'
+                                            class="inline-flex items-center justify-center w-8 h-8 text-amber-600 hover:bg-amber-50 rounded-lg transition-all duration-150"
+                                            title="Editar secretaria">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                </path>
+                                            </svg>
+                                        </button>
+
+                                        <button
+                                            onclick="openDeleteModal({{ $user->user_id }}, '{{ $user->persona->name }}')"
+                                            class="inline-flex items-center justify-center w-8 h-8 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-150"
+                                            title="Eliminar secretaria">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v3M4 7h16">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-between items-center mt-6">
+            <div class="text-sm text-gray-600">
+                Mostrando {{ $users->firstItem() ?? 0 }} a {{ $users->lastItem() ?? 0 }} de {{ $users->total() }}
+                resultados
+            </div>
+            <div class="flex justify-end">
+                {{ $users->links('pagination::tailwind') }}
+            </div>
+        </div>
     </div>
 
-    <div class="overflow-x-auto bg-white rounded-lg shadow">
-        <table class="min-w-full text-sm text-left text-gray-600">
-            <thead class="bg-gray-200 text-gray-700 uppercase">
-                <tr>
-
-                    <th class="px-4 py-3">Nombre</th>
-                    <th class="px-4 py-3">Apellido</th>
-                    <th class="px-4 py-3">Email</th>
-                    <th class="px-4 py-3">Teléfono</th>
-                    <th class="px-4 py-3">Foto</th>
-                    <th class="px-4 py-3">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($users as $user)
-                <tr class="border-b hover:bg-gray-50">
-                  
-                    <td class="px-4 py-3">{{ $user->persona->name }}</td>
-                    <td class="px-4 py-3">{{ $user->persona->lastname }}</td>
-                    <td class="px-4 py-3">{{ $user->email }}</td>
-                    <td class="px-4 py-3">{{ $user->persona->phone }}</td>
-                   
-                    <td>
-                        @if ($user->persona->photo)
-                        <button class="w-8 h-8 flex items-center justify-center rounded shadow cursor-pointer"
-                            onclick="openModal('{{ Storage::url($user->persona->photo) }}', 'image')">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2"
-                                class="w-6 h-6" viewBox="0 0 24 24">
-                                <path d="M18 22H4a2 2 0 0 1-2-2V6" />
-                                <path d="m22 13-1.296-1.296a2.41 2.41 0 0 0-3.408 0L11 18" />
-                                <circle cx="12" cy="8" r="2" />
-                                <rect width="16" height="16" x="6" y="2" rx="2" />
-                            </svg>
-                        </button>
-                        @else
-                        <span>No hay foto</span>
-                        @endif
-                    </td>
-                    <td class="px-4 py-3 flex items-center justify-center space-x-4">
-                        <button type="button" onclick="openEditModal(this)"
-                            data-user='@json($user->load(["persona", "secretaria"]))'
-                            class="text-yellow-500 hover:text-yellow-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                        </button>
-
-                        <button onclick="openDeleteModal({{ $user->user_id }}, '{{ $user->persona->name }}')"
-                            class="text-red-500 hover:text-red-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+    <!-- Modal para visualizar imágenes -->
+    <div id="archivoModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-4xl max-h-[90vh] overflow-hidden mx-4">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Foto de Perfil</h3>
+                <button class="text-gray-400 hover:text-gray-600 transition-colors" onclick="closeModal()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+            <div id="modalContent" class="p-4"></div>
+        </div>
     </div>
-
-    <div class="flex justify-end text-sm mt-4">
-        {{ $users->links('pagination::tailwind') }}
-    </div>
-</div>
-
 <!-- Modal de Creación -->
 <div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
     <div class="bg-white p-6 rounded shadow-lg max-w-4xl w-full max-h-screen overflow-y-auto relative">
@@ -296,14 +462,6 @@
     </div>
 </div>
 
-<!-- Modal para visualizar imágenes -->
-<div id="archivoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white p-7 rounded shadow-lg max-w-7xl w-full relative">
-        <button class="absolute top-2 right-2 text-gray-500 hover:text-black text-3xl p-2"
-            onclick="closeModal()">×</button>
-        <div id="modalContent"></div>
-    </div>
-</div>
 
 @if (session('success'))
     <script>

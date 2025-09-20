@@ -9,25 +9,110 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use App\Models\AsignaturaDocente;
 use App\Enums\UserRole;
+use App\Models\Pago;
 use App\Models\Estudiante;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Matricula;
 use App\Mail\TutorStatusNotification;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
     public function panel_admin()
     {
         $user = Auth::user();
-        $matriculas = Matricula::get();
-        return view("pages.admin.panels.admin", compact('user', 'matriculas'));
+        $matriculas = Matricula::with('estudiante')->get();
+
+        // Datos para gráficos
+        $matriculasPorMes = $this->getMatriculasPorMes();
+        $pagosPorMes = $this->getPagosPorMes();
+        $matriculasPorGrado = $this->getMatriculasPorGrado();
+        $matriculasPorSeccion = Matricula::with('seccion')
+            ->selectRaw('seccion_id, COUNT(*) as total')
+            ->groupBy('seccion_id')
+            ->get();
+
+
+        $matriculasPorEstado = Matricula::selectRaw('estado, COUNT(*) as total')
+            ->groupBy('estado')
+            ->get();
+
+        $alumnos = Matricula::with(['estudiante.persona', 'seccion'])
+            ->orderBy('seccion_id')
+            ->get();
+
+        return view("pages.admin.panels.admin", compact(
+            'user',
+            'matriculas',
+            'matriculasPorMes',
+            'pagosPorMes',
+            'matriculasPorGrado',
+            'matriculasPorSeccion',
+            'matriculasPorEstado',
+            'alumnos'
+        ));
     }
+
+    private function getMatriculasPorMes()
+    {
+        $currentYear = Carbon::now()->year;
+
+        $matriculas = Matricula::selectRaw('MONTH(fecha) as mes, COUNT(*) as total')
+            ->whereYear('fecha', $currentYear)
+            ->groupBy('mes')
+            ->orderBy('mes')
+            ->get();
+
+        $data = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $mesData = $matriculas->firstWhere('mes', $i);
+            $data[] = $mesData ? $mesData->total : 0;
+        }
+
+        return $data;
+    }
+
+    private function getPagosPorMes()
+    {
+        $currentYear = Carbon::now()->year;
+
+        $pagos = Pago::selectRaw('MONTH(fecha_pago) as mes, SUM(monto) as total')
+            ->whereYear('fecha_pago', $currentYear)
+            ->groupBy('mes')
+            ->orderBy('mes')
+            ->get();
+
+        $data = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $mesData = $pagos->firstWhere('mes', $i);
+            $data[] = $mesData ? $mesData->total : 0;
+        }
+
+        return $data;
+    }
+
+    private function getMatriculasPorGrado()
+    {
+        // Asumiendo que tienes una relación con sección y grado
+        $matriculas = Matricula::with('seccion.grado')
+            ->get()
+            ->groupBy(function ($matricula) {
+                return $matricula->seccion->grado->nombre ?? 'Sin grado';
+            })
+            ->map->count();
+
+        return [
+            'labels' => $matriculas->keys()->toArray(),
+            'data' => $matriculas->values()->toArray()
+        ];
+    }
+
 
     public function panel_docente()
     {
         $user = Auth::user();
-        $numAsign= AsignaturaDocente::where('codigo_docente','=',$user->docente->codigo_docente)->get()->count();
-        return view("pages.admin.panels.docente", compact('user','numAsign'));
+        $numAsign = AsignaturaDocente::where('codigo_docente', '=', $user->docente->codigo_docente)->get()->count();
+        return view("pages.admin.panels.docente", compact('user', 'numAsign'));
     }
 
     public function panel_secretaria()
@@ -36,13 +121,13 @@ class AdminController extends Controller
         $matriculas = Matricula::get();
         return view("pages.admin.panels.secretaria", compact('user', 'matriculas'));
     }
-    
+
     public function panel_tutor()
     {
         $user = Auth::user();
         return view("pages.admin.panels.tutor", compact('user'));
     }
-    
+
     public function index_tutor()
     {
         $users = User::where('estado', false)->paginate(10);

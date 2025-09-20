@@ -64,14 +64,69 @@ class UserController extends Controller
     public function showUser(Request $request)
     {
         $query = $request->input('search');
+        $roleFilter = $request->input('role');
+        $sexoFilter = $request->input('sexo');
+        $estadoCivilFilter = $request->input('estado_civil');
+        $edadMin = $request->input('edad_min');
+        $edadMax = $request->input('edad_max');
+        $orderBy = $request->input('order_by', 'created_at');
+        $orderDirection = $request->input('order_direction', 'desc');
 
-        $users = User::where('estado', true)
+
+        $users = User::with('persona')
+            ->where('estado', true)
             ->when($query, function ($queryBuilder) use ($query) {
                 $queryBuilder->where(function ($q) use ($query) {
-                    $q->Where('email', 'like', '%' . $query . '%');
+                    $q->where('email', 'like', '%' . $query . '%')
+                        ->orWhereHas('persona', function ($personaQuery) use ($query) {
+                            $personaQuery->where('name', 'like', '%' . $query . '%')
+                                ->orWhere('lastname', 'like', '%' . $query . '%')
+                                ->orWhere('dni', 'like', '%' . $query . '%')
+                                ->orWhere('phone', 'like', '%' . $query . '%');
+                        });
                 });
             })
-            ->paginate(10);
+            ->when($roleFilter, function ($queryBuilder) use ($roleFilter) {
+                $queryBuilder->where('rol', $roleFilter);
+            })
+            ->when($sexoFilter, function ($queryBuilder) use ($sexoFilter) {
+                $queryBuilder->whereHas('persona', function ($personaQuery) use ($sexoFilter) {
+                    $personaQuery->where('sexo', $sexoFilter);
+                });
+            })
+            ->when($estadoCivilFilter, function ($queryBuilder) use ($estadoCivilFilter) {
+                $queryBuilder->whereHas('persona', function ($personaQuery) use ($estadoCivilFilter) {
+                    $personaQuery->where('estado_civil', $estadoCivilFilter);
+                });
+            })
+            ->when($edadMin || $edadMax, function ($queryBuilder) use ($edadMin, $edadMax) {
+                $queryBuilder->whereHas('persona', function ($personaQuery) use ($edadMin, $edadMax) {
+                    if ($edadMin) {
+                        $fechaMaxima = now()->subYears($edadMin)->format('Y-m-d');
+                        $personaQuery->where('fecha_nacimiento', '<=', $fechaMaxima);
+                    }
+                    if ($edadMax) {
+                        $fechaMinima = now()->subYears($edadMax + 1)->addDay()->format('Y-m-d');
+                        $personaQuery->where('fecha_nacimiento', '>=', $fechaMinima);
+                    }
+                });
+            })
+            ->when($orderBy === 'name', function ($queryBuilder) use ($orderDirection) {
+                $queryBuilder->join('personas', 'users.persona_id', '=', 'personas.persona_id')
+                    ->orderBy('personas.name', $orderDirection)
+                    ->select('users.*');
+            })
+            ->when($orderBy === 'email', function ($queryBuilder) use ($orderDirection) {
+                $queryBuilder->orderBy('email', $orderDirection);
+            })
+            ->when($orderBy === 'role', function ($queryBuilder) use ($orderDirection) {
+                $queryBuilder->orderBy('rol', $orderDirection);
+            })
+            ->when($orderBy === 'created_at', function ($queryBuilder) use ($orderDirection) {
+                $queryBuilder->orderBy('created_at', $orderDirection);
+            })
+            ->paginate(10)
+            ->appends($request->all());
         $roles = UserRole::cases();
 
         return view('pages.admin.show', compact('users', 'roles'));
@@ -283,46 +338,46 @@ class UserController extends Controller
     public function destroy($user_id)
     {
 
-       DB::beginTransaction();
+        DB::beginTransaction();
 
-    try {
-        $user = User::with(['persona', 'docente', 'secretaria', 'tutor'])->findOrFail($user_id);
+        try {
+            $user = User::with(['persona', 'docente', 'secretaria', 'tutor'])->findOrFail($user_id);
 
-        // 1. Eliminar primero los modelos relacionados más específicos
-        if ($user->docente) {
-            $user->docente->delete();
+            // 1. Eliminar primero los modelos relacionados más específicos
+            if ($user->docente) {
+                $user->docente->delete();
+            }
+
+            if ($user->secretaria) {
+                $user->secretaria->delete();
+            }
+
+            if ($user->tutor) {
+                $user->tutor->delete();
+            }
+
+            // 2. Eliminar archivos asociados
+            if ($user->persona && $user->persona->photo) {
+                Storage::disk('public')->delete($user->persona->photo);
+            }
+
+            // 3. Eliminar el usuario (que tiene la FK a persona)
+            $user->delete();
+
+            // 4. Finalmente eliminar la persona
+            if ($user->persona) {
+                $user->persona->delete();
+            }
+
+            DB::commit();
+
+            return redirect()->route('users.buscar')->with('success-destroy', 'Usuario eliminado exitosamente.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al eliminar usuario: ' . $e->getMessage());
+
+            return redirect()->back()->with('error', 'No se pudo eliminar el usuario debido a relaciones existentes. Error: ' . $e->getMessage());
         }
-
-        if ($user->secretaria) {
-            $user->secretaria->delete();
-        }
-
-        if ($user->tutor) {
-            $user->tutor->delete();
-        }
-
-        // 2. Eliminar archivos asociados
-        if ($user->persona && $user->persona->photo) {
-            Storage::disk('public')->delete($user->persona->photo);
-        }
-
-        // 3. Eliminar el usuario (que tiene la FK a persona)
-        $user->delete();
-
-        // 4. Finalmente eliminar la persona
-        if ($user->persona) {
-            $user->persona->delete();
-        }
-
-        DB::commit();
-
-        return redirect()->route('users.buscar')->with('success-destroy', 'Usuario eliminado exitosamente.');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Error al eliminar usuario: ' . $e->getMessage());
-        
-        return redirect()->back()->with('error', 'No se pudo eliminar el usuario debido a relaciones existentes. Error: ' . $e->getMessage());
-    }
     }
 
     public function edit_user()
