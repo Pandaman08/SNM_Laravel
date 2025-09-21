@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Matricula extends Model
 {
     use HasFactory;
-
+    protected $table = 'matriculas';
     protected $primaryKey = 'codigo_matricula';
 
-    public $incrementing = false; 
+    public $incrementing = false;
     protected $fillable = [
         'codigo_matricula',
         'codigo_estudiante',
@@ -23,9 +23,11 @@ class Matricula extends Model
     ];
 
     protected $casts = [
-    'codigo_estudiante' => 'integer',
-  
-];
+        'codigo_estudiante' => 'integer',
+        'estado' => 'string',
+         'fecha' => 'datetime',
+
+    ];
     protected $dates = ['fecha'];
 
     public function estudiante()
@@ -59,7 +61,19 @@ class Matricula extends Model
         return $this->belongsTo(Pago::class, 'id_pago', 'id_pago');
     }
     public function pagos()
-{
-    return $this->hasMany(Pago::class, 'codigo_matricula', 'codigo_matricula');
-}
+    {
+        return $this->hasMany(Pago::class, 'codigo_matricula', 'codigo_matricula');
+    }
+    public static function generarCodigoMatricula()
+    {
+        $currentYear = date('Y');
+        do {
+            $randomNumber = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+            $generatedCode = "{$currentYear}{$randomNumber}";
+
+        } while (Matricula::where('codigo_matricula', $generatedCode)->exists());
+
+        return $generatedCode;
+
+    }
 }

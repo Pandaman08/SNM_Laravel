@@ -11,6 +11,7 @@ class Estudiante extends Model
     use HasFactory;
 
     protected $primaryKey = 'codigo_estudiante';
+    public $incrementing = false;
     protected $table = 'estudiantes';
 
     protected $fillable = [
@@ -24,7 +25,6 @@ class Estudiante extends Model
         'religion',
         'estado_civil'
     ];
-
 
 
     public function matriculas()
@@ -47,18 +47,8 @@ class Estudiante extends Model
         return $this->belongsTo(Persona::class, 'persona_id', 'persona_id');
     }
 
-    protected static function boot()
-    {
-        parent::boot();
 
-        static::creating(function ($model) {
-            if (empty($model->codigo_estudiante)) {
-                $model->codigo_estudiante = (new self())->generarCodigoEstudiante();
-            }
-        });
-    }
-
-    public function generarCodigoEstudiante(): int
+    public static function generarCodigoEstudiante(): int
     {
         do {
             $code = random_int(1000, 9999);

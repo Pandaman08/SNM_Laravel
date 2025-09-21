@@ -32,35 +32,6 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
-                    <i class="ri-team-fill text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Estudiantes</p>
-                    <p class="text-2xl font-bold">125</p>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-                    <i class="ri-file-edit-fill text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Notas Pendientes</p>
-                    <p class="text-2xl font-bold">32</p>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                <div class="p-3 rounded-full bg-amber-100 text-amber-600 mr-4">
-                    <i class="ri-calendar-todo-fill text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Clases Hoy</p>
-                    <p class="text-2xl font-bold">3</p>
-                </div>
-            </div>
         </div>
 
         <!-- Contenido Principal -->

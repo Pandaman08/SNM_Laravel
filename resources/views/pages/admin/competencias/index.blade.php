@@ -41,7 +41,7 @@
                         </th>
                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
                             Descripción
-                        </th>
+                        </th>               
                         <th scope="col" class="px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider">
                             Acciones
                         </th>

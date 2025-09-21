@@ -28,7 +28,7 @@
                 </div>
                 <div>
                     <p class="text-gray-500 text-sm">Estudiantes a Cargo</p>
-                    <p class="text-2xl font-bold">32</p>
+                    <p class="text-2xl font-bold">2</p>
                 </div>
             </div>
 
@@ -38,29 +38,11 @@
                 </div>
                 <div>
                     <p class="text-gray-500 text-sm">Matrículas Pendientes</p>
-                    <p class="text-2xl font-bold">5</p>
+                    <p class="text-2xl font-bold">0</p>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-                    <i class="ri-medal-fill text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Promedio General</p>
-                    <p class="text-2xl font-bold">15.6</p>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                <div class="p-3 rounded-full bg-amber-100 text-amber-600 mr-4">
-                    <i class="ri-alarm-warning-fill text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Alertas Académicas</p>
-                    <p class="text-2xl font-bold">3</p>
-                </div>
-            </div>
+          
         </div>
 
         <!-- Contenido Principal -->
