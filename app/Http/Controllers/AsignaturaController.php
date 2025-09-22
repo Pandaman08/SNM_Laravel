@@ -41,30 +41,61 @@ class AsignaturaController extends Controller
         }
     }
 
+   public function updateAsignacion(Request $request)
+    {
+        // Validar los datos recibidos
+        $request->validate([
+            'codigo_asignatura' => 'required|exists:asignaturas,codigo_asignatura',
+            'codigo_docente' => 'required|exists:docentes,codigo_docente'
+        ]);
 
-    // public function show(){
-    //     $nivelesEducativos = NivelEducativo::all();
-    //     $grados = Grado::select('id_grado', 'nivel_educativo_id', 'grado')->get();
-    //     $asignaturas = Asignatura::with('grado')->get();
-    //     return view('pages.admin.asignaturas.asignTeacher3', compact('nivelesEducativos','grados','asignaturas'));
-    // }
-
-    // public function asign(){
-    //     $nivelesEducativos = NivelEducativo::all();
-    //     $grados = Grado::select('id_grado', 'nivel_educativo_id', 'grado')->get();
-    //     $asignaturas = Asignatura::with([
-    //         'grado',
-    //         'docentes.user.persona' 
-    //     ])->get();
+        $asignatura = Asignatura::where('codigo_asignatura', $request->codigo_asignatura)->firstOrFail();
+        $nuevoDocente = Docente::where('codigo_docente', $request->codigo_docente)->firstOrFail();
         
-    //     return view('pages.admin.asignaturas.asignTeacher3', compact('nivelesEducativos','grados','asignaturas'));
-    // }
+        try {
+            // Verificar si ya existe una asignación con el mismo docente
+            if ($asignatura->docentes()->where('asignaturas_docentes.codigo_docente', $nuevoDocente->codigo_docente)->exists()) {
+                return redirect()->route('asignaturas.asignar.docentes')->with('warning', 'El docente ya está asignado a esta asignatura');
+            }
+
+            // Desconectar todos los docentes actuales de la asignatura
+            $asignatura->docentes()->detach();
+            
+            // Conectar el nuevo docente
+            $asignatura->docentes()->attach($nuevoDocente->codigo_docente, [
+                'fecha' => now()->toDateString()
+            ]);
+            
+            return redirect()->route('asignaturas.asignar.docentes')->with('success', 'Docente actualizado con éxito');
+            
+        } catch (\Exception $e) {
+            return redirect()->route('asignaturas.asignar.docentes')->with('error', 'Error al actualizar el docente: ' . $e->getMessage());
+        }
+    }
+
+      public function removeAsignacion(Request $request)
+    {
+        $request->validate([
+            'codigo_asignatura' => 'required|exists:asignaturas,codigo_asignatura',
+            'codigo_docente' => 'required|exists:docentes,codigo_docente'
+        ]);
+
+        $asignatura = Asignatura::where('codigo_asignatura', $request->codigo_asignatura)->firstOrFail();
+        $docente = Docente::where('codigo_docente', $request->codigo_docente)->firstOrFail();
+        
+        try {
+            $asignatura->docentes()->detach($docente->codigo_docente);
+            return redirect()->route('asignaturas.asignar.docentes')->with('success', 'Docente removido con éxito');
+        } catch (\Exception $e) {
+            return redirect()->route('asignaturas.asignar.docentes')->with('error', 'Error al remover el docente: ' . $e->getMessage());
+        }
+    }
 
     public function show(Request $request)
     {
         $nivelesEducativos = NivelEducativo::all();
         $grados = Grado::select('id_grado', 'nivel_educativo_id', 'grado')->get();
-        
+        $docentes = Docente::with('user.persona')->get(); 
         // Construir consulta base con relaciones
         $query = Asignatura::with([
             'grado.nivelEducativo',
@@ -84,7 +115,7 @@ class AsignaturaController extends Controller
         
         $asignaturas = $query->get();
         
-        return view('pages.admin.asignaturas.asignTeacher5', compact('nivelesEducativos','grados','asignaturas'));
+        return view('pages.admin.asignaturas.asignTeacher5', compact('nivelesEducativos','grados','asignaturas', 'docentes'));
     }
     
     public function index()

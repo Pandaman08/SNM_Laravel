@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - Bruning</title>
+    <link rel="icon" href="/images/logo-bruning1.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -199,7 +200,7 @@
                 </div>
 
                 <!-- Recordar sesión -->
-                <div class="flex items-center justify-between animate-slide-up" style="animation-delay: 0.5s">
+               <!-- <div class="flex items-center justify-between animate-slide-up" style="animation-delay: 0.5s">
                     <label class="flex items-center text-gray-400/80 text-sm">
                         <input type="checkbox" name="remember" class="mr-2 rounded border-white/20 bg-white/10 text-blue-500 focus:ring-blue-400">
                         Recordar sesión
@@ -207,7 +208,7 @@
                     <a href="#" class="text-blue-300 hover:text-blue-500 text-sm transition-colors">
                         ¿Olvidaste tu contraseña?
                     </a>
-                </div>
+                </div> -->
 
                 <!-- Botón de envío -->
                 <div class="animate-slide-up" style="animation-delay: 0.6s">

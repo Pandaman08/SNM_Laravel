@@ -4,6 +4,7 @@
 
 @section('contenido')
     <div class="container mx-auto px-4 py-6">
+        
         <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
             <div class="p-6 bg-gradient-to-r from-blue-50 to-gray-50 border-b border-gray-200">
                 <div class="flex items-center space-x-3">
@@ -175,5 +176,6 @@
                 </table>
             </div>
         </div>
+       
     </div>
 @endsection
