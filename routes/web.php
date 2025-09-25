@@ -21,6 +21,7 @@ use App\Http\Controllers\TipoCalificacionController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\CompetenciaController;
 use App\Http\Controllers\AsistenciaQRController;
+use App\Http\Controllers\ReporteController;
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
 Route::post('/', [UserController::class, 'login'])->name('login');
