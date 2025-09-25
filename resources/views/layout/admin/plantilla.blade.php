@@ -93,7 +93,7 @@
                         <i class="ri-arrow-right-s-line submenu-indicator text-lg text-[#98C560]"></i>
                     </a>
                     
-                    <ul class="pl-12 mt-2 space-y-2 {{ request()->routeIs(['person', 'users', 'docentes.buscar', 'secretarias.buscar', 'estudiantes.buscar', 'tutores.panel-aprobar']) ? 'block' : 'hidden' }} group-[.selected]:block">
+                    <ul class="pl-12 mt-2 space-y-2 {{ request()->routeIs(['person', 'users.buscar', 'docentes.buscar', 'secretarias.buscar', 'estudiantes.buscar', 'tutores.panel-aprobar']) ? 'block' : 'hidden' }} group-[.selected]:block">
                         <li>
                             <a href="{{ route('users.buscar') }}" class="flex items-center py-2 px-3 text-gray-300 hover:text-[#98C560] hover:bg-white/5 rounded-md transition-all duration-200 text-sm {{ request()->routeIs('users.buscar') ? 'text-[#98C560] bg-white/5' : '' }}">
                                 <div class="w-2 h-2 bg-green-400 rounded-full mr-3 opacity-60"></div>

@@ -461,7 +461,6 @@
         </div>
     </div>
 </div>
-uiui
 
 @if (session('success'))
     <script>
