@@ -8,13 +8,27 @@ use App\Models\User;
 use App\Models\Tutor;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class TutorController extends Controller
 {
     private const STRING_REQUIRED_MAX_255 = 'required|string|max:255';
 
+        public function index_tutor()
+    {
+        $users = User::where('estado', false)->paginate(10);
+        return view("pages.admin.users.tutores", compact("users"));
+    }
+
+    
     public function create(){
         return view('pages.admin.tutor.register');
+    }
+
+      public function panel_tutor()
+    {
+        $user = Auth::user();
+        return view("pages.admin.panels.tutor", compact('user'));
     }
 
     public function store(Request $request)
