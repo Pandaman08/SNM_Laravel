@@ -49,10 +49,6 @@
                     </p>
                 </div>
             </div>
-
-
-
-
         </div>
 
         <!-- Contenido Principal -->
@@ -110,11 +106,24 @@
                     </div>
                 </div>
 
-                <!-- Últimas Actividades -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                    <div class="bg-gradient-to-r from-gray-700 to-gray-900 p-4 text-white">
-                        <h2 class="text-xl font-bold">Grafico Matriculas</h2>
-                    </div>
+                  <!-- Últimas Actividades -->
+                   <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                      <div class="bg-gradient-to-r from-gray-700 to-gray-900 p-4 flex justify-between items-center">
+                         <h2 class="text-xl font-bold text-white"> Gráfico de Matrículas</h2>
+
+                         <!-- Filtro -->
+                          <form method="GET" action="{{ route('matriculas.reporte') }}" class="flex items-center space-x-2">
+                            <label for="nivel" class="font-medium text-sm text-gray-200">Filtrar por:</label>
+                             <select name="nivel" id="nivel" onchange="this.form.submit()"
+                              class="bg-white text-gray-800 border border-gray-300 rounded-lg px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                               <option value="">-- Todos --</option>
+                                <option value="Inicial" {{ ($nivel ?? '') == 'Inicial' ? 'selected' : '' }}>Inicial</option>
+                                <option value="Primaria" {{ ($nivel ?? '') == 'Primaria' ? 'selected' : '' }}>Primaria</option>
+                                <option value="Secundaria" {{ ($nivel ?? '') == 'Secundaria' ? 'selected' : '' }}>Secundaria</option>
+                            </select>
+                         </form>
+                        </div>
+
                     <div class="row g-4 mb-4">
                         <!-- Gráfico por Sección -->
                         <div class="col-md-6">
@@ -128,8 +137,6 @@
                         </div>
 
                     </div>
-
-
                 </div>
             </div>
 
