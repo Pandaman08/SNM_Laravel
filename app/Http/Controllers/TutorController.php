@@ -9,6 +9,7 @@ use App\Models\Tutor;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use App\Models\EstudianteTutor;
 
 class TutorController extends Controller
 {
@@ -17,6 +18,7 @@ class TutorController extends Controller
         public function index_tutor()
     {
         $users = User::where('estado', false)->paginate(10);
+
         return view("pages.admin.users.tutores", compact("users"));
     }
 
@@ -28,7 +30,38 @@ class TutorController extends Controller
       public function panel_tutor()
     {
         $user = Auth::user();
-        return view("pages.admin.panels.tutor", compact('user'));
+        $tutor = Auth::user()->tutor;
+          if (!$tutor) {
+            return redirect()->back()->with('error', 'No se encontró información de tutor');
+        }
+
+        // Obtener los estudiantes a cargo del tutor
+        $estudiantesTutor = EstudianteTutor::where('id_tutor', $tutor->id_tutor)
+            ->with([
+                'estudiante.persona',
+                'estudiante.matriculas' => function ($query) {
+                    $query->whereHas('anioEscolar', function ($q) {
+                        $q->where('anio', date('Y'));
+                    })->with('seccion.grado');
+                }
+            ])
+            ->get();
+        return view("pages.admin.panels.tutor", [
+                'user' => $user,
+                'tutor' => $tutor,
+                'estudiantes' => $estudiantesTutor->map(function ($et) {
+                    $matricula = $et->estudiante->matriculas->first();
+                    return [
+                        'codigo_estudiante' => $et->estudiante->codigo_estudiante,
+                        'nombre' => $et->estudiante->persona->name,
+                        'apellidos' => $et->estudiante->persona->lastname,
+                        'codigo_matricula' => $matricula ? $matricula->codigo_matricula : null,
+                        'grado' => $matricula && $matricula->seccion ? $matricula->seccion->grado->nombre_completo : null,
+                        'seccion' => $matricula && $matricula->seccion ? $matricula->seccion->seccion : null,
+                    ];
+                }),
+            ]);
+  
     }
 
     public function store(Request $request)
