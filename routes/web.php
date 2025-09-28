@@ -21,6 +21,7 @@ use App\Http\Controllers\TipoCalificacionController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\CompetenciaController;
 use App\Http\Controllers\AsistenciaQRController;
+use App\Http\Controllers\ReporteController;
 
 Route::get('/', [UserController::class, 'index'])->name('login.index');
 Route::post('/', [UserController::class, 'login'])->name('login');
@@ -29,9 +30,9 @@ Route::post('/tutor/register', [TutorController::class, 'store'])->name('tutor.s
 
 Route::middleware('auth')->group(function () {
     Route::get('/panel/admin', [AdminController::class, 'panel_admin'])->name('home.admin');
-    Route::get('/panel/docente', [AdminController::class, 'panel_docente'])->name('home.docente');
-    Route::get('/panel/tesorero', [AdminController::class, 'panel_secretaria'])->name('home.secretaria');
-    Route::get('/panel/tutor', [AdminController::class, 'panel_tutor'])->name('home.tutor');
+    Route::get('/panel/docente', [DocenteController::class, 'panel_docente'])->name('home.docente');
+    Route::get('/panel/tesorero', [SecretariaController::class, 'panel_secretaria'])->name('home.secretaria');
+    Route::get('/panel/tutor', [TutorController::class, 'panel_tutor'])->name('home.tutor');
 
 
     Route::get('/logout', [UserController::class, 'logout'])->name('logout');
@@ -75,7 +76,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/estudiantes-matriculado/{id_asignatura}/asignatura', [DocenteController::class, 'index_estudiantes'])->name('docentes.estudiantes');
     //------------------------tutores--------------------------------------
 // Route::get('tutores', [TutorController::class, 'indexTutores'])->name('tutores.index');
-    Route::get('/tutores/aprobar', [AdminController::class, 'index_tutor'])->name('tutores.panel-aprobar');
+    Route::get('/tutores/aprobar', [TutorController::class, 'index_tutor'])->name('tutores.panel-aprobar');
     Route::post('/tutores/{id}/approve', [AdminController::class, 'approveUser'])->name('person.approve');
     Route::post('/tutores/{id}/reject', [AdminController::class, 'rejectUser'])->name('person.reject');
     Route::delete('tutores/tutor/{id}', [AdminController::class, 'destroy_person'])->name('person.destroy_person');
@@ -175,6 +176,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/asistencias/secciones-por-grado', [AsistenciaController::class, 'obtenerSeccionesPorGrado'])->name('asistencias.secciones-por-grado');
 
     Route::get('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'show'])->name('asistencias.show');
+    Route::get('/asistencias/{codigo_estudiante}/show', [AsistenciaController::class, 'showAsistenciasEstudiante'])->name('asistencias.show.estudiante');
     Route::get('/asistencias/{codigo_estudiante}/edit', [AsistenciaController::class, 'edit'])->name('asistencias.edit');
     Route::put('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'update'])->name('asistencias.update');
 
@@ -212,3 +214,5 @@ Route::middleware('auth')->group(function () {
 
 
 });
+//MARK KBRO  
+

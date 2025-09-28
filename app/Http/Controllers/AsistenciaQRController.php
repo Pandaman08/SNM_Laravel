@@ -29,7 +29,7 @@ class AsistenciaQRController extends Controller
         $estudiante = Estudiante::findOrFail($id);
         
         // Generar código único para el QR
-        $uniqueCode = 's' . substr(uniqid(), -10); // 11 caracteres
+        $uniqueCode =$estudiante->persona->dni; // 11 caracteres
         $estudiante->qr_code = $uniqueCode;
         $estudiante->qr_generated_at = now();
         $estudiante->save();

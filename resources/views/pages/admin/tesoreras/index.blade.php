@@ -462,7 +462,6 @@
     </div>
 </div>
 
-
 @if (session('success'))
     <script>
         Swal.fire({
