@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-
+use Log;
+use App\Enums\AsistenciaEstado;
 class AsistenciaController extends Controller
 {
     public function index(Request $request)
@@ -73,22 +74,22 @@ class AsistenciaController extends Controller
             ->with(['estudiante.persona', 'seccion.grado'])
             ->where('estado', true)
             ->whereIn('seccion_id', $seccionesIds);
-        
+
         // Aplicar filtros adicionales
         if ($gradoId) {
-            $estudiantesQuery->whereHas('seccion', function($q) use ($gradoId) {
+            $estudiantesQuery->whereHas('seccion', function ($q) use ($gradoId) {
                 $q->where('id_grado', $gradoId);
             });
         }
-        
+
         if ($seccionId) {
             $estudiantesQuery->where('seccion_id', $seccionId);
         }
-        
+
         if ($search) {
-            $estudiantesQuery->whereHas('estudiante.persona', function($q) use ($search) {
+            $estudiantesQuery->whereHas('estudiante.persona', function ($q) use ($search) {
                 $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('lastname', 'LIKE', "%{$search}%");
+                    ->orWhere('lastname', 'LIKE', "%{$search}%");
             });
         }
 
@@ -104,10 +105,10 @@ class AsistenciaController extends Controller
                 ->orderBy('personas.name')
                 ->select('matriculas.*');
         }
-        
+
         // Paginación
         $matriculas = $estudiantesQuery->paginate(20)->withQueryString();
-        
+
         // Obtener periodos activos
         $hoy = Carbon::now();
         $periodos = Periodo::where('fecha_inicio', '<=', $hoy)
@@ -116,12 +117,12 @@ class AsistenciaController extends Controller
 
         $estudiantesIds = $matriculas->pluck('codigo_estudiante')->toArray();
         $periodosIds = $periodos->pluck('id_periodo')->toArray();
-        
+
         $asistencias = Asistencia::whereIn('codigo_estudiante', $estudiantesIds)
             ->whereIn('id_periodo', $periodosIds)
             ->get()
             ->groupBy(['codigo_estudiante', 'id_periodo']);
-        
+
         return view('pages.admin.asistencia.index', compact(
             'matriculas',
             'grados',
@@ -139,7 +140,7 @@ class AsistenciaController extends Controller
     {
         $user = Auth::user();
         $docente = $user->docente;
-        
+
         if (!$docente) {
             return redirect()->route('asistencias.index')
                 ->with('error', 'No tiene un registro de docente asociado.');
@@ -208,9 +209,9 @@ class AsistenciaController extends Controller
                 ->where('seccion_id', $seccionId);
 
             if ($search) {
-                $estudiantesQuery->whereHas('estudiante.persona', function($q) use ($search) {
+                $estudiantesQuery->whereHas('estudiante.persona', function ($q) use ($search) {
                     $q->where('name', 'LIKE', "%{$search}%")
-                      ->orWhere('lastname', 'LIKE', "%{$search}%");
+                        ->orWhere('lastname', 'LIKE', "%{$search}%");
                 });
             }
 
@@ -229,7 +230,7 @@ class AsistenciaController extends Controller
                 ->pluck('codigo_estudiante')
                 ->toArray();
         }
-        
+
         return view('pages.admin.asistencia.create', compact(
             'matriculas',
             'grados',
@@ -247,7 +248,7 @@ class AsistenciaController extends Controller
 
     public function store(Request $request)
     {
-       $fecha = $request->input('fecha');
+        $fecha = $request->input('fecha');
         $periodo = Periodo::findOrFail($request->input('id_periodo'));
 
         if (Carbon::parse($fecha)->isWeekend()) {
@@ -256,8 +257,10 @@ class AsistenciaController extends Controller
                 ->with('error', 'No puedes registrar asistencia en sábado ni domingo.');
         }
 
-        if (Carbon::parse($fecha)->lt($periodo->fecha_inicio) 
-            || Carbon::parse($fecha)->gt($periodo->fecha_fin)) {
+        if (
+            Carbon::parse($fecha)->lt($periodo->fecha_inicio)
+            || Carbon::parse($fecha)->gt($periodo->fecha_fin)
+        ) {
             return back()
                 ->withInput()
                 ->with('error', 'La fecha está fuera del rango del periodo seleccionado.');
@@ -269,27 +272,27 @@ class AsistenciaController extends Controller
                 ->where('id_periodo', $periodo->id_periodo)
                 ->exists();
 
-            if (! $existe) {
+            if (!$existe) {
                 Asistencia::create([
                     'codigo_estudiante' => $asis['codigo_estudiante'],
-                    'fecha'             => $fecha,
-                    'id_periodo'        => $periodo->id_periodo,
-                    'estado'            => $asis['estado'],
-                    'observacion'       => $asis['observacion'] ?? null,
-                    'justificacion'     => $asis['justificacion'] ?? null,
+                    'fecha' => $fecha,
+                    'id_periodo' => $periodo->id_periodo,
+                    'estado' => $asis['estado'],
+                    'observacion' => $asis['observacion'] ?? null,
+                    'justificacion' => $asis['justificacion'] ?? null,
                 ]);
             }
         }
 
         return redirect()->route('asistencias.index')
-                        ->with('success', 'Asistencias registradas correctamente.');
+            ->with('success', 'Asistencias registradas correctamente.');
     }
 
     public function edit($codigo_estudiante)
     {
         $user = Auth::user();
         $docente = $user->docente;
-        
+
         if (!$docente) {
             return redirect()->route('asistencias.index')
                 ->with('error', 'No tiene un registro de docente asociado.');
@@ -346,7 +349,7 @@ class AsistenciaController extends Controller
     {
         $user = Auth::user();
         $docente = $user->docente;
-        
+
         if (!$docente) {
             return redirect()->route('asistencias.index')
                 ->with('error', 'No tiene un registro de docente asociado.');
@@ -389,21 +392,21 @@ class AsistenciaController extends Controller
     {
         $user = Auth::user();
         $docente = $user->docente;
-        if (!$docente) {
+        /*if (!$docente) {
             return redirect()->route('asistencias.index')
                 ->with('error', 'No tiene un registro de docente asociado.');
-        }
+        } */
         $matricula = Matricula::with('estudiante.persona', 'seccion.grado')
             ->where('codigo_estudiante', $codigo_estudiante)
             ->firstOrFail();
 
-        if (!$docente->secciones->pluck('id_seccion')->contains($matricula->seccion_id)) {
-            return redirect()->route('asistencias.index')
-                ->with('error', 'No tienes permiso para ver este estudiante.');
-        }
+        /* if (!$docente->secciones->pluck('id_seccion')->contains($matricula->seccion_id)) {
+             return redirect()->route('asistencias.index')
+                 ->with('error', 'No tienes permiso para ver este estudiante.');
+         } */
 
         $hoy = Carbon::today();
-        
+
         $periodos = Periodo::orderBy('fecha_inicio')->get();
 
         if ($periodos->isEmpty()) {
@@ -423,7 +426,7 @@ class AsistenciaController extends Controller
             $fin = Carbon::parse($periodo->fecha_fin);
 
             $diasClases = 0;
-            
+
             if ($inicio->greaterThanOrEqualTo($hoy)) {
 
                 $estadoPeriodo = 'futuro';
@@ -449,10 +452,10 @@ class AsistenciaController extends Controller
             }
 
             $totales = [
-                'Presente'    => 0,
-                'Ausente'     => 0,
+                'Presente' => 0,
+                'Ausente' => 0,
                 'Justificado' => 0,
-                'Tarde'       => 0,
+                'Tarde' => 0,
             ];
 
             foreach ($asisPeriodo as $a) {
@@ -476,21 +479,143 @@ class AsistenciaController extends Controller
             }
 
             $statsPorPeriodo[] = [
-                'periodo'          => $periodo,
-                'estadoPeriodo'    => $estadoPeriodo,
-                'diasClases'       => $diasClases,
+                'periodo' => $periodo,
+                'estadoPeriodo' => $estadoPeriodo,
+                'diasClases' => $diasClases,
                 'diasTotalesPeriodo' => $diasTotalesPeriodo,
-                'totales'          => $totales,
-                'porcentajes'      => $porcentajes,
+                'totales' => $totales,
+                'porcentajes' => $porcentajes,
                 'asistenciasCount' => $asisPeriodo->count()
             ];
         }
 
         return view('pages.admin.asistencia.show', compact(
-            'matricula', 'statsPorPeriodo'
+            'matricula',
+            'statsPorPeriodo'
         ));
     }
 
+    public function showAsistenciasEstudiante($codigo_estudiante)
+    {
+        $matricula = Matricula::with('estudiante.persona', 'seccion.grado')
+            ->where('codigo_estudiante', $codigo_estudiante)
+            ->firstOrFail();
+
+        $hoy = Carbon::today();
+
+        $periodos = Periodo::orderBy('fecha_inicio')->get();
+
+        if ($periodos->isEmpty()) {
+            return redirect()->route('asistencias.index')
+                ->with('error', 'No hay periodos registrados en el sistema.');
+        }
+
+        // Obtener todas las asistencias del estudiante
+        $asistenciasCollection = Asistencia::where('codigo_estudiante', $codigo_estudiante)
+            ->with('periodo') // Cargar la relación del período
+            ->get();
+
+        // Agrupar por período para estadísticas
+        $asistenciasPorPeriodo = $asistenciasCollection->groupBy('id_periodo');
+
+        // Crear un array plano indexado por fecha para JavaScript
+        $asistenciasPlanas = [];
+        foreach ($asistenciasCollection as $asistencia) {
+            $fecha = Carbon::createFromFormat('Y-m-d H:i:s', $asistencia->fecha)->format('Y-m-d');
+
+            $asistenciasPlanas[$fecha] = [
+                'fecha' => $fecha,
+                'estado' => $asistencia->estado->value,
+                'observacion' => $asistencia->observacion,
+                'justificacion' => $asistencia->justificacion,
+                'periodo' => [
+                    'id' => $asistencia->periodo->id_periodo,
+                    'nombre' => $asistencia->periodo->nombre
+                ]
+            ];
+        }
+        Log::info('Asistencias planas para JavaScript: ', $asistenciasPlanas);
+
+        $statsPorPeriodo = [];
+        foreach ($periodos as $periodo) {
+            $asisPeriodo = $asistenciasPorPeriodo->get($periodo->id_periodo, collect());
+
+            $inicio = Carbon::parse($periodo->fecha_inicio);
+            $fin = Carbon::parse($periodo->fecha_fin);
+
+            $diasClases = 0;
+
+            if ($inicio->greaterThanOrEqualTo($hoy)) {
+                $estadoPeriodo = 'futuro';
+                $diasClases = 0;
+            } elseif ($fin->lt($hoy)) {
+                $estadoPeriodo = 'pasado';
+                for ($d = $inicio->copy(); $d->lte($fin); $d->addDay()) {
+                    if (!$d->isWeekend()) {
+                        $diasClases++;
+                    }
+                }
+            } else {
+                $estadoPeriodo = 'actual';
+                for ($d = $inicio->copy(); $d->lte($hoy); $d->addDay()) {
+                    if (!$d->isWeekend()) {
+                        $diasClases++;
+                    }
+                }
+            }
+
+            $totales = [];
+            foreach (AsistenciaEstado::cases() as $estado) {
+                $totales[$estado->value] = 0;
+            }
+
+            foreach ($asisPeriodo as $asistencia) {
+                $valorEstado = $asistencia->estado->value;
+                if (isset($totales[$valorEstado])) {
+                    $totales[$valorEstado]++;
+                }
+            }
+
+            // Calcular porcentajes basados en total de asistencias registradas (no días de clases)
+            $totalAsistenciasRegistradas = array_sum($totales);
+            $porcentajes = [];
+            foreach ($totales as $estado => $count) {
+                $porcentajes[$estado] = $totalAsistenciasRegistradas > 0
+                    ? round($count / $totalAsistenciasRegistradas * 100, 1)
+                    : 0;
+            }
+
+            $diasTotalesPeriodo = 0;
+            for ($d = $inicio->copy(); $d->lte($fin); $d->addDay()) {
+                if (!$d->isWeekend()) {
+                    $diasTotalesPeriodo++;
+                }
+            }
+
+            $statsPorPeriodo[] = [
+                'periodo' => [
+                    'id_periodo' => $periodo->id_periodo,
+                    'nombre' => $periodo->nombre,
+                    'fecha_inicio' => $periodo->fecha_inicio,
+                    'fecha_fin' => $periodo->fecha_fin
+                ],
+                'estadoPeriodo' => $estadoPeriodo,
+                'diasClases' => $diasClases,
+                'diasTotalesPeriodo' => $diasTotalesPeriodo,
+                'totales' => $totales,
+                'porcentajes' => $porcentajes,
+                'asistenciasCount' => $asisPeriodo->count()
+            ];
+        }
+
+        Log::info('Estadísticas por periodo: ', $statsPorPeriodo);
+
+        return view('pages.admin.asistencia.show-estudiante', compact(
+            'matricula',
+            'statsPorPeriodo',
+            'asistenciasPlanas' // Pasar las asistencias planas en lugar de agrupadas
+        ));
+    }
 
     public function obtenerSeccionesPorGrado(Request $request)
     {
@@ -513,7 +638,7 @@ class AsistenciaController extends Controller
                 }
             }
         } catch (\Throwable $e) {
-            \Log::error('Error AJAX secciones-por-grado: '.$e->getMessage());
+            \Log::error('Error AJAX secciones-por-grado: ' . $e->getMessage());
             $response = response()->json(['error' => 'Error interno'], 500);
         }
         return $response;

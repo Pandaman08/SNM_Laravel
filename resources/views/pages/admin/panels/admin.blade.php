@@ -32,7 +32,7 @@
                 <div>
                     <p class="text-gray-500 text-sm">Estudiantes Activos</p>
                     <p class="text-2xl font-bold">
-                        {{ $matriculas->filter(function ($m) {return $m->estado_validacion;})->count() }}</p>
+                        {{ $matriculas->filter(function ($m) {return $m->estado == 'activo';})->count() }}</p>
                 </div>
             </div>
 

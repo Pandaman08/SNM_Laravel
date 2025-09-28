@@ -55,19 +55,19 @@
                         <h2 class="text-xl font-bold">Gestión Estudiantil</h2>
                     </div>
                     <div class="p-6 grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <a href="" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-blue-50 transition-colors">
+                        <a href="{{route('matriculas.create')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-blue-50 transition-colors">
                             <div class="p-3 rounded-full bg-blue-100 text-blue-600 mb-2">
                                 <i class="ri-user-add-fill text-xl"></i>
                             </div>
                             <span class="text-sm font-medium text-center">Registrar Matrícula</span>
                         </a>
-                        <a href="" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-green-50 transition-colors">
+                        <a href="{{route('reporte_notas.tutor')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-green-50 transition-colors">
                             <div class="p-3 rounded-full bg-green-100 text-green-600 mb-2">
                                 <i class="ri-file-chart-fill text-xl"></i>
                             </div>
                             <span class="text-sm font-medium text-center">Ver Calificaciones</span>
                         </a>
-                        <a href="" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-purple-50 transition-colors">
+                        <a href="{{route('reporte_notas.tutor')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-purple-50 transition-colors">
                             <div class="p-3 rounded-full bg-purple-100 text-purple-600 mb-2">
                                 <i class="ri-team-fill text-xl"></i>
                             </div>
