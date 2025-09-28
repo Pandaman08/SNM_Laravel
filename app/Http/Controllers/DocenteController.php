@@ -39,6 +39,31 @@ class DocenteController extends Controller
         return view('pages.admin.docentes.index', compact('users'));
     }
 
+    public function showDocente(Request $request)
+    {
+        $query = $request->input('search');
+
+        $users = User::where('rol', '=', 'docente')
+            ->when($query, function ($queryBuilder) use ($query) {
+                $queryBuilder->where(function ($q) use ($query) {
+                    $q->where('name', 'like', '%' . $query . '%')
+                        ->orWhere('lastname', 'like', '%' . $query . '%')
+                        ->orWhere('email', 'like', '%' . $query . '%');
+                });
+            })
+            ->paginate(10);
+        $roles = UserRole::cases();
+
+        return view('pages.admin.docentes.index', compact('users', 'roles'));
+    }
+
+     public function panel_docente()
+    {
+        $user = Auth::user();
+        $numAsign = AsignaturaDocente::where('codigo_docente', '=', $user->docente->codigo_docente)->get()->count();
+        return view("pages.admin.panels.docente", compact('user', 'numAsign'));
+    }
+
     public function index_asignaturas()
     {
         $user = Auth::user();
