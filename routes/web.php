@@ -176,6 +176,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/asistencias/secciones-por-grado', [AsistenciaController::class, 'obtenerSeccionesPorGrado'])->name('asistencias.secciones-por-grado');
 
     Route::get('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'show'])->name('asistencias.show');
+    Route::get('/asistencias/{codigo_estudiante}/show', [AsistenciaController::class, 'showAsistenciasEstudiante'])->name('asistencias.show.estudiante');
     Route::get('/asistencias/{codigo_estudiante}/edit', [AsistenciaController::class, 'edit'])->name('asistencias.edit');
     Route::put('/asistencias/{codigo_estudiante}', [AsistenciaController::class, 'update'])->name('asistencias.update');
 
@@ -213,3 +214,5 @@ Route::middleware('auth')->group(function () {
 
 
 });
+//MARK KBRO  
+
