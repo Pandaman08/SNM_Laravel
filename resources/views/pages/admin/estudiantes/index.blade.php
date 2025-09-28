@@ -46,7 +46,8 @@
                         <tr>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 <div class="flex items-center space-x-2">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                     </svg>
@@ -55,18 +56,22 @@
                             </th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 <div class="flex items-center space-x-2">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                        </path>
                                     </svg>
                                     <span>Información Personal</span>
                                 </div>
                             </th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 <div class="flex items-center space-x-2">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                        </path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     </svg>
@@ -75,15 +80,20 @@
                             </th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 <div class="flex items-center space-x-2">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                        </path>
                                     </svg>
                                     <span>Cultural</span>
                                 </div>
                             </th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Foto
+                            </th>
+                               <th class="px-6 py-4 text-left text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                QR 
                             </th>
                         </tr>
                     </thead>
@@ -145,10 +155,12 @@
                                             <span class="font-medium">País:</span> {{ $estudiante->pais ?? 'N/A' }}
                                         </div>
                                         <div class="text-sm text-gray-900">
-                                            <span class="font-medium">Departamento:</span> {{ $estudiante->departamento ?? 'N/A' }}
+                                            <span class="font-medium">Departamento:</span>
+                                            {{ $estudiante->departamento ?? 'N/A' }}
                                         </div>
                                         <div class="text-sm text-gray-900">
-                                            <span class="font-medium">Provincia:</span> {{ $estudiante->provincia ?? 'N/A' }}
+                                            <span class="font-medium">Provincia:</span>
+                                            {{ $estudiante->provincia ?? 'N/A' }}
                                         </div>
                                         <div class="text-sm text-gray-900">
                                             <span class="font-medium">Distrito:</span> {{ $estudiante->distrito ?? 'N/A' }}
@@ -160,10 +172,12 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="space-y-1">
                                         <div class="text-sm text-gray-900">
-                                            <span class="font-medium">Lengua materna:</span> {{ $estudiante->lengua_materna ?? 'N/A' }}
+                                            <span class="font-medium">Lengua materna:</span>
+                                            {{ $estudiante->lengua_materna ?? 'N/A' }}
                                         </div>
                                         <div class="text-sm text-gray-900">
-                                            <span class="font-medium">Religión:</span> {{ $estudiante->religion ?? 'N/A' }}
+                                            <span class="font-medium">Religión:</span>
+                                            {{ $estudiante->religion ?? 'N/A' }}
                                         </div>
                                     </div>
                                 </td>
@@ -186,6 +200,25 @@
                                         <span class="text-sm text-gray-400">Sin foto</span>
                                     @endif
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    @if ($estudiante->qrImageRender())
+                                        <button type="button" class="inline-block p-2 bg-white rounded-lg shadow-md border border-gray-200" onclick="openModal('{{ Storage::url('qrcodes/' . $estudiante->qr_code . '.png') }}', 'qr')">
+                                            <img src="{{ Storage::url('qrcodes/' . $estudiante->qr_code . '.png')  }}"
+                                                alt="Código QR de {{ $estudiante->persona->name }}"
+                                                class="w-20 h-20 mx-auto object-contain rounded-lg border-2 border-gray-100 shadow-sm"
+                                                onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0iI2YzZjNmMyIvPjxwYXRoIGQ9Ik02IDZINhY2SDE4VjE4SDZWNlpNOCA4VjE2SDE2VjhIOFpNMTAgMTBIMTRWMTRIMTBWMTBaIiBmaWxsPSIjOTk5Ii8+PC9zdmc+'">
+                                        </button>
+                                    @else
+                                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+                                            <svg class="w-4 h-4 text-yellow-500 mx-auto mb-3" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                            <p class="text-yellow-700 font-medium"> QR no disponible</p>
+                                        </div>
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -196,7 +229,8 @@
         <!-- Pagination -->
         <div class="flex justify-between items-center mt-6">
             <div class="text-sm text-gray-600">
-                Mostrando {{ $estudiantes->firstItem() ?? 0 }} a {{ $estudiantes->lastItem() ?? 0 }} de {{ $estudiantes->total() }}
+                Mostrando {{ $estudiantes->firstItem() ?? 0 }} a {{ $estudiantes->lastItem() ?? 0 }} de
+                {{ $estudiantes->total() }}
                 resultados
             </div>
             <div class="flex justify-end">
@@ -209,7 +243,7 @@
     <div id="archivoModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
         <div class="bg-white rounded-xl shadow-xl max-w-4xl max-h-[90vh] overflow-hidden mx-4">
             <div class="flex justify-between items-center p-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">Foto de Perfil</h3>
+                <h3 id="modal-title" class="text-lg font-semibold text-gray-900">Foto de Perfil</h3>
                 <button class="text-gray-400 hover:text-gray-600 transition-colors" onclick="closeModal()">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
@@ -221,222 +255,242 @@
         </div>
     </div>
 
-<!-- Modal de Edición -->
-<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 w-full h-full">
-    <div class="flex items-center justify-center w-full h-full">
-        <div class="bg-white px-8 py-6 rounded-lg shadow-xl max-w-4xl w-full relative max-h-screen overflow-y-auto">
-            <div class="text-center mb-8">
-                <h2 class="text-2xl font-semibold text-blue-800">Editar Estudiante</h2>
-                <div class="mx-auto mt-2 w-1/5 h-1 bg-green-400"></div>
+    <!-- Modal de Edición -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 w-full h-full">
+        <div class="flex items-center justify-center w-full h-full">
+            <div class="bg-white px-8 py-6 rounded-lg shadow-xl max-w-4xl w-full relative max-h-screen overflow-y-auto">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-semibold text-blue-800">Editar Estudiante</h2>
+                    <div class="mx-auto mt-2 w-1/5 h-1 bg-green-400"></div>
+                </div>
+
+                <form id="editForm" action="" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Columna Izquierda -->
+                        <div class="space-y-4">
+                            <div>
+                                <label for="edit_name" class="block text-gray-700">Nombres:</label>
+                                <input type="text" id="edit_name" name="name"
+                                    class="w-full px-4 py-2 border rounded" required>
+                            </div>
+                            <div>
+                                <label for="edit_lastname" class="block text-gray-700">Apellidos:</label>
+                                <input type="text" id="edit_lastname" name="lastname"
+                                    class="w-full px-4 py-2 border rounded" required>
+                            </div>
+                            <div>
+                                <label for="edit_dni" class="block text-gray-700">DNI:</label>
+                                <input type="text" id="edit_dni" name="dni"
+                                    class="w-full px-4 py-2 border rounded" required maxlength="8">
+                            </div>
+
+                            <div>
+                                <label for="edit_sexo" class="block text-gray-700">Sexo:</label>
+                                <select id="edit_sexo" name="sexo" class="w-full px-4 py-2 border rounded">
+                                    <option value="M">Masculino</option>
+                                    <option value="F">Femenino</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="edit_address" class="block text-gray-700">Dirección:</label>
+                                <input type="text" id="edit_address" name="address"
+                                    class="w-full px-4 py-2 border rounded" required>
+                            </div>
+                        </div>
+
+                        <!-- Columna Derecha -->
+                        <div class="space-y-4">
+                            <div>
+                                <label for="edit_fecha_nacimiento" class="block text-gray-700">Fecha Nacimiento:</label>
+                                <input type="date" id="edit_fecha_nacimiento" name="fecha_nacimiento"
+                                    class="w-full px-4 py-2 border rounded" required>
+                            </div>
+                            <div>
+                                <label for="edit_pais" class="block text-gray-700">País:</label>
+                                <input type="text" id="edit_pais" name="pais"
+                                    class="w-full px-4 py-2 border rounded" required>
+                            </div>
+                            <div>
+                                <label for="edit_provincia" class="block text-gray-700">Provincia:</label>
+                                <input type="text" id="edit_provincia" name="provincia"
+                                    class="w-full px-4 py-2 border rounded" required>
+                            </div>
+                            <div>
+                                <label for="edit_distrito" class="block text-gray-700">Distrito:</label>
+                                <input type="text" id="edit_distrito" name="distrito"
+                                    class="w-full px-4 py-2 border rounded" required>
+                            </div>
+                            <div>
+                                <label for="edit_departamento" class="block text-gray-700">Departamento:</label>
+                                <input type="text" id="edit_departamento" name="departamento"
+                                    class="w-full px-4 py-2 border rounded" required>
+                            </div>
+                            <div>
+                                <label for="edit_lengua_materna" class="block text-gray-700">Lengua Materna:</label>
+                                <input type="text" id="edit_lengua_materna" name="lengua_materna"
+                                    class="w-full px-4 py-2 border rounded" required>
+                            </div>
+                            <div>
+                                <label for="edit_religion" class="block text-gray-700">Religión:</label>
+                                <input type="text" id="edit_religion" name="religion"
+                                    class="w-full px-4 py-2 border rounded" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Foto de perfil -->
+                    <div class="mt-6">
+                        <label class="block text-gray-700 mb-1">Foto de Perfil:</label>
+                        <div id="edit-image-upload"
+                            class="border-2 border-dashed border-gray-300 w-full h-52 flex flex-col items-center justify-center cursor-pointer relative text-center rounded-md"
+                            onclick="document.getElementById('edit_photo').click()">
+                            <span id="edit-image-placeholder" class="text-gray-500 flex flex-col items-center">
+                                <svg class="w-8 h-8 mb-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 20 16">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+                                </svg>
+                                Selecciona o arrastra una imagen
+                            </span>
+                            <img id="previewImg" src="" alt="Vista previa"
+                                class="hidden w-52 h-full object-cover rounded shadow mx-auto">
+                            <input type="file" id="edit_photo" name="photo" class="hidden" accept="image/*">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center gap-4 mt-6">
+                        <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-700">
+                            Actualizar
+                        </button>
+                        <button type="button" onclick="closeEditModal()"
+                            class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-700">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
             </div>
-
-            <form id="editForm" action="" method="POST" enctype="multipart/form-data" class="space-y-6">
-                @csrf
-                @method('PUT')
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Columna Izquierda -->
-                    <div class="space-y-4">
-                        <div>
-                            <label for="edit_name" class="block text-gray-700">Nombres:</label>
-                            <input type="text" id="edit_name" name="name" class="w-full px-4 py-2 border rounded" required>
-                        </div>
-                        <div>
-                            <label for="edit_lastname" class="block text-gray-700">Apellidos:</label>
-                            <input type="text" id="edit_lastname" name="lastname" class="w-full px-4 py-2 border rounded" required>
-                        </div>
-                        <div>
-                            <label for="edit_dni" class="block text-gray-700">DNI:</label>
-                            <input type="text" id="edit_dni" name="dni" class="w-full px-4 py-2 border rounded" required maxlength="8">
-                        </div>
-                     
-                        <div>
-                            <label for="edit_sexo" class="block text-gray-700">Sexo:</label>
-                            <select id="edit_sexo" name="sexo" class="w-full px-4 py-2 border rounded">
-                                <option value="M">Masculino</option>
-                                <option value="F">Femenino</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="edit_address" class="block text-gray-700">Dirección:</label>
-                            <input type="text" id="edit_address" name="address" class="w-full px-4 py-2 border rounded" required>
-                        </div>
-                    </div>
-
-                    <!-- Columna Derecha -->
-                    <div class="space-y-4">
-                        <div>
-                            <label for="edit_fecha_nacimiento" class="block text-gray-700">Fecha Nacimiento:</label>
-                            <input type="date" id="edit_fecha_nacimiento" name="fecha_nacimiento" class="w-full px-4 py-2 border rounded" required>
-                        </div>
-                        <div>
-                            <label for="edit_pais" class="block text-gray-700">País:</label>
-                            <input type="text" id="edit_pais" name="pais" class="w-full px-4 py-2 border rounded" required>
-                        </div>
-                        <div>
-                            <label for="edit_provincia" class="block text-gray-700">Provincia:</label>
-                            <input type="text" id="edit_provincia" name="provincia" class="w-full px-4 py-2 border rounded" required>
-                        </div>
-                        <div>
-                            <label for="edit_distrito" class="block text-gray-700">Distrito:</label>
-                            <input type="text" id="edit_distrito" name="distrito" class="w-full px-4 py-2 border rounded" required>
-                        </div>
-                        <div>
-                            <label for="edit_departamento" class="block text-gray-700">Departamento:</label>
-                            <input type="text" id="edit_departamento" name="departamento" class="w-full px-4 py-2 border rounded" required>
-                        </div>
-                        <div>
-                            <label for="edit_lengua_materna" class="block text-gray-700">Lengua Materna:</label>
-                            <input type="text" id="edit_lengua_materna" name="lengua_materna" class="w-full px-4 py-2 border rounded" required>
-                        </div>
-                        <div>
-                            <label for="edit_religion" class="block text-gray-700">Religión:</label>
-                            <input type="text" id="edit_religion" name="religion" class="w-full px-4 py-2 border rounded" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Foto de perfil -->
-                <div class="mt-6">
-                    <label class="block text-gray-700 mb-1">Foto de Perfil:</label>
-                    <div id="edit-image-upload" class="border-2 border-dashed border-gray-300 w-full h-52 flex flex-col items-center justify-center cursor-pointer relative text-center rounded-md" onclick="document.getElementById('edit_photo').click()">
-                        <span id="edit-image-placeholder" class="text-gray-500 flex flex-col items-center">
-                            <svg class="w-8 h-8 mb-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                            </svg>
-                            Selecciona o arrastra una imagen
-                        </span>
-                        <img id="previewImg" src="" alt="Vista previa" class="hidden w-52 h-full object-cover rounded shadow mx-auto">
-                        <input type="file" id="edit_photo" name="photo" class="hidden" accept="image/*">
-                    </div>
-                </div>
-
-                <div class="flex justify-center gap-4 mt-6">
-                    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-700">
-                        Actualizar
-                    </button>
-                    <button type="button" onclick="closeEditModal()" class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-700">
-                        Cancelar
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
-</div>
 
 
 
-@if (session('success'))
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                title: "Actualizado!",
+                text: "{{ session('success') }}",
+                icon: "success",
+                customClass: {
+                    confirmButton: 'bg-green-500 text-white hover:bg-green-600 focus:ring-2 focus:ring-green-300 rounded-lg py-2 px-4'
+                }
+            });
+        </script>
+    @elseif (session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                html: "{!! session('error') !!}",
+                customClass: {
+                    confirmButton: 'bg-red-500 text-white hover:bg-red-600 focus:ring-2 focus:ring-red-300 rounded-lg py-2 px-4'
+                }
+            });
+        </script>
+    @endif
+
     <script>
-        Swal.fire({
-            title: "Actualizado!",
-            text: "{{ session('success') }}",
-            icon: "success",
-            customClass: {
-                confirmButton: 'bg-green-500 text-white hover:bg-green-600 focus:ring-2 focus:ring-green-300 rounded-lg py-2 px-4'
+        function openEditModal(button) {
+            const estudiante = JSON.parse(button.getAttribute('data-estudiante'));
+
+            // Datos personales
+            document.getElementById('edit_name').value = estudiante.persona.name;
+            document.getElementById('edit_lastname').value = estudiante.persona.lastname;
+            document.getElementById('edit_dni').value = estudiante.persona.dni;
+            document.getElementById('edit_sexo').value = estudiante.persona.sexo;
+            document.getElementById('edit_address').value = estudiante.persona.address;
+            const fechaNacimiento = new Date(estudiante.persona.fecha_nacimiento);
+            document.getElementById('edit_fecha_nacimiento').value = fechaNacimiento.toISOString().split('T')[0];
+
+            // Datos de estudiante
+            document.getElementById('edit_pais').value = estudiante.pais;
+            document.getElementById('edit_provincia').value = estudiante.provincia;
+            document.getElementById('edit_distrito').value = estudiante.distrito;
+            document.getElementById('edit_departamento').value = estudiante.departamento;
+            document.getElementById('edit_lengua_materna').value = estudiante.lengua_materna;
+            document.getElementById('edit_religion').value = estudiante.religion;
+
+            // Foto de perfil
+            const previewImg = document.getElementById('previewImg');
+            if (estudiante.persona.photo) {
+                previewImg.src = `/storage/${estudiante.persona.photo}`;
+                previewImg.classList.remove('hidden');
+                document.getElementById('edit-image-placeholder').classList.add('hidden');
+            } else {
+                previewImg.src = '';
+                previewImg.classList.add('hidden');
+                document.getElementById('edit-image-placeholder').classList.remove('hidden');
+            }
+
+            // Establecer acción del formulario
+            document.getElementById('editForm').action = `/estudiantes/${estudiante.id}`;
+
+            // Mostrar modal
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function buscarEstudiantes(query) {
+            fetch(`/estudiantes/buscar?search=${query}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const tableBody = doc.querySelector('tbody');
+                    document.querySelector('tbody').innerHTML = tableBody.innerHTML;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function openModal(imageUrl, type) {
+            const modalContent = document.getElementById('modalContent');
+            const modalTitle = document.getElementById('modal-title');
+            modalTitle.textContent = type === 'image' ? 'Foto de Perfil' : 'QR Code';
+            modalContent.innerHTML = `<img src="${imageUrl}" class="w-full max-h-[75vh] object-contain">`;
+            document.getElementById('archivoModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('archivoModal').classList.add('hidden');
+        }
+
+        // Preview de imagen en edición
+        document.getElementById('edit_photo').addEventListener('change', function(e) {
+            const previewImg = document.getElementById('previewImg');
+            const placeholder = document.getElementById('edit-image-placeholder');
+
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewImg.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                }
+
+                reader.readAsDataURL(this.files[0]);
             }
         });
     </script>
-@elseif (session('error'))
-    <script>
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            html: "{!! session('error') !!}",
-            customClass: {
-                confirmButton: 'bg-red-500 text-white hover:bg-red-600 focus:ring-2 focus:ring-red-300 rounded-lg py-2 px-4'
-            }
-        });
-    </script>
-@endif
-
-<script>
-function openEditModal(button) {
-    const estudiante = JSON.parse(button.getAttribute('data-estudiante'));
-    
-    // Datos personales
-    document.getElementById('edit_name').value = estudiante.persona.name;
-    document.getElementById('edit_lastname').value = estudiante.persona.lastname;
-    document.getElementById('edit_dni').value = estudiante.persona.dni;
-    document.getElementById('edit_sexo').value = estudiante.persona.sexo;
-    document.getElementById('edit_address').value = estudiante.persona.address;
-   const fechaNacimiento = new Date(estudiante.persona.fecha_nacimiento);
-    document.getElementById('edit_fecha_nacimiento').value = fechaNacimiento.toISOString().split('T')[0];
-    
-    // Datos de estudiante
-    document.getElementById('edit_pais').value = estudiante.pais;
-    document.getElementById('edit_provincia').value = estudiante.provincia;
-    document.getElementById('edit_distrito').value = estudiante.distrito;
-    document.getElementById('edit_departamento').value = estudiante.departamento;
-    document.getElementById('edit_lengua_materna').value = estudiante.lengua_materna;
-    document.getElementById('edit_religion').value = estudiante.religion;
-    
-    // Foto de perfil
-    const previewImg = document.getElementById('previewImg');
-    if(estudiante.persona.photo) {
-        previewImg.src = `/storage/${estudiante.persona.photo}`;
-        previewImg.classList.remove('hidden');
-        document.getElementById('edit-image-placeholder').classList.add('hidden');
-    } else {
-        previewImg.src = '';
-        previewImg.classList.add('hidden');
-        document.getElementById('edit-image-placeholder').classList.remove('hidden');
-    }
-    
-    // Establecer acción del formulario
-    document.getElementById('editForm').action = `/estudiantes/${estudiante.id}`;
-    
-    // Mostrar modal
-    document.getElementById('editModal').classList.remove('hidden');
-}
-
-function closeEditModal() {
-    document.getElementById('editModal').classList.add('hidden');
-}
-
-function buscarEstudiantes(query) {
-    fetch(`/estudiantes/buscar?search=${query}`, {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.text())
-    .then(html => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const tableBody = doc.querySelector('tbody');
-        document.querySelector('tbody').innerHTML = tableBody.innerHTML;
-    })
-    .catch(error => console.error('Error:', error));
-}
-
-function openModal(imageUrl, type) {
-    const modalContent = document.getElementById('modalContent');
-    modalContent.innerHTML = `<img src="${imageUrl}" class="w-full max-h-[75vh] object-contain">`;
-    document.getElementById('archivoModal').classList.remove('hidden');
-}
-
-function closeModal() {
-    document.getElementById('archivoModal').classList.add('hidden');
-}
-
-// Preview de imagen en edición
-document.getElementById('edit_photo').addEventListener('change', function(e) {
-    const previewImg = document.getElementById('previewImg');
-    const placeholder = document.getElementById('edit-image-placeholder');
-    
-    if (this.files && this.files[0]) {
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            previewImg.src = e.target.result;
-            previewImg.classList.remove('hidden');
-            placeholder.classList.add('hidden');
-        }
-        
-        reader.readAsDataURL(this.files[0]);
-    }
-});
-</script>
 @endsection

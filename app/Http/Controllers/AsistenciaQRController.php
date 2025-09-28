@@ -68,7 +68,16 @@ class AsistenciaQRController extends Controller
     public function showScanner()
     {
         $periodos = Periodo::get();
-        return view('pages.admin.asistencia.scanner', compact('periodos'));
+        $hoy = now();
+        $periodoActual = null;
+
+        foreach ($periodos as $periodo) {
+            if ($hoy->between($periodo->fecha_inicio, $periodo->fecha_fin)) {
+                $periodoActual = $periodo;
+                break;
+            }
+        }
+        return view('pages.admin.asistencia.scanner', compact('periodos','periodoActual'));
     }
 
     // Ruta corta para escanear QR
@@ -122,7 +131,7 @@ class AsistenciaQRController extends Controller
             'observacion' => 'Registrado mediante QR',
         ]);
         
-        return back()->with('success', 'Asistencia registrada para: ' . $estudiante->persona->nombres);
+        return back()->with('success', 'Asistencia registrada para: ' . $estudiante->persona->name);
     }
 
     // Vista para mostrar QR del estudiante

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 
 class Estudiante extends Model
 {
@@ -55,6 +57,28 @@ class Estudiante extends Model
         } while (self::where('codigo_estudiante', $code)->exists());
 
         return $code;
+    }
+
+     public function qrImageRender()
+    {
+
+        $qrUrl = url('/qr-scan/' . $this->qr_code);
+        $options = new QROptions([
+            'version' => 10,
+            'outputType' => QRCode::OUTPUT_IMAGE_PNG,
+            'eccLevel' => QRCode::ECC_M,
+            'scale' => 8,
+            'imageBase64' => false,
+        ]);
+
+        $qrCode = new QRCode($options);
+        $qrImage = $qrCode->render($qrUrl);
+
+        if (!$this->qr_code) {
+            return null;
+        }
+
+        return $qrImage;
     }
 
 }
