@@ -128,6 +128,9 @@ Route::middleware('auth')->group(function () {
     Route::get('estudiantes', [EstudianteController::class, 'index'])->name('estudiantes.index');
     Route::get('/estudiantes/buscar', [EstudianteController::class, 'showEstudiante'])->name('estudiantes.buscar');
     Route::put('/estudiantes/{estudiante_id}', [EstudianteController::class, 'update'])->name('estudiantes.update');
+    Route::post('/estudiantes/enviar-correo-tutor', [EstudianteController::class, 'enviarCorreoTutor'])
+    ->name('estudiantes.enviar-correo-tutor');
+    
     //------------------------ docentes ---------------------------------
 //Route::get('/docentes',[DocenteController::class, 'index'])->name('docente');
 //Route::get('/docentes/create',[DocenteController::class, 'create'])->name('docente.create');
@@ -219,4 +222,5 @@ Route::middleware('auth')->group(function () {
 
 });
 //MARK KBRO  
+
 

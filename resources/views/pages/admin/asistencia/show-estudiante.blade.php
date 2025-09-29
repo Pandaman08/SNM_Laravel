@@ -274,8 +274,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const asistenciasData = @json($asistenciasPlanas);
     const periodosData = @json($statsPorPeriodo);
     
-    console.log('Asistencias Data:', asistenciasData);
-    console.log('Períodos Data:', periodosData);
     
     // Ya no necesitamos convertir porque los datos ya vienen en el formato correcto
     const asistenciasPorFecha = asistenciasData;
@@ -330,7 +328,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const fechaStr = fecha.toISOString().split('T')[0];
         
         let clases = 'w-8 h-8 rounded text-xs flex items-center justify-center font-medium cursor-pointer transition-all duration-200 hover:scale-110 dia-calendario';
-        
         if (esFindeSemana) {
             clases += ' bg-blue-50 border border-blue-200 text-blue-600';
             if (!mostrarFinesSemana.checked) {
