@@ -1,6 +1,6 @@
 @extends('layout.admin.plantilla')
 
-@section('titulo', 'Asignar docente')
+@section('titulo','Asignar docente')
 
 @section('contenido')
 
@@ -33,74 +33,72 @@
         </div>
     @endif
 
-        <!-- Formulario de Filtros -->
-        <div class="bg-white shadow-sm rounded-lg mb-6">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Filtros de Búsqueda</h3>
-            </div>
-            <form method="GET" action="{{ route('asignaturas.asignar.docentes') }}" class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <!-- Dropdown de Nivel Educativo -->
-                    <div>
-                        <label for="nivelEducativo" class="block text-sm font-medium text-gray-700 mb-2">
-                            Nivel Educativo
-                        </label>
-                        <select id="nivelEducativo" name="nivelEducativo"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900">
-                            <option value="">Seleccione un nivel</option>
-                            @foreach ($nivelesEducativos as $nivel)
-                                <option value="{{ $nivel->id_nivel_educativo }}"
-                                    {{ request('nivelEducativo') == $nivel->id_nivel_educativo ? 'selected' : '' }}>
-                                    {{ $nivel->nombre }}
+    <!-- Formulario de Filtros -->
+    <div class="bg-white shadow-sm rounded-lg mb-6">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Filtros de Búsqueda</h3>
+        </div>
+        <form method="GET" action="{{ route('asignaturas.asignar.docentes') }}" class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Dropdown de Nivel Educativo -->
+                <div>
+                    <label for="nivelEducativo" class="block text-sm font-medium text-gray-700 mb-2">
+                        Nivel Educativo
+                    </label>
+                    <select id="nivelEducativo" name="nivelEducativo"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900">
+                        <option value="">Seleccione un nivel</option>
+                        @foreach($nivelesEducativos as $nivel)
+                            <option value="{{ $nivel->id_nivel_educativo }}" 
+                                {{ request('nivelEducativo') == $nivel->id_nivel_educativo ? 'selected' : '' }}>
+                                {{ $nivel->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Dropdown de Grado -->
+                <div>
+                    <label for="grado" class="block text-sm font-medium text-gray-700 mb-2">
+                        Grado
+                    </label>
+                    <select id="grado" name="grado"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        {{ !request('nivelEducativo') ? 'disabled' : '' }}>
+                        <option value="">Primero seleccione un nivel educativo</option>
+                        @if(request('nivelEducativo'))
+                            @foreach($grados->where('nivel_educativo_id', request('nivelEducativo')) as $gradoItem)
+                                <option value="{{ $gradoItem->id_grado }}" 
+                                    {{ request('grado') == $gradoItem->id_grado ? 'selected' : '' }}>
+                                    {{ $gradoItem->grado }}°
                                 </option>
                             @endforeach
-                        </select>
-                    </div>
-
-                    <!-- Dropdown de Grado -->
-                    <div>
-                        <label for="grado" class="block text-sm font-medium text-gray-700 mb-2">
-                            Grado
-                        </label>
-                        <select id="grado" name="grado"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                            {{ !request('nivelEducativo') ? 'disabled' : '' }}>
-                            <option value="">Primero seleccione un nivel educativo</option>
-                            @if (request('nivelEducativo'))
-                                @foreach ($grados->where('nivel_educativo_id', request('nivelEducativo')) as $gradoItem)
-                                    <option value="{{ $gradoItem->id_grado }}"
-                                        {{ request('grado') == $gradoItem->id_grado ? 'selected' : '' }}>
-                                        {{ $gradoItem->grado }}°
-                                    </option>
-                                @endforeach
-                            @endif
-                        </select>
-                    </div>
+                        @endif
+                    </select>
                 </div>
+            </div>
 
-                <!-- Botones de Acción -->
-                <div class="flex flex-wrap items-center gap-3">
-                    <button type="submit" id="buscarpor" name="buscarpor"
-                        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200">
+            <!-- Botones de Acción -->
+            <div class="flex flex-wrap items-center gap-3">
+                <button type="submit" id="buscarpor" name="buscarpor"
+                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Buscar Asignaturas
+                </button>
+                @if(request('nivelEducativo') || request('grado'))
+                    <a href="{{ route('asignaturas.asignar.docentes') }}" 
+                       class="inline-flex items-center px-4 py-2 bg-gray-500 text-white text-sm font-medium rounded-md shadow-sm hover:bg-gray-600 transition duration-200">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
-                        Buscar Asignaturas
-                    </button>
-                    @if (request('nivelEducativo') || request('grado'))
-                        <a href="{{ route('asignaturas.asignar.docentes') }}"
-                            class="inline-flex items-center px-4 py-2 bg-gray-500 text-white text-sm font-medium rounded-md shadow-sm hover:bg-gray-600 transition duration-200">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                            Limpiar Filtros
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div>
+                        Limpiar Filtros
+                    </a>
+                @endif
+            </div>
+        </form>
+    </div>
 
     <!-- Tabla de Asignaturas -->
     <div class="bg-white shadow-sm rounded-lg overflow-hidden">
@@ -695,33 +693,33 @@
         const nivelId = parseInt(this.value);
         const gradoSelect = document.getElementById('grado');
 
-            gradoSelect.innerHTML = '';
+        gradoSelect.innerHTML = '';
 
-            if (isNaN(nivelId)) {
-                gradoSelect.disabled = true;
-                gradoSelect.innerHTML = '<option value="">Primero seleccione un nivel educativo</option>';
-                return;
+        if (isNaN(nivelId)) {
+            gradoSelect.disabled = true;
+            gradoSelect.innerHTML = '<option value="">Primero seleccione un nivel educativo</option>';
+            return;
+        }
+
+        const gradosFiltrados = grados.filter(g => g.nivel_educativo_id === nivelId);
+
+        if (gradosFiltrados.length > 0) { 
+            gradoSelect.disabled = false;
+            gradoSelect.innerHTML = '<option value="">Seleccione un grado</option>';
+
+            gradosFiltrados.forEach(grado => {
+                gradoSelect.innerHTML += `<option value="${grado.id_grado}">${grado.grado}°</option>`;
+            });
+            
+            const gradoSeleccionado = '{{ request("grado") }}';
+            if (gradoSeleccionado) {
+                gradoSelect.value = gradoSeleccionado;
             }
-
-            const gradosFiltrados = grados.filter(g => g.nivel_educativo_id === nivelId);
-
-            if (gradosFiltrados.length > 0) {
-                gradoSelect.disabled = false;
-                gradoSelect.innerHTML = '<option value="">Seleccione un grado</option>';
-
-                gradosFiltrados.forEach(grado => {
-                    gradoSelect.innerHTML += `<option value="${grado.id_grado}">${grado.grado}°</option>`;
-                });
-
-                const gradoSeleccionado = '{{ request('grado') }}';
-                if (gradoSeleccionado) {
-                    gradoSelect.value = gradoSeleccionado;
-                }
-            } else {
-                gradoSelect.disabled = true;
-                gradoSelect.innerHTML = '<option value="">No hay grados disponibles</option>';
-            }
-        });
+        } else {
+            gradoSelect.disabled = true;
+            gradoSelect.innerHTML = '<option value="">No hay grados disponibles</option>';
+        }
+    });
 
     // Inicializar dropdown de grados si hay un nivel preseleccionado
     document.addEventListener('DOMContentLoaded', function() {
