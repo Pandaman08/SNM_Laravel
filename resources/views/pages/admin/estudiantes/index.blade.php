@@ -11,106 +11,78 @@
             <p class="text-gray-600 mt-3">Administra todos los estudiantes del sistema</p>
         </div>
 
-        <!-- Controls Section -->
+        <!-- Mensajes -->
+        @if(session('success'))
+            <div class="mb-6 bg-green-50 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                {{ session('success') }}
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                {{ session('error') }}
+            </div>
+        @endif
+
+        <!-- Barra de búsqueda -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <!-- Search Bar -->
                 <div class="flex-1 max-w-md">
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
                         </div>
-                        <input type="text" id="search" placeholder="Buscar por nombre o DNI..."
-                            class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent transition-all duration-200"
+                        <input type="text" id="search" placeholder="Buscar por nombre, apellido o DNI..."
+                            class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent transition-all"
                             oninput="buscarEstudiantes(this.value)">
                     </div>
                 </div>
-
-                <!-- Actions -->
-                <div class="flex items-center space-x-3">
-                    <div class="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
-                        <span class="font-medium">Total: {{ $estudiantes->total() }}</span>
-                    </div>
+                <div class="text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-lg">
+                    <span class="font-medium">Total: {{ $estudiantes->total() }}</span>
                 </div>
             </div>
         </div>
 
-        <!-- Table Section -->
+        <!-- Tabla -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                <div class="flex items-center space-x-2">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                     </svg>
-                                    <span>Estudiante</span>
+                                    Estudiante
                                 </div>
                             </th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                <div class="flex items-center space-x-2">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                        </path>
-                                    </svg>
-                                    <span>Información Personal</span>
-                                </div>
-                            </th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                <div class="flex items-center space-x-2">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                        </path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    </svg>
-                                    <span>Ubicación</span>
-                                </div>
-                            </th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                <div class="flex items-center space-x-2">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                                        </path>
-                                    </svg>
-                                    <span>Cultural</span>
-                                </div>
-                            </th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                Foto
-                            </th>
-                               <th class="px-6 py-4 text-left text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                QR 
-                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Información</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tutores</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ubicación</th>
+                            <th class="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Foto</th>
+                            <th class="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">QR</th>
+                            <th class="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @foreach ($estudiantes as $estudiante)
-                            <tr class="hover:bg-gray-50 transition-colors duration-150">
-                                <!-- Estudiante Info -->
+                            <tr class="hover:bg-gray-50 transition-colors">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <div class="flex-shrink-0">
                                             @if ($estudiante->persona->photo)
-                                                <img class="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
-                                                    src="{{ Storage::url($estudiante->persona->photo) }}"
-                                                    alt="{{ $estudiante->persona->name }}">
+                                                <img class="h-12 w-12 rounded-full object-cover border-2 border-gray-200" 
+                                                    src="{{ Storage::url($estudiante->persona->photo) }}" alt="">
                                             @else
-                                                <div
-                                                    class="h-12 w-12 rounded-full bg-[#2e5382] flex items-center justify-center text-white font-semibold">
+                                                <div class="h-12 w-12 rounded-full bg-[#2e5382] flex items-center justify-center text-white font-semibold">
                                                     {{ strtoupper(substr($estudiante->persona->name, 0, 1)) }}{{ strtoupper(substr($estudiante->persona->lastname, 0, 1)) }}
                                                 </div>
                                             @endif
@@ -119,105 +91,94 @@
                                             <div class="text-sm font-semibold text-gray-900">
                                                 {{ $estudiante->persona->name }} {{ $estudiante->persona->lastname }}
                                             </div>
-                                            <div class="text-sm text-gray-500">
-                                                DNI: {{ $estudiante->persona->dni ?? 'N/A' }}
-                                            </div>
+                                            <div class="text-xs text-gray-500">DNI: {{ $estudiante->persona->dni ?? 'N/A' }}</div>
                                         </div>
                                     </div>
                                 </td>
-
-                                <!-- Información Personal -->
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="space-y-1">
-                                        <div class="text-sm text-gray-900">
-                                            {{ $estudiante->persona->fecha_nacimiento ? \Carbon\Carbon::parse($estudiante->persona->fecha_nacimiento)->format('d/m/Y') : 'N/A' }}
-                                        </div>
-                                        @if ($estudiante->persona->address)
-                                            <div class="text-sm text-gray-500 truncate max-w-xs">
-                                                {{ $estudiante->persona->address }}
-                                            </div>
-                                        @endif
-                                        <div class="flex items-center space-x-2">
-                                            @if ($estudiante->persona->sexo)
-                                                <span
-                                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                                                    {{ $estudiante->persona->sexo === 'M' ? 'Masculino' : 'Femenino' }}
-                                                </span>
-                                            @endif
-                                        </div>
+                                    <div class="text-sm text-gray-900">
+                                        {{ $estudiante->persona->fecha_nacimiento ? \Carbon\Carbon::parse($estudiante->persona->fecha_nacimiento)->format('d/m/Y') : 'N/A' }}
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        {{ $estudiante->persona->sexo === 'M' ? 'Masculino' : 'Femenino' }}
                                     </div>
                                 </td>
-
-                                <!-- Ubicación -->
+                                <td class="px-6 py-4">
+                                    @if($estudiante->tutores && $estudiante->tutores->count() > 0)
+                                        <div class="space-y-1.5">
+                                            @foreach($estudiante->tutores as $tutor)
+                                                <div class="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-2 hover:bg-blue-100 transition-colors">
+                                                    <div class="flex-1 min-w-0 mr-2">
+                                                        <div class="text-xs font-medium text-gray-900 truncate">
+                                                            {{ $tutor->user->persona->name }} {{ $tutor->user->persona->lastname }}
+                                                        </div>
+                                                        <div class="text-xs text-gray-500 truncate">
+                                                            {{ $tutor->user->email }}
+                                                        </div>
+                                                        @if($tutor->pivot->tipo_relacion)
+                                                            <div class="mt-1">
+                                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                                                    {{ $tutor->pivot->tipo_relacion }}
+                                                                </span>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                    <button type="button" 
+                                                        onclick="openEmailModal({{ $estudiante->codigo_estudiante }}, '{{ addslashes($estudiante->persona->name . ' ' . $estudiante->persona->lastname) }}', '{{ addslashes($tutor->user->persona->name . ' ' . $tutor->user->persona->lastname) }}', '{{ $tutor->user->email }}')"
+                                                        class="flex-shrink-0 p-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                                                        title="Enviar correo">
+                                                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <span class="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">Sin tutores</span>
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="space-y-1">
-                                        <div class="text-sm text-gray-900">
-                                            <span class="font-medium">País:</span> {{ $estudiante->pais ?? 'N/A' }}
-                                        </div>
-                                        <div class="text-sm text-gray-900">
-                                            <span class="font-medium">Departamento:</span>
-                                            {{ $estudiante->departamento ?? 'N/A' }}
-                                        </div>
-                                        <div class="text-sm text-gray-900">
-                                            <span class="font-medium">Provincia:</span>
-                                            {{ $estudiante->provincia ?? 'N/A' }}
-                                        </div>
-                                        <div class="text-sm text-gray-900">
-                                            <span class="font-medium">Distrito:</span> {{ $estudiante->distrito ?? 'N/A' }}
-                                        </div>
+                                    <div class="text-xs text-gray-900 space-y-0.5">
+                                        <div><span class="font-medium">País:</span> {{ $estudiante->pais ?? 'N/A' }}</div>
+                                        <div><span class="font-medium">Dpto:</span> {{ $estudiante->departamento ?? 'N/A' }}</div>
+                                        <div><span class="font-medium">Dist:</span> {{ $estudiante->distrito ?? 'N/A' }}</div>
                                     </div>
                                 </td>
-
-                                <!-- Cultural -->
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="space-y-1">
-                                        <div class="text-sm text-gray-900">
-                                            <span class="font-medium">Lengua materna:</span>
-                                            {{ $estudiante->lengua_materna ?? 'N/A' }}
-                                        </div>
-                                        <div class="text-sm text-gray-900">
-                                            <span class="font-medium">Religión:</span>
-                                            {{ $estudiante->religion ?? 'N/A' }}
-                                        </div>
-                                    </div>
-                                </td>
-
-                                <!-- Foto -->
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <td class="px-6 py-4 text-center">
                                     @if ($estudiante->persona->photo)
-                                        <button
-                                            class="inline-flex items-center justify-center w-8 h-8 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-150"
-                                            onclick="openModal('{{ Storage::url($estudiante->persona->photo) }}', 'image')"
-                                            title="Ver foto">
-                                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                                </path>
+                                        <button onclick="openModal('{{ Storage::url($estudiante->persona->photo) }}', 'image')" 
+                                            class="inline-flex items-center justify-center w-8 h-8 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                             </svg>
                                         </button>
                                     @else
-                                        <span class="text-sm text-gray-400">Sin foto</span>
+                                        <span class="text-xs text-gray-400">Sin foto</span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <td class="px-6 py-4 text-center">
                                     @if ($estudiante->qrImageRender())
-                                        <button type="button" class="inline-block p-2 bg-white rounded-lg shadow-md border border-gray-200" onclick="openModal('{{ Storage::url('qrcodes/' . $estudiante->qr_code . '.png') }}', 'qr')">
-                                            <img src="{{ Storage::url('qrcodes/' . $estudiante->qr_code . '.png')  }}"
-                                                alt="Código QR de {{ $estudiante->persona->name }}"
-                                                class="w-20 h-20 mx-auto object-contain rounded-lg border-2 border-gray-100 shadow-sm"
-                                                onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0iI2YzZjNmMyIvPjxwYXRoIGQ9Ik02IDZINhY2SDE4VjE4SDZWNlpNOCA4VjE2SDE2VjhIOFpNMTAgMTBIMTRWMTRIMTBWMTBaIiBmaWxsPSIjOTk5Ii8+PC9zdmc+'">
+                                        <button onclick="openModal('{{ Storage::url('qrcodes/' . $estudiante->qr_code . '.png') }}', 'qr')" 
+                                            class="inline-block p-1 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+                                            <img src="{{ Storage::url('qrcodes/' . $estudiante->qr_code . '.png') }}" 
+                                                class="w-14 h-14" alt="QR">
                                         </button>
                                     @else
-                                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-                                            <svg class="w-4 h-4 text-yellow-500 mx-auto mb-3" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                            </svg>
-                                            <p class="text-yellow-700 font-medium"> QR no disponible</p>
-                                        </div>
+                                        <span class="text-xs text-yellow-600">Sin QR</span>
                                     @endif
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <button onclick='openEditModal(@json($estudiante))' 
+                                        class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors shadow-sm hover:shadow">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Editar
+                                    </button>
                                 </td>
                             </tr>
                         @endforeach
@@ -226,149 +187,142 @@
             </div>
         </div>
 
-        <!-- Pagination -->
+        <!-- Paginación -->
         <div class="flex justify-between items-center mt-6">
             <div class="text-sm text-gray-600">
-                Mostrando {{ $estudiantes->firstItem() ?? 0 }} a {{ $estudiantes->lastItem() ?? 0 }} de
-                {{ $estudiantes->total() }}
-                resultados
+                Mostrando {{ $estudiantes->firstItem() ?? 0 }} a {{ $estudiantes->lastItem() ?? 0 }} de {{ $estudiantes->total() }}
             </div>
-            <div class="flex justify-end">
-                {{ $estudiantes->links('pagination::tailwind') }}
-            </div>
+            {{ $estudiantes->links('pagination::tailwind') }}
         </div>
     </div>
 
-    <!-- Modal para visualizar imágenes -->
-    <div id="archivoModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-xl shadow-xl max-w-4xl max-h-[90vh] overflow-hidden mx-4">
-            <div class="flex justify-between items-center p-4 border-b border-gray-200">
-                <h3 id="modal-title" class="text-lg font-semibold text-gray-900">Foto de Perfil</h3>
-                <button class="text-gray-400 hover:text-gray-600 transition-colors" onclick="closeModal()">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                </button>
-            </div>
-            <div id="modalContent" class="p-4"></div>
-        </div>
-    </div>
-
-    <!-- Modal de Edición -->
-    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 w-full h-full">
-        <div class="flex items-center justify-center w-full h-full">
-            <div class="bg-white px-8 py-6 rounded-lg shadow-xl max-w-4xl w-full relative max-h-screen overflow-y-auto">
-                <div class="text-center mb-8">
-                    <h2 class="text-2xl font-semibold text-blue-800">Editar Estudiante</h2>
-                    <div class="mx-auto mt-2 w-1/5 h-1 bg-green-400"></div>
+    <!-- Modal Edición -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="sticky top-0 z-10 flex justify-between items-center p-5 border-b bg-gradient-to-r from-[#2e5382] to-[#1e3a5f]">
+                    <div class="text-white">
+                        <h2 class="text-xl font-semibold flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            Editar Estudiante
+                        </h2>
+                        <p class="text-sm text-blue-100 mt-1">Actualiza la información del estudiante</p>
+                    </div>
+                    <button onclick="closeEditModal()" class="text-white hover:text-blue-200 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
 
-                <form id="editForm" action="" method="POST" enctype="multipart/form-data" class="space-y-6">
+                <form id="editForm" method="POST" enctype="multipart/form-data" class="p-6">
                     @csrf
                     @method('PUT')
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Columna Izquierda -->
-                        <div class="space-y-4">
+                    <!-- Preview Foto -->
+                    <div class="mb-6 pb-6 border-b">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Foto de Perfil</label>
+                        <div class="flex items-center gap-4">
+                            <img id="edit_photo_preview" src="" alt="Preview" 
+                                class="w-20 h-20 rounded-full object-cover border-2 border-gray-300">
                             <div>
-                                <label for="edit_name" class="block text-gray-700">Nombres:</label>
-                                <input type="text" id="edit_name" name="name"
-                                    class="w-full px-4 py-2 border rounded" required>
-                            </div>
-                            <div>
-                                <label for="edit_lastname" class="block text-gray-700">Apellidos:</label>
-                                <input type="text" id="edit_lastname" name="lastname"
-                                    class="w-full px-4 py-2 border rounded" required>
-                            </div>
-                            <div>
-                                <label for="edit_dni" class="block text-gray-700">DNI:</label>
-                                <input type="text" id="edit_dni" name="dni"
-                                    class="w-full px-4 py-2 border rounded" required maxlength="8">
-                            </div>
-
-                            <div>
-                                <label for="edit_sexo" class="block text-gray-700">Sexo:</label>
-                                <select id="edit_sexo" name="sexo" class="w-full px-4 py-2 border rounded">
-                                    <option value="M">Masculino</option>
-                                    <option value="F">Femenino</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="edit_address" class="block text-gray-700">Dirección:</label>
-                                <input type="text" id="edit_address" name="address"
-                                    class="w-full px-4 py-2 border rounded" required>
-                            </div>
-                        </div>
-
-                        <!-- Columna Derecha -->
-                        <div class="space-y-4">
-                            <div>
-                                <label for="edit_fecha_nacimiento" class="block text-gray-700">Fecha Nacimiento:</label>
-                                <input type="date" id="edit_fecha_nacimiento" name="fecha_nacimiento"
-                                    class="w-full px-4 py-2 border rounded" required>
-                            </div>
-                            <div>
-                                <label for="edit_pais" class="block text-gray-700">País:</label>
-                                <input type="text" id="edit_pais" name="pais"
-                                    class="w-full px-4 py-2 border rounded" required>
-                            </div>
-                            <div>
-                                <label for="edit_provincia" class="block text-gray-700">Provincia:</label>
-                                <input type="text" id="edit_provincia" name="provincia"
-                                    class="w-full px-4 py-2 border rounded" required>
-                            </div>
-                            <div>
-                                <label for="edit_distrito" class="block text-gray-700">Distrito:</label>
-                                <input type="text" id="edit_distrito" name="distrito"
-                                    class="w-full px-4 py-2 border rounded" required>
-                            </div>
-                            <div>
-                                <label for="edit_departamento" class="block text-gray-700">Departamento:</label>
-                                <input type="text" id="edit_departamento" name="departamento"
-                                    class="w-full px-4 py-2 border rounded" required>
-                            </div>
-                            <div>
-                                <label for="edit_lengua_materna" class="block text-gray-700">Lengua Materna:</label>
-                                <input type="text" id="edit_lengua_materna" name="lengua_materna"
-                                    class="w-full px-4 py-2 border rounded" required>
-                            </div>
-                            <div>
-                                <label for="edit_religion" class="block text-gray-700">Religión:</label>
-                                <input type="text" id="edit_religion" name="religion"
-                                    class="w-full px-4 py-2 border rounded" required>
+                                <label for="edit_photo" 
+                                    class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    Cambiar Foto
+                                </label>
+                                <input type="file" id="edit_photo" name="photo" class="hidden" accept="image/*">
+                                <p class="text-xs text-gray-500 mt-1">JPG, PNG (máx. 2MB)</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Foto de perfil -->
-                    <div class="mt-6">
-                        <label class="block text-gray-700 mb-1">Foto de Perfil:</label>
-                        <div id="edit-image-upload"
-                            class="border-2 border-dashed border-gray-300 w-full h-52 flex flex-col items-center justify-center cursor-pointer relative text-center rounded-md"
-                            onclick="document.getElementById('edit_photo').click()">
-                            <span id="edit-image-placeholder" class="text-gray-500 flex flex-col items-center">
-                                <svg class="w-8 h-8 mb-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 20 16">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
-                                </svg>
-                                Selecciona o arrastra una imagen
-                            </span>
-                            <img id="previewImg" src="" alt="Vista previa"
-                                class="hidden w-52 h-full object-cover rounded shadow mx-auto">
-                            <input type="file" id="edit_photo" name="photo" class="hidden" accept="image/*">
+                    <!-- Campos del formulario -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombres <span class="text-red-500">*</span></label>
+                            <input type="text" id="edit_name" name="name" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Apellidos <span class="text-red-500">*</span></label>
+                            <input type="text" id="edit_lastname" name="lastname" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">DNI <span class="text-red-500">*</span></label>
+                            <input type="text" id="edit_dni" name="dni" required maxlength="8" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sexo <span class="text-red-500">*</span></label>
+                            <select id="edit_sexo" name="sexo" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent">
+                                <option value="">Seleccionar</option>
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Nacimiento <span class="text-red-500">*</span></label>
+                            <input type="date" id="edit_fecha_nacimiento" name="fecha_nacimiento" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">País <span class="text-red-500">*</span></label>
+                            <input type="text" id="edit_pais" name="pais" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Departamento <span class="text-red-500">*</span></label>
+                            <input type="text" id="edit_departamento" name="departamento" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Provincia <span class="text-red-500">*</span></label>
+                            <input type="text" id="edit_provincia" name="provincia" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Distrito <span class="text-red-500">*</span></label>
+                            <input type="text" id="edit_distrito" name="distrito" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Lengua Materna <span class="text-red-500">*</span></label>
+                            <input type="text" id="edit_lengua_materna" name="lengua_materna" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Religión <span class="text-red-500">*</span></label>
+                            <input type="text" id="edit_religion" name="religion" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent">
                         </div>
                     </div>
 
-                    <div class="flex justify-center gap-4 mt-6">
-                        <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-700">
-                            Actualizar
-                        </button>
-                        <button type="button" onclick="closeEditModal()"
-                            class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-700">
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Dirección <span class="text-red-500">*</span></label>
+                        <textarea id="edit_address" name="address" required rows="2" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent"></textarea>
+                    </div>
+
+                    <div class="flex justify-end gap-3 mt-6 pt-6 border-t">
+                        <button type="button" onclick="closeEditModal()" 
+                            class="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium">
                             Cancelar
+                        </button>
+                        <button type="submit" 
+                            class="px-5 py-2 bg-gradient-to-r from-[#2e5382] to-[#1e3a5f] text-white rounded-lg hover:from-[#1e3a5f] hover:to-[#2e5382] transition-all shadow-md hover:shadow-lg font-medium flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Guardar Cambios
                         </button>
                     </div>
                 </form>
@@ -376,98 +330,82 @@
         </div>
     </div>
 
+    <!-- Modal Imagen/QR -->
+    <div id="archivoModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl max-w-4xl mx-4 overflow-hidden">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 id="modal-title" class="text-lg font-semibold text-gray-900"></h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="modalContent" class="p-4"></div>
+        </div>
+    </div>
 
-
-    @if (session('success'))
-        <script>
-            Swal.fire({
-                title: "Actualizado!",
-                text: "{{ session('success') }}",
-                icon: "success",
-                customClass: {
-                    confirmButton: 'bg-green-500 text-white hover:bg-green-600 focus:ring-2 focus:ring-green-300 rounded-lg py-2 px-4'
-                }
-            });
-        </script>
-    @elseif (session('error'))
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                html: "{!! session('error') !!}",
-                customClass: {
-                    confirmButton: 'bg-red-500 text-white hover:bg-red-600 focus:ring-2 focus:ring-red-300 rounded-lg py-2 px-4'
-                }
-            });
-        </script>
-    @endif
+    <!-- Modal Email -->
+    <div id="emailModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center p-5 border-b bg-gradient-to-r from-[#2e5382] to-[#1e3a5f]">
+                <div class="text-white">
+                    <h3 class="text-lg font-semibold flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Enviar Mensaje al Tutor
+                    </h3>
+                    <p class="text-sm text-blue-100 mt-1">Estudiante: <span id="estudianteNombre" class="font-medium"></span></p>
+                    <p class="text-xs text-blue-200">Para: <span id="tutorName"></span> (<span id="tutorEmail"></span>)</p>
+                </div>
+                <button onclick="closeEmailModal()" class="text-white hover:text-blue-200 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form action="{{ route('estudiantes.enviar-correo-tutor') }}" method="POST" class="p-6">
+                @csrf
+                <input type="hidden" name="codigo_estudiante" id="codigo_estudiante">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Asunto <span class="text-red-500">*</span></label>
+                        <input type="text" name="asunto" id="asunto" required 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent"
+                            placeholder="Ej: Reunión de padres, Boleta de notas">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Mensaje <span class="text-red-500">*</span></label>
+                        <textarea name="mensaje" id="mensaje" rows="5" required 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e5382] focus:border-transparent"
+                            placeholder="Escriba el mensaje que desea enviar al tutor..."></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeEmailModal()" 
+                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" 
+                        class="px-4 py-2 bg-[#2e5382] text-white rounded-lg hover:bg-[#1e3a5f] transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Enviar Correo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
-        function openEditModal(button) {
-            const estudiante = JSON.parse(button.getAttribute('data-estudiante'));
-
-            // Datos personales
-            document.getElementById('edit_name').value = estudiante.persona.name;
-            document.getElementById('edit_lastname').value = estudiante.persona.lastname;
-            document.getElementById('edit_dni').value = estudiante.persona.dni;
-            document.getElementById('edit_sexo').value = estudiante.persona.sexo;
-            document.getElementById('edit_address').value = estudiante.persona.address;
-            const fechaNacimiento = new Date(estudiante.persona.fecha_nacimiento);
-            document.getElementById('edit_fecha_nacimiento').value = fechaNacimiento.toISOString().split('T')[0];
-
-            // Datos de estudiante
-            document.getElementById('edit_pais').value = estudiante.pais;
-            document.getElementById('edit_provincia').value = estudiante.provincia;
-            document.getElementById('edit_distrito').value = estudiante.distrito;
-            document.getElementById('edit_departamento').value = estudiante.departamento;
-            document.getElementById('edit_lengua_materna').value = estudiante.lengua_materna;
-            document.getElementById('edit_religion').value = estudiante.religion;
-
-            // Foto de perfil
-            const previewImg = document.getElementById('previewImg');
-            if (estudiante.persona.photo) {
-                previewImg.src = `/storage/${estudiante.persona.photo}`;
-                previewImg.classList.remove('hidden');
-                document.getElementById('edit-image-placeholder').classList.add('hidden');
-            } else {
-                previewImg.src = '';
-                previewImg.classList.add('hidden');
-                document.getElementById('edit-image-placeholder').classList.remove('hidden');
-            }
-
-            // Establecer acción del formulario
-            document.getElementById('editForm').action = `/estudiantes/${estudiante.id}`;
-
-            // Mostrar modal
-            document.getElementById('editModal').classList.remove('hidden');
-        }
-
-        function closeEditModal() {
-            document.getElementById('editModal').classList.add('hidden');
-        }
-
-        function buscarEstudiantes(query) {
-            fetch(`/estudiantes/buscar?search=${query}`, {
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const tableBody = doc.querySelector('tbody');
-                    document.querySelector('tbody').innerHTML = tableBody.innerHTML;
-                })
-                .catch(error => console.error('Error:', error));
-        }
-
-        function openModal(imageUrl, type) {
-            const modalContent = document.getElementById('modalContent');
-            const modalTitle = document.getElementById('modal-title');
-            modalTitle.textContent = type === 'image' ? 'Foto de Perfil' : 'QR Code';
-            modalContent.innerHTML = `<img src="${imageUrl}" class="w-full max-h-[75vh] object-contain">`;
+        // Modal para imágenes y QR
+        function openModal(url, type) {
+            document.getElementById('modal-title').textContent = type === 'image' ? 'Foto de Perfil' : 'Código QR';
+            document.getElementById('modalContent').innerHTML = `<img src="${url}" class="max-h-[70vh] w-auto mx-auto rounded-lg">`;
             document.getElementById('archivoModal').classList.remove('hidden');
         }
 
@@ -475,22 +413,134 @@
             document.getElementById('archivoModal').classList.add('hidden');
         }
 
-        // Preview de imagen en edición
+        // Modal para email
+        function openEmailModal(codigo, estudiante, tutor, email) {
+            document.getElementById('codigo_estudiante').value = codigo;
+            document.getElementById('estudianteNombre').textContent = estudiante;
+            document.getElementById('tutorName').textContent = tutor;
+            document.getElementById('tutorEmail').textContent = email;
+            document.getElementById('asunto').value = '';
+            document.getElementById('mensaje').value = '';
+            document.getElementById('emailModal').classList.remove('hidden');
+        }
+
+        function closeEmailModal() {
+            document.getElementById('emailModal').classList.add('hidden');
+        }
+
+        // Modal de edición
+        function openEditModal(est) {
+            document.getElementById('editForm').action = `/estudiantes/${est.codigo_estudiante}`;
+            document.getElementById('edit_name').value = est.persona.name || '';
+            document.getElementById('edit_lastname').value = est.persona.lastname || '';
+            document.getElementById('edit_dni').value = est.persona.dni || '';
+            document.getElementById('edit_sexo').value = est.persona.sexo || '';
+            document.getElementById('edit_fecha_nacimiento').value = est.persona.fecha_nacimiento || '';
+            document.getElementById('edit_address').value = est.persona.address || '';
+            document.getElementById('edit_pais').value = est.pais || '';
+            document.getElementById('edit_departamento').value = est.departamento || '';
+            document.getElementById('edit_provincia').value = est.provincia || '';
+            document.getElementById('edit_distrito').value = est.distrito || '';
+            document.getElementById('edit_lengua_materna').value = est.lengua_materna || '';
+            document.getElementById('edit_religion').value = est.religion || '';
+            
+            // Preview de foto
+            const photoPreview = document.getElementById('edit_photo_preview');
+            if (est.persona.photo) {
+                photoPreview.src = `/storage/${est.persona.photo}`;
+            } else {
+                photoPreview.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE4IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+U2luIGZvdG88L3RleHQ+PC9zdmc+';
+            }
+            
+            document.getElementById('editModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            document.getElementById('editForm').reset();
+            document.body.style.overflow = 'auto';
+        }
+
+        // Búsqueda en tiempo real
+        function buscarEstudiantes(query) {
+            fetch(`/estudiantes/buscar?search=${query}`, {
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+            .then(r => r.text())
+            .then(html => {
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const tbody = doc.querySelector('tbody');
+                if (tbody) document.querySelector('tbody').innerHTML = tbody.innerHTML;
+            })
+            .catch(err => console.error('Error:', err));
+        }
+
+        // Preview de foto al seleccionar
         document.getElementById('edit_photo').addEventListener('change', function(e) {
-            const previewImg = document.getElementById('previewImg');
-            const placeholder = document.getElementById('edit-image-placeholder');
-
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    previewImg.src = e.target.result;
-                    previewImg.classList.remove('hidden');
-                    placeholder.classList.add('hidden');
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 2097152) {
+                    alert('La imagen no debe superar los 2MB');
+                    this.value = '';
+                    return;
                 }
-
-                reader.readAsDataURL(this.files[0]);
+                if (!file.type.match('image.*')) {
+                    alert('El archivo debe ser una imagen');
+                    this.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('edit_photo_preview').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
             }
         });
+
+        // Validación de DNI
+        document.getElementById('edit_dni').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8);
+        });
+
+        // Cerrar modales con ESC
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeEmailModal();
+                closeEditModal();
+            }
+        });
+
+        // Cerrar modales al hacer clic fuera
+        ['archivoModal', 'emailModal', 'editModal'].forEach(modalId => {
+            document.getElementById(modalId).addEventListener('click', function(e) {
+                if (e.target === this) {
+                    if (modalId === 'archivoModal') closeModal();
+                    else if (modalId === 'emailModal') closeEmailModal();
+                    else closeEditModal();
+                }
+            });
+        });
     </script>
+
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                title: "¡Éxito!",
+                text: "{{ session('success') }}",
+                icon: "success",
+                confirmButtonText: 'Aceptar'
+            });
+        </script>
+    @elseif (session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: '¡Error!',
+                html: "{!! session('error') !!}",
+                confirmButtonText: 'Aceptar'
+            });
+        </script>
+    @endif
 @endsection
