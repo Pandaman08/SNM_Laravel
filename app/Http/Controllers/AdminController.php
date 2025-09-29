@@ -108,49 +108,8 @@ class AdminController extends Controller
     }
 
 
-    public function panel_docente()
-    {
-        $user = Auth::user();
-        $numAsign = AsignaturaDocente::where('codigo_docente', '=', $user->docente->codigo_docente)->get()->count();
-        return view("pages.admin.panels.docente", compact('user', 'numAsign'));
-    }
 
-    public function panel_secretaria()
-    {
-        $user = Auth::user();
-        $matriculas = Matricula::get();
-        return view("pages.admin.panels.secretaria", compact('user', 'matriculas'));
-    }
-
-    public function panel_tutor()
-    {
-        $user = Auth::user();
-        return view("pages.admin.panels.tutor", compact('user'));
-    }
-
-    public function index_tutor()
-    {
-        $users = User::where('estado', false)->paginate(10);
-        return view("pages.admin.users.tutores", compact("users"));
-    }
-
-    public function showDocente(Request $request)
-    {
-        $query = $request->input('search');
-
-        $users = User::where('rol', '=', 'docente')
-            ->when($query, function ($queryBuilder) use ($query) {
-                $queryBuilder->where(function ($q) use ($query) {
-                    $q->where('name', 'like', '%' . $query . '%')
-                        ->orWhere('lastname', 'like', '%' . $query . '%')
-                        ->orWhere('email', 'like', '%' . $query . '%');
-                });
-            })
-            ->paginate(10);
-        $roles = UserRole::cases();
-
-        return view('pages.admin.docentes.index', compact('users', 'roles'));
-    }
+    
 
     // MÉTODO MODIFICADO: Aprobar usuario con notificación email
     public function approveUser($id)

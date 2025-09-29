@@ -16,6 +16,7 @@ class PagoController extends Controller
 
     public function index(Request $request)
     {
+        
         $searchTerm = $request->input('buscarpor');
         $userId = auth()->user()->user_id; // Obtener el ID del usuario autenticado
         
@@ -129,6 +130,7 @@ class PagoController extends Controller
                 ->with('error', 'Error al registrar el pago: ' . $e->getMessage());
         }
     }
+    
 
     public function edit($id)
     {
@@ -241,7 +243,19 @@ class PagoController extends Controller
             return redirect()->back()
                 ->with('error', 'Error al eliminar el pago: ' . $e->getMessage());
         }
+        
     }
+
+
+    public function panelTesoreria()
+    {
+
+    $pagados = Pago::where('estado', 'Finalizado')->count(); 
+    $pendientes = Pago::where('estado', 'Pendiente')->count();
+    $matriculas = Matricula::all();
+    
+    return view('panel.tesoreria', compact('pagados', 'pendientes', 'matriculas'));
+}
 
     public function handleFileSize()
     {

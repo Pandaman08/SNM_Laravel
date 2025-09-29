@@ -219,7 +219,7 @@
                                             <div class="ml-4">
                                                 <div class="text-sm font-medium text-gray-900">
                                                     {{ $matricula->estudiante->persona->name }}
-                                                    {{ $matricula->estudiante->persona->lastName }}
+                                                    {{ $matricula->estudiante->persona->lastname }}
                                                 </div>
                                                 <div class="text-sm text-gray-500">
                                                     DNI: {{ $matricula->estudiante->persona->dni }}

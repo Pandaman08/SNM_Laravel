@@ -96,7 +96,7 @@
                     <div class="space-y-6">
                         <form id="attendanceForm" action="{{ route('asistencia.process-scan') }}" method="POST" class="space-y-4">
                             @csrf
-                            <div>
+                            {{-- <div>
                                 <label for="id_periodo" class="block text-sm font-medium text-gray-700 mb-2">Periodo Académico *</label>
                                 <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200" 
                                         id="id_periodo" name="id_periodo" required>
@@ -105,7 +105,8 @@
                                         <option value="{{ $periodo->id_periodo }}">{{ $periodo->nombre }}</option>
                                     @endforeach
                                 </select>
-                            </div>
+                            </div> --}}
+                           <input type="hidden" id="id_periodo" name="id_periodo" value="{{ $periodoActual->id_periodo }}">
                             
                             <div>
                                 <label for="qr_code" class="block text-sm font-medium text-gray-700 mb-2">Código QR Escaneado</label>
@@ -277,7 +278,7 @@ let cameras = [];
 let currentCameraId = null;
 
 // Debug mode - cambiar a false en producción
-const DEBUG = true;
+const DEBUG = false;
 
 function debugLog(message, data = null) {
     if (DEBUG) {
