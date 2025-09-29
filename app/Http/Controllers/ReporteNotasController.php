@@ -11,13 +11,6 @@ use App\Models\Periodo;
 use App\Models\Matricula;
 use App\Models\EstudianteTutor;
 use App\Models\TipoCalificacion;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\StreamedResponse;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -93,32 +86,7 @@ class ReporteNotasController extends Controller
 
         return view('pages.admin.reporte_notas.create', compact('matricula', 'detalles_asignatura', 'tipos_cal', 'periodos', 'id_asignatura'));
     }
-    /*
-        public function store(Request $request)
-        {
-            $validated = $request->validate([
-                'id_detalle_asignatura' => 'required|exists:detalles_asignatura,id_detalle_asignatura',
-                'id_tipo_calificacion' => 'required|exists:tipos_calificacion,id_tipo_calificacion',
-                'id_periodo' => 'required|exists:periodos,id_periodo',
-                'observacion' => 'max:255',
-                'fecha_registro' => 'required|date',
-                'id_asignatura' => 'required|exists:asignaturas,codigo_asignatura',
-            ]);
 
-            // Crear el reporte con los campos definidos explícitamente
-            ReporteNota::create([
-                'id_detalle_asignatura' => $validated['id_detalle_asignatura'],
-                'id_tipo_calificacion' => $validated['id_tipo_calificacion'],
-                'id_periodo' => $validated['id_periodo'],
-                'observacion' => $validated['observacion'],
-                'fecha_registro' => $validated['fecha_registro'],
-            ]);
-
-            return redirect()
-                ->route('docentes.estudiantes', ['id_asignatura' => $validated['id_asignatura']])
-                ->with('success', 'Nota registrada correctamente.');
-        }
-                */
 
     public function store(Request $request)
     {
@@ -325,16 +293,23 @@ class ReporteNotasController extends Controller
             ]);
         }
 
-        // Preparar datos para la vista
         $estudiantes = $estudiantesTutor->map(function ($item) {
-            $matricula = $item->estudiante->matriculas->first();
+            // Filtrar y luego obtener la primera matrícula activa del año actual
+            $matriculaActiva = $item->estudiante->matriculas->filter(function ($matricula) {
+                return $matricula->estado === 'activo' &&
+                    $matricula->anioEscolar &&
+                    $matricula->anioEscolar->anio == date('Y');
+            })->first();
+
             return [
                 'id_estudiante' => $item->estudiante->codigo_estudiante,
-                'codigo_matricula' => $matricula ? $matricula->codigo_matricula : null,
+                'codigo_matricula' => $matriculaActiva ? $matriculaActiva->codigo_matricula : null,
                 'nombre_completo' => $item->estudiante->persona->name . ' ' . $item->estudiante->persona->lastname,
                 'dni' => $item->estudiante->persona->dni,
-                'grado' => $matricula && $matricula->seccion ? $matricula->seccion->grado->grado : 'Sin matrícula',
-                'seccion' => $matricula && $matricula->seccion ? $matricula->seccion->seccion : 'N/A'
+                'grado' => $matriculaActiva && $matriculaActiva->seccion ? $matriculaActiva->seccion->grado->grado : 'Sin matrícula activa',
+                'seccion' => $matriculaActiva && $matriculaActiva->seccion ? $matriculaActiva->seccion->seccion : 'N/A',
+                'tiene_matricula_activa' => (bool) $matriculaActiva,
+                'estado_matricula' => $matriculaActiva ? $matriculaActiva->estado : 'sin_matricula'
             ];
         });
 
@@ -484,7 +459,7 @@ class ReporteNotasController extends Controller
         $pdf = Pdf::loadView('pages.admin.reporte_notas.reporte-pdf', [
             'matricula' => $matricula,
             'asignaturas' => $asignaturas,
-            'fecha' => Carbon::parse(  now())->format('d/m/Y')
+            'fecha' => Carbon::parse(now())->format('d/m/Y')
         ]);
 
         return $pdf->download('reporte-calificaciones-' . $matricula->estudiante->persona->lastname . '.pdf');
@@ -519,11 +494,6 @@ class ReporteNotasController extends Controller
     {
         $asignatura = Asignatura::findOrFail($id_asignatura);
 
-        /*  $competencias = Competencia::where('codigo_asignatura', $id_asignatura)->get();
-          $competenciaIds = $competencias->pluck('id_competencias');
-
-          $detalles = DetalleAsignatura::whereIn('id_competencias', $competenciaIds)->get();
-          $detalleIds = $detalles->pluck('id_detalle_asignatura'); */
 
 
         $reportes = \DB::table('matriculas as m')->where('m.estado', '=', 'activo')
@@ -552,20 +522,9 @@ class ReporteNotasController extends Controller
             ->orderBy('p.lastname')
             ->get();
 
-
-        /*$reportes = ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
-            ->with([
-                'detalleAsignatura' => function ($query) {
-                    $query->select('*');
-                },
-                'tipoCalificacion',
-                'periodo'
-            ])
-            ->get(); */
-
         return view('pages.admin.reporte_notas.docentes-view', compact('reportes', 'asignatura'));
     }
 
-   
+
 
 }

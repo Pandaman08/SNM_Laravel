@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Matricula;
 use App\Models\TipoMatricula;
@@ -117,7 +118,7 @@ class MatriculaController extends Controller
                     'apellidos' => $estudiante->persona->lastname,
                     'dni' => $estudiante->persona->dni,
                     'sexo' => $estudiante->persona->sexo,
-                    'fecha_nacimiento' => $estudiante->persona->fecha_nacimiento->format('Y-m-d'),
+                    'fecha_nacimiento' => Carbon::parse($estudiante->persona->fecha_nacimiento)->format('Y-m-d'),
                     'pais' => $estudiante->pais,
                     'provincia' => $estudiante->provincia,
                     'distrito' => $estudiante->distrito,

@@ -44,25 +44,25 @@
                         <h2 class="text-xl font-bold">Gestión Académica</h2>
                     </div>
                     <div class="p-6 grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <a href="" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-blue-50 transition-colors">
+                        <a href="{{route('docentes.asignaturas')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-blue-50 transition-colors">
                             <div class="p-3 rounded-full bg-blue-100 text-blue-600 mb-2">
                                 <i class="ri-file-edit-fill text-xl"></i>
                             </div>
                             <span class="text-sm font-medium text-center">Registrar Notas</span>
                         </a>
-                        <a href="" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-green-50 transition-colors">
+                        <a href="{{route('docentes.asignaturas')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-green-50 transition-colors">
                             <div class="p-3 rounded-full bg-green-100 text-green-600 mb-2">
                                 <i class="ri-book-2-fill text-xl"></i>
                             </div>
                             <span class="text-sm font-medium text-center">Mis Cursos</span>
                         </a>
-                        <a href="" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-purple-50 transition-colors">
+                        <a href="{{route('docente.mis_estudiantes')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-purple-50 transition-colors">
                             <div class="p-3 rounded-full bg-purple-100 text-purple-600 mb-2">
                                 <i class="ri-team-fill text-xl"></i>
                             </div>
                             <span class="text-sm font-medium text-center">Mis Estudiantes</span>
                         </a>
-                        <a href="" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-amber-50 transition-colors">
+                        <a href="{{route('asistencias.index')}}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-amber-50 transition-colors">
                             <div class="p-3 rounded-full bg-amber-100 text-amber-600 mb-2">
                                 <i class="ri-calendar-check-fill text-xl"></i>
                             </div>
@@ -74,7 +74,7 @@
                             </div>
                             <span class="text-sm font-medium text-center">Subir Material</span>
                         </a>
-                        <a href="" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-indigo-50 transition-colors">
+                        <a href="{{ route('users.edit_user') }}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-indigo-50 transition-colors">
                             <div class="p-3 rounded-full bg-indigo-100 text-indigo-600 mb-2">
                                 <i class="ri-settings-4-fill text-xl"></i>
                             </div>

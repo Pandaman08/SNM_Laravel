@@ -66,12 +66,16 @@ Route::middleware('auth')->group(function () {
     Route::delete('/asignaturas/{id}', [AsignaturaController::class, 'destroy'])->name('asignaturas.destroy');
     Route::get('/asignaturas/asignar-docentes', [AsignaturaController::class, 'show'])->name('asignaturas.asignar.docentes');
     Route::get('/asignaturas/asignar/{id}', [AsignaturaController::class, 'asignar'])->name('asignaturas.asignar');
-    Route::post('/asignaturas/asignar', [AsignaturaController::class, 'storeAsignacion'])->name('asignaturas.storeAsignacion');
+    Route::post('/asignaturas/store-asignacion', [AsignaturaController::class, 'storeAsignacion'])->name('asignaturas.storeAsignacion');
     Route::put('/actualizar-asignacion', [AsignaturaController::class, 'updateAsignacion'])->name('asignaturas.updateAsignacion');
     Route::delete('/remover-asignacion', [AsignaturaController::class, 'removeAsignacion'])->name('asignaturas.removeAsignacion');
+    Route::post('/asignaturas/agregar-docente', [AsignaturaController::class, 'agregarDocente'])->name('asignaturas.agregarDocente');
+    Route::post('/asignaturas/remover-docente', [AsignaturaController::class, 'removeAsignacion'])->name('asignaturas.removeAsignacion');
     Route::get('cancelar', function () {
         return redirect()->route('asignaturas.asignar.docentes');
     })->name('ruta.cancelar');
+    Route::get('/asignaturas/{codigoAsignatura}/docentes-activos', [AsignaturaController::class, 'getDocentesActivos'])->name('asignaturas.docentesActivos');
+    Route::get('/asignaturas/{codigoAsignatura}/seccion/{idSeccion}/docentes-activos', [AsignaturaController::class, 'getDocentesActivosEnSeccion'])->name('asignaturas.docentesActivosEnSeccion');
     Route::get('/asignaturas-asignadas', [DocenteController::class, 'index_asignaturas'])->name('docentes.asignaturas');
     Route::get('/estudiantes-matriculado/{id_asignatura}/asignatura', [DocenteController::class, 'index_estudiantes'])->name('docentes.estudiantes');
     //------------------------tutores--------------------------------------
