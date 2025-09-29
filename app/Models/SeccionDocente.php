@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class SeccionDocente extends Pivot
@@ -11,9 +10,14 @@ class SeccionDocente extends Pivot
     use HasFactory;
 
     protected $table = 'secciones_docentes';
-    
+
+    // Si la tabla no tiene una columna id auto-incremental:
+    protected $primaryKey = null;
     public $incrementing = false;
-    
+
+    // IMPORTANTE: si la tabla tiene created_at/updated_at
+    public $timestamps = true;
+
     protected $fillable = [
         'id_seccion',
         'codigo_docente',
@@ -24,25 +28,22 @@ class SeccionDocente extends Pivot
         'estado' => 'boolean',
     ];
 
-    // Relación con Seccion
+    // relaciones y scopes (como tenías)
     public function seccion()
     {
         return $this->belongsTo(Seccion::class, 'id_seccion', 'id_seccion');
     }
 
-    // Relación con Docente
     public function docente()
     {
         return $this->belongsTo(Docente::class, 'codigo_docente', 'codigo_docente');
     }
 
-    // Scope para obtener solo asignaciones activas
     public function scopeActivos($query)
     {
         return $query->where('estado', true);
     }
 
-    // Scope para obtener asignaciones por grado
     public function scopePorGrado($query, $gradoId)
     {
         return $query->whereHas('seccion', function ($q) use ($gradoId) {
@@ -50,7 +51,6 @@ class SeccionDocente extends Pivot
         });
     }
 
-    // Método para activar/desactivar asignación
     public function toggleEstado()
     {
         $this->estado = !$this->estado;
@@ -58,7 +58,6 @@ class SeccionDocente extends Pivot
         return $this;
     }
 
-    // Método para verificar si la asignación está activa
     public function estaActiva()
     {
         return $this->estado === true;
