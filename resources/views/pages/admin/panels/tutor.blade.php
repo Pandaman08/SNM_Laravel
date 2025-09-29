@@ -28,7 +28,7 @@
                 </div>
                 <div>
                     <p class="text-gray-500 text-sm">Estudiantes a Cargo</p>
-                    <p class="text-2xl font-bold">2</p>
+                    <p class="text-2xl font-bold">{{count($estudiantes)}}</p>
                 </div>
             </div>
 
@@ -73,24 +73,7 @@
                             </div>
                             <span class="text-sm font-medium text-center">Mis Estudiantes</span>
                         </a>
-                        <a href="" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-amber-50 transition-colors">
-                            <div class="p-3 rounded-full bg-amber-100 text-amber-600 mb-2">
-                                <i class="ri-book-2-fill text-xl"></i>
-                            </div>
-                            <span class="text-sm font-medium text-center">Cursos Asignados</span>
-                        </a>
-                        <a href="" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-red-50 transition-colors">
-                            <div class="p-3 rounded-full bg-red-100 text-red-600 mb-2">
-                                <i class="ri-file-text-fill text-xl"></i>
-                            </div>
-                            <span class="text-sm font-medium text-center">Generar Informes</span>
-                        </a>
-                        <a href="" class="flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 hover:bg-indigo-50 transition-colors">
-                            <div class="p-3 rounded-full bg-indigo-100 text-indigo-600 mb-2">
-                                <i class="ri-megaphone-fill text-xl"></i>
-                            </div>
-                            <span class="text-sm font-medium text-center">Enviar Comunicados</span>
-                        </a>
+                 
                     </div>
                 </div>
 
@@ -100,33 +83,19 @@
                         <h2 class="text-xl font-bold">Estudiantes con Alertas</h2>
                     </div>
                     <div class="p-4 space-y-4">
+                        @foreach ($estudiantes as $estudiante )
+                        
+                        
                         <div class="flex items-start border-b border-gray-100 pb-4">
-                            <div class="p-2 rounded-full bg-red-100 text-red-600 mr-3">
-                                <i class="ri-alert-fill"></i>
+                            <div class="p-2 rounded-full bg-yellow-100 text-yello-600 mr-3">
+                                  <i class="ri-team-fill text-xl"></i>
                             </div>
                             <div>
-                                <p class="font-medium">Juan Pérez - 4to "A"</p>
-                                <p class="text-sm text-gray-500">2 cursos en riesgo - Matemáticas (08) e Inglés (09)</p>
+                                <p class="font-medium">{{$estudiante["nombre"] ?? 'NA'}} {{$estudiante["apellidos"] ?? 'NA'}} </p>
+                                <p class="text-sm text-gray-500">En vista</p>
                             </div>
                         </div>
-                        <div class="flex items-start border-b border-gray-100 pb-4">
-                            <div class="p-2 rounded-full bg-amber-100 text-amber-600 mr-3">
-                                <i class="ri-alert-fill"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium">María Gómez - 3ro "B"</p>
-                                <p class="text-sm text-gray-500">Inasistencias recurrentes (5 faltas este mes)</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start">
-                            <div class="p-2 rounded-full bg-yellow-100 text-yellow-600 mr-3">
-                                <i class="ri-alert-fill"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium">Carlos Rojas - 5to "C"</p>
-                                <p class="text-sm text-gray-500">Pendiente documentación de matrícula</p>
-                            </div>
-                        </div>
+                        @endforeach()
                     </div>
                 </div>
             </div>
@@ -134,7 +103,7 @@
             <!-- Panel Derecho -->
             <div class="space-y-6">
                 <!-- Calendario Académico -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                {{-- <div class="bg-white rounded-xl shadow-md overflow-hidden">
                     <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 p-4 text-white">
                         <h2 class="text-xl font-bold">Próximas Actividades</h2>
                     </div>
@@ -167,7 +136,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
                 <!-- Accesos Directos -->
                 <div class="bg-white rounded-xl shadow-md overflow-hidden">
