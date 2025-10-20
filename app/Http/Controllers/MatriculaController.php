@@ -50,14 +50,15 @@ class MatriculaController extends Controller
         }
 
         $tiposMatricula = TipoMatricula::all();
-        $aniosEscolares = AnioEscolar::all();
+        $currentYear = Carbon::now()->year;
+        $anioActual = AnioEscolar::where('anio', $currentYear)->first();
         $tutores = Tutor::with('user')->get();
         $nivelesEducativos = NivelEducativo::activos()->get();
         $secciones = Seccion::with('grado.nivelEducativo')->get();
 
         return view('pages.admin.matriculas.create', compact(
             'tiposMatricula',
-            'aniosEscolares',
+            'anioActual',
             'tutores',
             'nivelesEducativos',
             'secciones'
@@ -70,7 +71,8 @@ class MatriculaController extends Controller
     public function createTutor()
     {
         $tiposMatricula = TipoMatricula::all();
-        $aniosEscolares = AnioEscolar::all();
+         $currentYear = Carbon::now()->year;
+        $anioActual = AnioEscolar::where('anio', $currentYear)->first();
         $nivelesEducativos = NivelEducativo::activos()->get();
         $grados = Grado::with('nivelEducativo')
             ->orderBy('grado')
@@ -81,7 +83,7 @@ class MatriculaController extends Controller
 
         return view('pages.admin.matriculas.create-tutor', compact(
             'tiposMatricula',
-            'aniosEscolares',
+            'anioActual',
             'nivelesEducativos',
             'grados',
             'secciones'
