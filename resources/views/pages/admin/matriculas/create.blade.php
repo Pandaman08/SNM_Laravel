@@ -15,7 +15,7 @@
                         </div>
                         <div class="text-right">
                             <span class="text-sm text-gray-500">Año Escolar:</span>
-                            <span class="font-semibold text-blue-600">2025</span>
+                            <span class="font-semibold text-blue-600">{{ $anioActual->anio }}</span>
                         </div>
                     </div>
                 </div>
@@ -77,18 +77,11 @@
 
                             <!-- Año Escolar -->
                             <div>
-                                <label for="id_anio_escolar" class="block text-sm font-medium text-gray-700 mb-2">Año
-                                    Escolar *</label>
-                                <select name="id_anio_escolar" id="anio_escolar_id"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+
+                                <input name="id_anio_escolar" id="id_anio_escolar"
+                                    value="{{ $anioActual->id_anio_escolar }}"
+                                    class="hidden w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     required>
-                                    <option value="" disabled selected>Seleccione el año escolar</option>
-                                    @foreach ($aniosEscolares as $anio)
-                                        <option value="{{ $anio->id_anio_escolar }}">
-                                            {{ $anio->anio }} - {{ $anio->descripcion ?? '' }}
-                                        </option>
-                                    @endforeach
-                                </select>
                             </div>
                         </div>
 
@@ -239,8 +232,8 @@
                                 <label for="fecha_nacimiento" class="block text-sm font-medium text-gray-700 mb-2">Fecha
                                     de Nacimiento *</label>
                                 <input type="date" name="fecha_nacimiento" id="fecha_nacimiento"
-                                 min="{{ date('Y-m-d', strtotime('-100 years')) }}"
-                                 max="{{ date('Y-m-d', strtotime('-2 years')) }}"
+                                    min="{{ date('Y-m-d', strtotime('-100 years')) }}"
+                                    max="{{ date('Y-m-d', strtotime('-2 years')) }}"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             </div>
 
@@ -251,7 +244,7 @@
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             </div>
 
-                               <!-- Departamento -->
+                            <!-- Departamento -->
                             <div>
                                 <label for="departamento"
                                     class="block text-sm font-medium text-gray-700 mb-2">Departamento *</label>
@@ -287,7 +280,7 @@
                                 </select>
                             </div>
 
-                              <!-- Provincia -->
+                            <!-- Provincia -->
                             <div>
                                 <label for="provincia" class="block text-sm font-medium text-gray-700 mb-2">Provincia
                                     *</label>
@@ -298,7 +291,7 @@
                                 </select>
                             </div>
 
-                             <!-- Distrito -->
+                            <!-- Distrito -->
                             <div>
                                 <label for="distrito" class="block text-sm font-medium text-gray-700 mb-2">Distrito
                                     *</label>
@@ -925,90 +918,7 @@
             }
         });
 
-        // Datos de provincias por departamento (enfoque norte)
-        const provinciasPorDepartamento = {
-            "Amazonas": ["Chachapoyas", "Bagua", "Bongará", "Condorcanqui", "Luya", "Rodríguez de Mendoza",
-                "Utcubamba"],
-            "Ancash": ["Huaraz", "Aija", "Antonio Raymondi", "Asunción", "Bolognesi", "Carhuaz",
-                "Carlos Fermín Fitzcarrald",
-                "Casma", "Corongo", "Huari", "Huarmey", "Huaylas", "Mariscal Luzuriaga", "Ocros", "Pallasca",
-                "Pomabamba", "Recuay", "Santa", "Sihuas", "Yungay"
-            ],
-            "Cajamarca": ["Cajamarca", "Cajabamba", "Celendín", "Chota", "Contumazá", "Cutervo", "Hualgayoc",
-                "Jaén", "San Ignacio", "San Marcos", "San Miguel", "San Pablo", "Santa Cruz"
-            ],
-            "La Libertad": ["Trujillo", "Ascope", "Bolívar", "Chepén", "Gran Chimú", "Julcán", "Otuzco",
-                "Pacasmayo", "Pataz", "Sánchez Carrión", "Santiago de Chuco", "Virú"
-            ],
-            "Lambayeque": ["Chiclayo", "Ferreñafe", "Lambayeque"],
-            "Piura": ["Piura", "Ayabaca", "Huancabamba", "Morropón", "Paita", "Sechura", "Sullana", "Talara"],
-            "Tumbes": ["Tumbes", "Contralmirante Villar", "Zarumilla"],
-            "San Martin": ["Moyobamba", "Bellavista", "El Dorado", "Huallaga", "Lamas", "Mariscal Cáceres",
-                "Picota", "Rioja", "San Martín", "Tocache"
-            ]
-        };
-
-        // Datos de distritos por provincia (ejemplos para provincias del norte)
-        const distritosPorProvincia = {
-            // Amazonas
-            "Chachapoyas": ["Chachapoyas", "Asunción", "Balsas", "Cheto", "Chiliquín", "Chuquibamba",
-                "Granada", "Huancas", "La Jalca", "Leimebamba", "Levanto", "Magdalena",
-                "Mariscal Castilla", "Molinopampa", "Montevideo", "Olleros", "Quinjalca",
-                "San Francisco de Daguas", "San Isidro de Maino", "Soloco", "Sonche"
-            ],
-            "Bagua": ["Bagua", "Aramango", "Copallín", "El Parco", "Imaza", "La Peca"],
-
-            // Ancash
-            "Huaraz": ["Huaraz", "Cochabamba", "Colcabamba", "Huanchay", "Independencia", "Jangas",
-                "La Libertad", "Olleros", "Pampas Grande", "Pariacoto", "Pira", "Tarica"
-            ],
-            "Santa": ["Chimbote", "Cáceres del Perú", "Coishco", "Macate", "Moro", "Nepeña",
-                "Samanco", "Santa", "Nuevo Chimbote"
-            ],
-
-            // Cajamarca
-            "Cajamarca": ["Cajamarca", "Asunción", "Chetilla", "Cospán", "Encañada", "Jesús",
-                "Llacanora", "Los Baños del Inca", "Magdalena", "Matara", "Namora",
-                "San Juan"
-            ],
-            "Jaén": ["Jaén", "Bellavista", "Chontali", "Colasay", "Huabal", "Las Pirias",
-                "Pomahuaca", "Pucará", "Sallique", "San Felipe", "San José del Alto", "Santa Rosa"
-            ],
-
-            // La Libertad
-            "Trujillo": ["Trujillo", "El Porvenir", "Florencia de Mora", "Huanchaco", "La Esperanza",
-                "Laredo", "Moche", "Poroto", "Salaverry", "Simbal", "Victor Larco Herrera"
-            ],
-            "Chepén": ["Chepén", "Pacanga", "Pueblo Nuevo"],
-
-            // Lambayeque
-            "Chiclayo": ["Chiclayo", "Chongoyape", "Eten", "Eten Puerto", "José Leonardo Ortiz",
-                "La Victoria", "Lagunas", "Monsefú", "Nueva Arica", "Oyotún", "Picsi",
-                "Pimentel", "Reque", "Santa Rosa", "Saña", "Cayaltí", "Patapo",
-                "Pomalca", "Pucalá", "Tumán"
-            ],
-
-            // Piura
-            "Piura": ["Piura", "Castilla", "Catacaos", "Cura Mori", "El Tallán", "La Arena",
-                "La Unión", "Las Lomas", "Tambo Grande", "Veintiséis de Octubre"
-            ],
-            "Sullana": ["Sullana", "Bellavista", "Ignacio Escudero", "Lancones", "Marcavelica",
-                "Miguel Checa", "Querecotillo", "Salitral"
-            ],
-
-            // Tumbes
-            "Tumbes": ["Tumbes", "Corrales", "La Cruz", "Pampas de Hospital", "San Jacinto",
-                "San Juan de la Virgen"
-            ],
-
-            // San Martín
-            "Moyobamba": ["Moyobamba", "Calzada", "Habana", "Jepelacio", "Soritor", "Yantalo"],
-            "Rioja": ["Rioja", "Awajún", "Elías Soplín Vargas", "Nueva Cajamarca", "Pardo Miguel",
-                "Posic", "San Fernando", "Yorongos", "Yuracyacu"
-            ]
-        };
-
-        function cargarProvincias() {
+        async function cargarProvincias() {
             const departamentoSelect = document.getElementById('departamento');
             const provinciaSelect = document.getElementById('provincia');
             const distritoSelect = document.getElementById('distrito');
@@ -1022,20 +932,30 @@
             distritoSelect.innerHTML = '<option value="" disabled selected>Primero seleccione una provincia</option>';
             distritoSelect.disabled = true;
 
-            if (departamento && provinciasPorDepartamento[departamento]) {
-                // Cargar provincias del departamento seleccionado
-                provinciasPorDepartamento[departamento].forEach(provincia => {
-                    const option = document.createElement('option');
-                    option.value = provincia;
-                    option.textContent = provincia;
-                    provinciaSelect.appendChild(option);
-                });
+            if (departamento) {
+                try {
+                    // Cargar datos desde el archivo JSON en public/data/ubigeo.json
+                    const response = await fetch('/data/ubigeo.json');
+                    const data = await response.json();
 
-                provinciaSelect.disabled = false;
+                    if (data.provinciasPorDepartamento[departamento]) {
+                        // Cargar provincias del departamento seleccionado
+                        data.provinciasPorDepartamento[departamento].forEach(provincia => {
+                            const option = document.createElement('option');
+                            option.value = provincia;
+                            option.textContent = provincia;
+                            provinciaSelect.appendChild(option);
+                        });
+
+                        provinciaSelect.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Error al cargar las provincias:', error);
+                }
             }
         }
 
-        function cargarDistritos() {
+        async function cargarDistritos() {
             const provinciaSelect = document.getElementById('provincia');
             const distritoSelect = document.getElementById('distrito');
             const provincia = provinciaSelect.value;
@@ -1043,17 +963,26 @@
             // Limpiar select de distritos
             distritoSelect.innerHTML = '<option value="" disabled selected>Seleccione distrito</option>';
             distritoSelect.disabled = true;
+            if (provincia) {
+                try {
+                    // Cargar datos desde el archivo JSON en public/data/ubigeo.json
+                    const response = await fetch('/data/ubigeo.json');
+                    const data = await response.json();
 
-            if (provincia && distritosPorProvincia[provincia]) {
-                // Cargar distritos de la provincia seleccionada
-                distritosPorProvincia[provincia].forEach(distrito => {
-                    const option = document.createElement('option');
-                    option.value = distrito;
-                    option.textContent = distrito;
-                    distritoSelect.appendChild(option);
-                });
+                    if (data.distritosPorProvincia[provincia]) {
+                        // Cargar distritos de la provincia seleccionada
+                        data.distritosPorProvincia[provincia].forEach(distrito => {
+                            const option = document.createElement('option');
+                            option.value = distrito;
+                            option.textContent = distrito;
+                            distritoSelect.appendChild(option);
+                        });
 
-                distritoSelect.disabled = false;
+                        distritoSelect.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Error al cargar los distritos:', error);
+                }
             }
         }
     </script>
