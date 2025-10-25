@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Enums\UserRole;
+
 return new class extends Migration
 {
     /**
@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('docentes', function (Blueprint $table) {
             $table->id('codigo_docente');
+            $table->unsignedBigInteger('nivel_educativo_id');
             $table->unsignedBigInteger('user_id');
-            $table->string('especialidad', 100)->nullable();
-            $table->float('jornada_laboral')->nullable();
-            $table->date('fecha_contratacion')->nullable();
-            $table->string('departamento_estudios', 100)->nullable();
+            $table->longText('firma_docente')->nullable();
             $table->timestamps();
-            $table->foreign('user_id')->references('user_id')->on('users');
+            
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
+            $table->foreign('nivel_educativo_id')->references('id_nivel_educativo')->on('niveles_educativos')->onDelete('cascade');
         });
     }
 

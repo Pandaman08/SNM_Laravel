@@ -7,7 +7,6 @@ use App\Models\Pago;
 use App\Models\Persona;
 use App\Models\Matricula;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Secretaria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -15,10 +14,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Enums\UserRole;
 use Illuminate\Support\Str;
+
 class SecretariaController extends Controller
 {
-
-
     public function showTesoreros(Request $request)
     {
         $query = $request->input('search');
@@ -34,11 +32,12 @@ class SecretariaController extends Controller
 
         return view('pages.admin.tesoreras.index', compact('users', 'roles'));
     }
+
     public function index(Request $request)
     {
         $query = $request->input('search');
 
-        $users = User::with(['persona', 'secretaria'])
+        $users = User::with(['persona'])
             ->where('rol', '=', 'secretaria')
             ->when($query, function ($queryBuilder) use ($query) {
                 $queryBuilder->where(function ($q) use ($query) {
@@ -49,13 +48,12 @@ class SecretariaController extends Controller
                 });
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(10)
-            ->withQueryString();
+            ->paginate(10);
 
         return view('pages.admin.tesoreras.index', compact('users'));
     }
 
-       public function panel_secretaria()
+    public function panel_secretaria()
     {
         $user = Auth::user();
         $matriculas = Matricula::get();
@@ -75,9 +73,6 @@ class SecretariaController extends Controller
             'sexo' => 'required|in:M,F',
             'address' => 'required|string',
             'fecha_nacimiento' => 'required|date',
-            'area_responsabilidad' => 'required|string',
-            'jornada_laboral' => 'required|numeric',
-            'fecha_contratacion' => 'required|date',
             'photo' => 'nullable|image|max:2048'
         ]);
 
@@ -110,14 +105,6 @@ class SecretariaController extends Controller
             $user->estado = true;
             $user->save();
 
-            // Crear secretaria
-            $secretaria = new Secretaria();
-            $secretaria->user_id = $user->user_id;
-            $secretaria->area_responsabilidad = $request->area_responsabilidad;
-            $secretaria->jornada_laboral = $request->jornada_laboral;
-            $secretaria->fecha_contratacion = $request->fecha_contratacion;
-            $secretaria->save();
-
             DB::commit();
 
             return redirect()->route('secretarias.buscar')->with('success', 'Secretaria registrada correctamente');
@@ -138,16 +125,13 @@ class SecretariaController extends Controller
             'edit_sexo' => 'required|in:M,F',
             'edit_address' => 'required|string',
             'edit_fecha_nacimiento' => 'required|date',
-            'edit_area_responsabilidad' => 'required|string',
-            'edit_jornada_laboral' => 'required|numeric',
-            'edit_fecha_contratacion' => 'required|date',
             'edit_photo' => 'nullable|image|max:2048'
         ]);
 
         DB::beginTransaction();
 
         try {
-            $user = User::with(['persona', 'secretaria'])->findOrFail($id);
+            $user = User::with(['persona'])->findOrFail($id);
 
             // Actualizar persona
             $user->persona->name = $request->edit_name;
@@ -159,7 +143,6 @@ class SecretariaController extends Controller
             $user->persona->fecha_nacimiento = $request->edit_fecha_nacimiento;
 
             if ($request->hasFile('edit_photo')) {
-                // Eliminar foto anterior si existe
                 if ($user->persona->photo) {
                     Storage::disk('public')->delete($user->persona->photo);
                 }
@@ -168,12 +151,6 @@ class SecretariaController extends Controller
             }
 
             $user->persona->save();
-
-            // Actualizar secretaria
-            $user->secretaria->area_responsabilidad = $request->edit_area_responsabilidad;
-            $user->secretaria->jornada_laboral = $request->edit_jornada_laboral;
-            $user->secretaria->fecha_contratacion = $request->edit_fecha_contratacion;
-            $user->secretaria->save();
 
             DB::commit();
 
@@ -190,16 +167,12 @@ class SecretariaController extends Controller
         DB::beginTransaction();
 
         try {
-            $user = User::with(['persona', 'secretaria'])->findOrFail($id);
+            $user = User::with(['persona'])->findOrFail($id);
 
-            // Eliminar foto si existe
             if ($user->persona->photo) {
                 Storage::disk('public')->delete($user->persona->photo);
             }
 
-            if ($user->secretaria) {
-                $user->secretaria->delete();
-            }
             $user->delete();
             $user->persona->delete();
 

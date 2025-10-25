@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('personas', function (Blueprint $table) {
             $table->id('persona_id');
-            $table->string('name', 45);
+            $table->string('name', 80);
             $table->string('lastname', 150);
-            $table->char('dni',8);
-            $table->char('phone',9);
+            $table->char('dni', 8)->unique();
+            $table->char('phone', 9);
             $table->enum('sexo',['M', 'F'])->default('M');
             $table->enum('estado_civil',['S', 'C','D','V'])->default('S');
-            $table->string('photo', 255)->nullable();
+            $table->longText('photo')->nullable();
             $table->string('address', 70)->nullable();
-             $table->timestamps();
             $table->date('fecha_nacimiento');
+            $table->timestamps();
+            
         });
     }
 

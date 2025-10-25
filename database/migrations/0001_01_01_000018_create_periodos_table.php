@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tutores', function (Blueprint $table) {
-            $table->id('id_tutor');
-            $table->unsignedBigInteger('user_id');
-            $table->string('parentesco', 75)->nullable();
+        Schema::create('periodos', function (Blueprint $table) {
+            $table->id('id_periodo');
+            $table->string('nombre', 45)->nullable();
+            $table->dateTime('fecha_inicio');
+            $table->dateTime('fecha_final');
+            $table->enum('estado', ['Proceso', 'Finalizado'])->default('Proceso');
             $table->timestamps();
-
-            $table->foreign('user_id')->references('user_id')->on('users');
         });
+        
     }
 
     /**
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tutores');
+        Schema::dropIfExists('periodos');
     }
 };

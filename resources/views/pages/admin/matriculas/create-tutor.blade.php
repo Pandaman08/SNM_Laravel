@@ -417,6 +417,66 @@
                     </div>
                 </div>
 
+                <!-- NUEVO: Contactos de emergencia (Parientes) -->
+                <div id="seccion-parientes" class="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i class="ri-phone-line text-red-500 mr-2"></i>
+                            Contactos de Emergencia (Parientes) <span class="text-sm text-gray-500 ml-3">Opcional</span>
+                        </h2>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-sm text-gray-600 mb-4">Agregue uno o más contactos de emergencia. Estos se vincularán a su perfil y podrán ser consultados por la institución.</p>
+
+                        <div id="parientes-container" class="space-y-4">
+                            <!-- Plantilla clonable -->
+                            <template id="pariente-template">
+                                <div class="pariente-item grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm text-gray-700">Nombre</label>
+                                        <input type="text" name="parientes[][nombre]" class="nombre-pariente w-full px-3 py-2 border rounded-lg" placeholder="Nombre completo">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm text-gray-700">Celular</label>
+                                        <input type="text" name="parientes[][celular]" class="celular-pariente w-full px-3 py-2 border rounded-lg" placeholder="9 dígitos" maxlength="9" pattern="[0-9]{9}">
+                                    </div>
+                                    <div class="md:col-span-2 flex space-x-2">
+                                        <button type="button" class="add-pariente inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                            <i class="ri-add-line mr-2"></i> Agregar
+                                        </button>
+                                        <button type="button" class="remove-pariente inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                                            <i class="ri-subtract-line mr-2"></i> Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Un item por defecto (debe enviarse vacío si no se completa) -->
+                            <div class="pariente-item grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm text-gray-700">Nombre</label>
+                                    <input type="text" name="parientes[][nombre]" class="nombre-pariente w-full px-3 py-2 border rounded-lg" placeholder="Nombre completo">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm text-gray-700">Celular</label>
+                                    <input type="text" name="parientes[][celular]" class="celular-pariente w-full px-3 py-2 border rounded-lg" placeholder="9 dígitos" maxlength="9" pattern="[0-9]{9}">
+                                </div>
+                                <div class="md:col-span-2 flex space-x-2">
+                                    <button type="button" id="btn-add-pariente" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                        <i class="ri-add-line mr-2"></i> Agregar
+                                    </button>
+                                    <button type="button" class="remove-pariente inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                                        <i class="ri-subtract-line mr-2"></i> Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-gray-400 mt-3">Nota: deje los campos vacíos si no desea agregar contactos.</p>
+                    </div>
+                </div>
+                <!-- FIN NUEVO: Contactos de emergencia (Parientes) -->
+
                 <!-- Botones de Acción -->
                 <div id="seccion-botones" class="bg-white rounded-lg shadow-sm border border-gray-200">
                     <div class="px-6 py-4">
@@ -731,7 +791,7 @@
                         }
                         return response.json();
                     })
-                    .then(data => {
+                    .then data => {
                         seccionSelect.innerHTML = '<option value="" disabled selected>Seleccione la sección</option>';
 
                         if (data.secciones && data.secciones.length > 0) {

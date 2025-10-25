@@ -14,80 +14,97 @@ class Seccion extends Model
 
     protected $fillable = [
         'id_grado',
-        'seccion'
+        'seccion',
+        'vacantes_seccion',
+        'estado_vacantes',
     ];
 
-    // Relación: Sección pertenece a un grado
+    protected $casts = [
+        'vacantes_seccion' => 'integer',
+        'estado_aforo' => 'boolean',
+    ];
+
+    // Relación con Grado
     public function grado()
     {
         return $this->belongsTo(Grado::class, 'id_grado', 'id_grado');
     }
-    
 
-    // Relación: Sección tiene muchas matrículas
+    // Relación con Matrículas
     public function matriculas()
     {
         return $this->hasMany(Matricula::class, 'seccion_id', 'id_seccion');
     }
 
-    // Relación con docentes (solo activos)
+    // Relación con Docentes (solo activos)
     public function docentes()
     {
         return $this->belongsToMany(Docente::class, 'secciones_docentes', 'id_seccion', 'codigo_docente')
-                    ->using(SeccionDocente::class)
                     ->withPivot('estado')
                     ->withTimestamps()
-                    ->wherePivot('estado', true);
+                    ->wherePivot('estado', 1);
     }
     
-    // Relación para obtener TODOS los docentes (activos e inactivos)
+    // Todos los docentes asignados (activos e inactivos)
     public function todosLosDocentes()
     {
         return $this->belongsToMany(Docente::class, 'secciones_docentes', 'id_seccion', 'codigo_docente')
-                    ->using(SeccionDocente::class)
                     ->withPivot('estado')
                     ->withTimestamps();
     }
     
-    // Relación directa con la tabla pivot
-    public function asignacionesDocentes()
+    // Relación directa con tabla pivot secciones_docentes
+    public function seccionesDocentes()
     {
         return $this->hasMany(SeccionDocente::class, 'id_seccion', 'id_seccion');
     }
 
-    // Relación: Obtener el nivel educativo a través del grado
+    // Nivel educativo a través del grado
     public function nivelEducativo()
     {
         return $this->hasOneThrough(
             NivelEducativo::class,
             Grado::class,
-            'id_grado',              // FK en tabla grados
-            'id_nivel_educativo',    // PK en tabla niveles_educativos
-            'id_grado',              // FK local en tabla secciones
-            'id_nivel_educativo'     // FK local en tabla grados
+            'id_grado',
+            'id_nivel_educativo',
+            'id_grado',
+            'nivel_id_nivel'
         );
     }
-    // Scope: Secciones de un grado específico
+
+    // Scope: Secciones de un grado
     public function scopeDeGrado($query, $gradoId)
     {
         return $query->where('id_grado', $gradoId);
     }
 
-    // Scope: Secciones de un nivel educativo específico
+    // Scope: Secciones de un nivel educativo
     public function scopeDeNivel($query, $nivelId)
     {
         return $query->whereHas('grado', function ($q) use ($nivelId) {
-            $q->where('id_nivel_educativo', $nivelId);
+            $q->where('nivel_id_nivel', $nivelId);
         });
     }
 
-    // Método: Obtener nombre completo de la sección
+    // Atributo: Nombre completo
     public function getNombreCompletoAttribute()
     {
         $grado = $this->grado;
         if ($grado && $grado->nivelEducativo) {
-            return "Sección {$this->seccion} - {$grado->nombre_completo}";
+            return "Sección {$this->seccion} - {$grado->grado} {$grado->nivelEducativo->nombre_nivel_educativo}";
         }
         return "Sección {$this->seccion}";
+    }
+
+    // Verificar si hay cupo disponible
+    public function tieneCupo()
+    {
+        return $this->estado_aforo == 1;
+    }
+
+    // Obtener cantidad de estudiantes matriculados
+    public function cantidadEstudiantes()
+    {
+        return $this->matriculas()->where('estado', 'activo')->count();
     }
 }

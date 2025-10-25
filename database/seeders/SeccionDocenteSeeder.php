@@ -1,60 +1,59 @@
 <?php
-
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Docente;
+// database/seeders/SeccionDocenteSeeder.php
+
 use App\Models\Seccion;
-use App\Models\SeccionDocente;
+use App\Models\Docente;
+use Illuminate\Database\Seeder;
 
 class SeccionDocenteSeeder extends Seeder
 {
     public function run()
     {
-        // Obtener todos los docentes y secciones
-        $docentes = Docente::all();
-        $secciones = Seccion::with('grado.nivelEducativo')->get();
-        
-        if ($docentes->isEmpty() || $secciones->isEmpty()) {
-            $this->command->warn('No hay docentes o secciones para asignar.');
-            return;
+        // Obtener todos los docentes por nivel
+        $docentesPrimaria = Docente::where('nivel_educativo_id', function ($query) {
+            $query->select('id_nivel_educativo')
+                  ->from('niveles_educativos')
+                  ->where('nombre', 'Primaria');
+        })->get();
+
+        $docentesSecundaria = Docente::where('nivel_educativo_id', function ($query) {
+            $query->select('id_nivel_educativo')
+                  ->from('niveles_educativos')
+                  ->where('nombre', 'Secundaria');
+        })->get();
+
+        // Asignar docentes a secciones de PRIMARIA: 1 docente por sección
+        $seccionesPrimaria = Seccion::whereHas('grado.nivelEducativo', fn($q) => $q->where('nombre', 'Primaria'))->get();
+        $docentesPrimaria = $docentesPrimaria->shuffle()->values();
+        $index = 0;
+
+        foreach ($seccionesPrimaria as $seccion) {
+            if ($index >= $docentesPrimaria->count()) break;
+            $docente = $docentesPrimaria[$index];
+            $seccion->todosLosDocentes()->attach($docente->codigo_docente, [
+                'estado' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $index++;
         }
-        
-        // Asignar docentes a secciones basándose en el nivel educativo
-        foreach ($secciones as $seccion) {
-            $nivelEducativo = $seccion->grado->nivelEducativo->codigo ?? null;
-            
-            if ($nivelEducativo === 'INI' || $nivelEducativo === 'PRI') {
-                // En inicial y primaria, asignar un docente por sección
-                $docente = $docentes->random();
-                
-                SeccionDocente::firstOrCreate([
-                    'id_seccion' => $seccion->id_seccion,
-                    'codigo_docente' => $docente->codigo_docente,
-                ], [
+
+        // Asignar docentes a secciones de SECUNDARIA: 3-5 docentes por sección (reutilizando docentes)
+        $seccionesSecundaria = Seccion::whereHas('grado.nivelEducativo', fn($q) => $q->where('nombre', 'Secundaria'))->get();
+
+        foreach ($seccionesSecundaria as $seccion) {
+            if ($docentesSecundaria->isEmpty()) continue;
+            $cantidad = rand(3, 5);
+            $seleccionados = $docentesSecundaria->shuffle()->take($cantidad);
+            foreach ($seleccionados as $docente) {
+                $seccion->todosLosDocentes()->attach($docente->codigo_docente, [
                     'estado' => true,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
-                
-                $this->command->info("Asignado docente {$docente->codigo_docente} a sección {$seccion->seccion} - {$seccion->grado->nombre_completo}");
-                
-            } elseif ($nivelEducativo === 'SEC') {
-                // En secundaria, asignar varios docentes por sección (simulando diferentes materias)
-                $numDocentes = min(rand(3, 5), $docentes->count()); // Asegurar que no exceda el número de docentes disponibles
-                $docentesAsignados = $docentes->random($numDocentes);
-                
-                foreach ($docentesAsignados as $docente) {
-                    SeccionDocente::firstOrCreate([
-                        'id_seccion' => $seccion->id_seccion,
-                        'codigo_docente' => $docente->codigo_docente,
-                    ], [
-                        'estado' => true,
-                    ]);
-                }
-                
-                $this->command->info("Asignados {$numDocentes} docentes a sección {$seccion->seccion} - {$seccion->grado->nombre_completo}");
             }
         }
-        
-        $this->command->info('Asignación de docentes a secciones completada.');
     }
 }

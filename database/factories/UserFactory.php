@@ -56,10 +56,10 @@ class UserFactory extends Factory
         ]);
     }
 
-    public function estudiante()
+    public function auxiliar()
     {
         return $this->state([
-            'rol' => UserRole::ESTUDIANTE->value,
+            'rol' => UserRole::AUXILIAR->value,
         ]);
     }
      public function tutor()

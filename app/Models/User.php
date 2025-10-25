@@ -95,4 +95,8 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Persona::class, 'persona_id', 'persona_id');
     }
+    public function instucionEducativa()
+    {
+        return $this->hasOne(InstitucionEducativa::class, 'user_id', 'user_id');
+    }
 }

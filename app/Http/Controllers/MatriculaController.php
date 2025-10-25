@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\AsignaturaDocente;
+use App\Models\InstitucionEducativa; // <-- agregado
+use App\Models\ParienteTutor; // <-- agregado
 
 
 class MatriculaController extends Controller
@@ -53,8 +55,21 @@ class MatriculaController extends Controller
         $currentYear = Carbon::now()->year;
         $anioActual = AnioEscolar::where('anio', $currentYear)->first();
         $tutores = Tutor::with('user')->get();
-        $nivelesEducativos = NivelEducativo::activos()->get();
-        $secciones = Seccion::with('grado.nivelEducativo')->get();
+        // Obtener solo niveles educativos activos
+        $nivelesEducativos = NivelEducativo::where('estado', true)->get();
+
+        // Solo secciones con vacantes disponibles (estado_vacantes = true y matriculados < vacantes_seccion)
+        $secciones = Seccion::with('grado.nivelEducativo')
+            ->withCount(['matriculas as activos_count' => function ($q) {
+                $q->where('estado', 'activo');
+            }])
+            ->get()
+            ->filter(function ($s) {
+                // Si vacantes_seccion es null, considerarlo disponible; además revisar estado_vacantes
+                $hasVacantes = is_null($s->vacantes_seccion) ? true : ($s->activos_count < $s->vacantes_seccion);
+                return ($s->estado_vacantes ?? true) && $hasVacantes;
+            })
+            ->values();
 
         return view('pages.admin.matriculas.create', compact(
             'tiposMatricula',
@@ -71,15 +86,25 @@ class MatriculaController extends Controller
     public function createTutor()
     {
         $tiposMatricula = TipoMatricula::all();
-         $currentYear = Carbon::now()->year;
+        $currentYear = Carbon::now()->year;
         $anioActual = AnioEscolar::where('anio', $currentYear)->first();
-        $nivelesEducativos = NivelEducativo::activos()->get();
+        // Obtener solo niveles educativos activos
+        $nivelesEducativos = NivelEducativo::where('estado', true)->get();
         $grados = Grado::with('nivelEducativo')
             ->orderBy('grado')
             ->get(['id_grado', 'grado', 'nivel_educativo_id']);
+
         $secciones = Seccion::with('grado.nivelEducativo')
+            ->withCount(['matriculas as activos_count' => function ($q) {
+                $q->where('estado', 'activo');
+            }])
             ->orderBy('seccion')
-            ->get(['id_seccion', 'seccion', 'id_grado']);
+            ->get(['id_seccion', 'seccion', 'id_grado', 'vacantes_seccion', 'estado_vacantes'])
+            ->filter(function ($s) {
+                $hasVacantes = is_null($s->vacantes_seccion) ? true : ($s->activos_count < $s->vacantes_seccion);
+                return ($s->estado_vacantes ?? true) && $hasVacantes;
+            })
+            ->values();
 
         return view('pages.admin.matriculas.create-tutor', compact(
             'tiposMatricula',
@@ -159,9 +184,8 @@ class MatriculaController extends Controller
  */
         public function store(Request $request)
     {
-
-
         $baseValidationRules = [
+            'institucion_educativa_codigo_modular' => 'nullable|string|exists:institucion_educativa,codigo_modular',
             'id_tipo_matricula' => 'required|exists:tipos_matricula,id_tipo_matricula',
             'id_anio_escolar' => 'required|exists:anios_escolares,id_anio_escolar',
             'seccion_id' => 'required|exists:secciones,id_seccion',
@@ -190,16 +214,30 @@ class MatriculaController extends Controller
             'monto' => 'required|numeric|min:0',
             'fecha_pago' => 'required|date',
             'comprobante_img' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
-
         ];
+
         DB::beginTransaction();
 
         try {
-
             $validatedData = $request->validate($baseValidationRules);
+
+            // Verificar disponibilidad de la sección antes de crear matrícula
+            $seccion = Seccion::withCount(['matriculas as activos_count' => function ($q) {
+                $q->where('estado', 'activo');
+            }])->findOrFail($validatedData['seccion_id']);
+
+            $activos = $seccion->activos_count;
+            $vacantes = $seccion->vacantes_seccion;
+
+            if (!($seccion->estado_vacantes ?? true) || (!is_null($vacantes) && $activos >= $vacantes)) {
+                return back()->withErrors([
+                    'seccion_id' => 'La sección seleccionada no tiene vacantes disponibles.'
+                ])->withInput();
+            }
 
             $estudiante = null;
             $codigoEstudiante = null;
+
             if (in_array($request->id_tipo_matricula, ['2', '3', '4'])) {
 
                 $request->validate([
@@ -227,8 +265,8 @@ class MatriculaController extends Controller
                     'address' => $validatedData['address'] ?? null,
                 ]);
 
-                $codigoEstudiante = Estudiante::generarCodigoEstudiante(); 
-                
+                $codigoEstudiante = Estudiante::generarCodigoEstudiante();
+
                 $estudiante = Estudiante::create([
                     'codigo_estudiante' => $codigoEstudiante,
                     'persona_id' => $persona->persona_id,
@@ -239,13 +277,35 @@ class MatriculaController extends Controller
                     'lengua_materna' => $validatedData['lengua_materna'],
                     'religion' => $validatedData['religion'] ?? null,
                 ]);
-
             }
 
             $estadoMat = !Auth::user()->isTutor() ?  'activo':'pendiente';
             $codigoEstudiante = $estudiante->codigo_estudiante;
+
+            // Si el usuario es admin y la matrícula va a quedar 'activo', volver a verificar capacidad
+            if ($estadoMat === 'activo') {
+                // refrescar conteo
+                $seccion->refresh();
+                $activos = $seccion->matriculas()->where('estado','activo')->count();
+                $vacantes = $seccion->vacantes_seccion;
+                if (!($seccion->estado_vacantes ?? true) || (!is_null($vacantes) && $activos >= $vacantes)) {
+                    return back()->withErrors([
+                        'seccion_id' => 'No hay vacantes disponibles para activar la matrícula.'
+                    ])->withInput();
+                }
+            }
+
+            // obtener código modular de la institución (automático)
+            $institucionCodigo = $this->resolverCodigoInstitucion();
+            if (empty($institucionCodigo)) {
+                return back()->withErrors([
+                    'institucion_educativa_codigo_modular' => 'No se encontró la institución educativa en el sistema.'
+                ])->withInput();
+            }
+
             // Create matriculation
             $matricula = Matricula::create([
+                'institucion_educativa_codigo_modular' => $institucionCodigo,
                 'codigo_matricula' => Matricula::generarCodigoMatricula(),
                 'codigo_estudiante' => $codigoEstudiante,
                 'id_tipo_matricula' => $validatedData['id_tipo_matricula'],
@@ -262,7 +322,6 @@ class MatriculaController extends Controller
                     $rutaImagen = $request->file('comprobante_img')->store('comprobantes', 'public');
                 }
 
-
                 $pago = Pago::create([
                     'codigo_matricula' => $matricula->codigo_matricula,
                     'concepto' => $validatedPago['concepto'],
@@ -271,9 +330,7 @@ class MatriculaController extends Controller
                     'comprobante_img' => $rutaImagen,
                     'estado' => 'Finalizado'
                 ]);
-
             }
-
 
             DB::table('estudiantes_tutores')->insert([
                 'codigo_estudiante' => $codigoEstudiante,
@@ -317,7 +374,11 @@ class MatriculaController extends Controller
             'seccion_id' => 'required|exists:secciones,id_seccion',
             'fecha' => 'required|date',
             'tipo_relacion' => 'required|string|max:50',
-            'address' => 'required|string|max:255'
+            'address' => 'required|string|max:255',
+            // Nuevo: parientes (opcional)
+            'parientes' => 'nullable|array',
+            'parientes.*.nombre' => 'required_with:parientes|string|max:255',
+            'parientes.*.celular' => 'required_with:parientes|digits:9',
         ]);
 
         DB::beginTransaction();
@@ -347,12 +408,13 @@ class MatriculaController extends Controller
 
             // Crear matrícula en estado pendiente
             $matricula = Matricula::create([
-                'codigo_matricula' => Matricula::generarCodigoMatricula(), // Se generará cuando se apruebe
+                'institucion_educativa_codigo_modular' => $this->resolverCodigoInstitucion(),
+                'codigo_matricula' => Matricula::generarCodigoMatricula(),
                 'codigo_estudiante' => $estudiante->codigo_estudiante,
                 'id_tipo_matricula' => $validated['id_tipo_matricula'],
                 'id_anio_escolar' => $validated['id_anio_escolar'],
                 'seccion_id' => $validated['seccion_id'],
-                'fecha' => $validated['fecha']
+                'fecha' => $validated['fecha'],
             ]);
 
             // Crear relación estudiante-tutor
@@ -363,6 +425,20 @@ class MatriculaController extends Controller
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
+
+            // Si vienen parientes, guardarlos vinculados al tutor
+            if (!empty($validated['parientes']) && is_array($validated['parientes'])) {
+                $tutor = Auth::user()->tutor;
+                if ($tutor) {
+                    foreach ($validated['parientes'] as $p) {
+                        ParienteTutor::create([
+                            'tutor_id_tutor' => $tutor->id_tutor,
+                            'nombre_pariente_tutor' => $p['nombre'],
+                            'celular_pariente_tutor' => $p['celular'],
+                        ]);
+                    }
+                }
+            }
 
             DB::commit();
 
@@ -414,21 +490,15 @@ class MatriculaController extends Controller
     public function obtenerGrados(Request $request)
     {
         try {
-            // Validar usando el campo correcto según tu migración
             $request->validate([
                 'nivel_id' => 'required|integer|exists:niveles_educativos,id_nivel_educativo'
             ]);
 
             $nivelId = $request->get('nivel_id');
 
-            // \Log::info('Buscando grados para nivel ID: ' . $nivelId);
-
-            // Buscar usando el campo FK correcto según tu migración
             $grados = Grado::where('nivel_educativo_id', $nivelId)
                 ->orderBy('grado')
                 ->get(['id_grado', 'grado']);
-
-            // \Log::info('Grados encontrados: ' . $grados->count());
 
             return response()->json([
                 'success' => true,
@@ -437,7 +507,6 @@ class MatriculaController extends Controller
 
         } catch (\Exception $e) {
             \Log::error('Error al obtener grados: ' . $e->getMessage());
-
             return response()->json([
                 'success' => false,
                 'error' => 'Error al obtener los grados',
@@ -459,14 +528,20 @@ class MatriculaController extends Controller
 
             $gradoId = $request->get('grado_id');
 
-
-            // Buscar secciones usando el campo correcto
+            // Buscar secciones usando conteo de matriculas activas y filtrando por vacantes
             $secciones = Seccion::where('id_grado', $gradoId)
+                ->withCount(['matriculas as activos_count' => function ($q) {
+                    $q->where('estado', 'activo');
+                }])
                 ->orderBy('seccion')
-                ->get(['id_seccion', 'seccion']);
+                ->get(['id_seccion', 'seccion', 'vacantes_seccion', 'estado_vacantes'])
+                ->filter(function ($s) {
+                    $hasVacantes = is_null($s->vacantes_seccion) ? true : ($s->activos_count < $s->vacantes_seccion);
+                    return ($s->estado_vacantes ?? true) && $hasVacantes;
+                })
+                ->values();
 
             if ($secciones->isEmpty()) {
-
                 $totalSecciones = \App\Models\Seccion::count();
                 $gradoExiste = \App\Models\Grado::find($gradoId);
 
@@ -670,11 +745,23 @@ class MatriculaController extends Controller
     public function aprobar($codigo_matricula)
     {
         try {
-            $matricula = Matricula::with('pagos')->findOrFail($codigo_matricula);
+            $matricula = Matricula::with('pagos', 'seccion')->findOrFail($codigo_matricula);
 
             // Verificar si hay pagos asociados
             if ($matricula->pagos->isEmpty()) {
                 return back()->with('error', 'No se puede aprobar una matrícula sin pagos registrados');
+            }
+
+            // Verificar capacidad de la sección antes de aprobar
+            $seccion = Seccion::withCount(['matriculas as activos_count' => function ($q) {
+                $q->where('estado', 'activo');
+            }])->findOrFail($matricula->seccion_id);
+
+            $activos = $seccion->activos_count;
+            $vacantes = $seccion->vacantes_seccion;
+
+            if (!($seccion->estado_vacantes ?? true) || (!is_null($vacantes) && $activos >= $vacantes)) {
+                return back()->with('error', 'No hay vacantes disponibles en la sección para aprobar esta matrícula');
             }
 
             // Actualizar estado de la matrícula
@@ -683,10 +770,10 @@ class MatriculaController extends Controller
                 'motivo_rechazo' => null // Limpiar motivo de rechazo si existía
             ]);
 
-
             // Actualizar el último pago a estado "Finalizado"
             $ultimoPago = $matricula->pagos->sortByDesc('created_at')->first();
             $ultimoPago->update(['estado' => 'Finalizado']);
+
             foreach ($matricula->seccion->grado->asignaturas as $asignatura) {
                 foreach ($asignatura->competencias as $competencia) {
                     DetalleAsignatura::create([
@@ -696,7 +783,6 @@ class MatriculaController extends Controller
                     ]);
                 }
             }
-
 
             return back()->with('success', 'Matrícula aprobada exitosamente');
 
@@ -771,4 +857,10 @@ class MatriculaController extends Controller
         ]);
     }
 
+    // Resolver código modular de la única institución registrada (estática)
+    protected function resolverCodigoInstitucion()
+    {
+        $ie = InstitucionEducativa::first();
+        return $ie ? $ie->codigo_modular : null;
+    }
 }

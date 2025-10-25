@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('detalles_asignatura', function (Blueprint $table) {
             $table->id('id_detalle_asignatura');
-            $table->unsignedBigInteger('codigo_asignatura');
+            $table->unsignedBigInteger('id_competencias');
             $table->unsignedBigInteger('codigo_matricula');
             $table->dateTime('fecha');
+            $table->string('calificacion_anual', 2)->nullable();
             $table->timestamps();
 
-            $table->foreign('codigo_asignatura')->references('codigo_asignatura')->on('asignaturas');
+            $table->foreign('id_competencias')->references('id_competencias')->on('competencias');
             $table->foreign('codigo_matricula')->references('codigo_matricula')->on('matriculas');
         });
     }
