@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('matriculas', function (Blueprint $table) {
             $table->string('institucion_educativa_codigo_modular', 7);
             $table->id('codigo_matricula');
-            $table->unsignedBigInteger('estudiante_codigo_estudiante');
-            $table->unsignedBigInteger('anio_escolar_id_anio_escolar');
-            $table->unsignedBigInteger('tipo_matricula_id_tipo_matricula');
-            $table->unsignedBigInteger('seccion_id_seccion');
+            $table->unsignedBigInteger('codigo_estudiante');
+            $table->unsignedBigInteger('id_anio_escolar');
+            $table->unsignedBigInteger('id_tipo_matricula');
+            $table->unsignedBigInteger('seccion_id');
             $table->dateTime('fecha');
             $table->enum('estado', ['Pendiente', 'Rechazado', 'Activo', 'Finalizado'])->default('Pendiente');
             $table->timestamps();
@@ -27,22 +27,22 @@ return new class extends Migration
                 ->on('institucion_educativa')
                 ->onDelete('cascade');
                 
-            $table->foreign('estudiante_codigo_estudiante')
+            $table->foreign('codigo_estudiante')
                 ->references('codigo_estudiante')
                 ->on('estudiantes')
                 ->onDelete('cascade');
                 
-            $table->foreign('anio_escolar_id_anio_escolar')
+            $table->foreign('id_anio_escolar')
                 ->references('id_anio_escolar')
                 ->on('anios_escolares')
                 ->onDelete('cascade');
                 
-            $table->foreign('tipo_matricula_id_tipo_matricula')
+            $table->foreign('id_tipo_matricula')
                 ->references('id_tipo_matricula')
                 ->on('tipos_matricula')
                 ->onDelete('cascade');
                 
-            $table->foreign('seccion_id_seccion')
+            $table->foreign('seccion_id')
                 ->references('id_seccion')
                 ->on('secciones')
                 ->onDelete('cascade');
