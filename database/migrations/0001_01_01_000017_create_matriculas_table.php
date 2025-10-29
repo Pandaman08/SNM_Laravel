@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('matriculas', function (Blueprint $table) {
             $table->string('institucion_educativa_codigo_modular', 7);
-            $table->id('codigo_matricula');
+            $table->unsignedBigInteger('codigo_matricula')->primary();
             $table->unsignedBigInteger('codigo_estudiante');
             $table->unsignedBigInteger('id_anio_escolar');
             $table->unsignedBigInteger('id_tipo_matricula');

@@ -102,6 +102,7 @@
                             <div>
 
                                 <input name="id_anio_escolar" id="id_anio_escolar"
+                                    value="{{ $anioActual->id_anio_escolar }}"
                                     class="hidden w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     required>
 
@@ -791,7 +792,7 @@
                         }
                         return response.json();
                     })
-                    .then data => {
+                    .then(data => {
                         seccionSelect.innerHTML = '<option value="" disabled selected>Seleccione la sección</option>';
 
                         if (data.secciones && data.secciones.length > 0) {

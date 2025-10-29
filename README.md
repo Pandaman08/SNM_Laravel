@@ -12,18 +12,6 @@
  A website 
 ## App Configuration guide
 
-### Basic Steps
-
-1. **Copy file  `.env.example`**:
-   ```bash
-   cp .env.example .env
-   ```
-
-2. **Generate app key**:
-   ```bash
-   php artisan key:generate
-   ```
-
 ## Installation
 
 ### Install node packages
@@ -38,7 +26,26 @@ npm i
 composer install
 ```
 
-## Run app
+### Basic Steps
+
+1. **Copy file  `.env.example`**:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Generate app key**:
+   ```bash
+   php artisan key:generate
+   ```
+
+### Run migrations
+1. **Installation with sample data**:
+   ```bash
+   php artisan migrate --seed
+   ```
+
+
+### Run app
 
 ```bash
 php artisan serve
