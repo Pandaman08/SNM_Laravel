@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_tipo_matricula');
             $table->unsignedBigInteger('seccion_id');
             $table->dateTime('fecha');
-            $table->enum('estado', ['Pendiente', 'Rechazado', 'Activo', 'Finalizado'])->default('Pendiente');
+            $table->enum('estado', ['pendiente', 'rechazado', 'activo', 'finalizado'])->default('pendiente');
             $table->timestamps();
 
             $table->foreign('institucion_educativa_codigo_modular')

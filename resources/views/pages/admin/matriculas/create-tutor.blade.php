@@ -129,7 +129,7 @@
                                 <div>
                                     <label for="dni_buscar" class="block text-sm font-medium text-gray-700 mb-2">DNI del
                                         Estudiante *</label>
-                                    <input type="text" id="dni_buscar" maxlength="8"
+                                    <input type="text" id="dni_buscar" name="dni_busqueda"  maxlength="8"
                                         class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         placeholder="Ingrese el DNI del estudiante" pattern="[0-9]{8}">
                                 </div>
@@ -181,8 +181,8 @@
                                         class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         required>
                                         <option value="" disabled selected>Seleccione</option>
-                                        <option value="M">M</option>
-                                        <option value="F">F</option>
+                                        <option value="M">Masculino</option>
+                                        <option value="F">Femenino</option>
                                     </select>
                                 </div>
 
@@ -387,7 +387,7 @@
                                 <p class="text-gray-500 text-sm">DNI: {{ auth()->user()->persona->dni }}</p>
                                 <p class="text-gray-500 text-sm">Email: {{ auth()->user()->email }}</p>
                             </div>
-                            <div class="p-4 bg-gray-50 rounded-lg">
+                            <diwv class="p-4 bg-gray-50 rounded-lg">
                                 <h4 class="font-semibold text-gray-800 mb-2">Tipo de Relación *</h4>
                                 <select name="tipo_relacion" id="tipo_relacion"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -427,7 +427,8 @@
                         </h2>
                     </div>
                     <div class="p-6">
-                        <p class="text-sm text-gray-600 mb-4">Agregue uno o más contactos de emergencia. Estos se vincularán a su perfil y podrán ser consultados por la institución.</p>
+                        <p class="text-sm text-gray-600 mb-4">Agregue uno o más contactos de emergencia. Estos se
+                            vincularán a su perfil y podrán ser consultados por la institución.</p>
 
                         <div id="parientes-container" class="space-y-4">
                             <!-- Plantilla clonable -->
@@ -435,17 +436,23 @@
                                 <div class="pariente-item grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
                                     <div class="md:col-span-2">
                                         <label class="block text-sm text-gray-700">Nombre</label>
-                                        <input type="text" name="parientes[][nombre]" class="nombre-pariente w-full px-3 py-2 border rounded-lg" placeholder="Nombre completo">
+                                        <input type="text" name="parientes[][nombre]"
+                                            class="nombre-pariente w-full px-3 py-2 border rounded-lg"
+                                            placeholder="Nombre completo">
                                     </div>
                                     <div class="md:col-span-2">
                                         <label class="block text-sm text-gray-700">Celular</label>
-                                        <input type="text" name="parientes[][celular]" class="celular-pariente w-full px-3 py-2 border rounded-lg" placeholder="9 dígitos" maxlength="9" pattern="[0-9]{9}">
+                                        <input type="text" name="parientes[][celular]"
+                                            class="celular-pariente w-full px-3 py-2 border rounded-lg"
+                                            placeholder="9 dígitos" maxlength="9" pattern="[0-9]{9}">
                                     </div>
                                     <div class="md:col-span-2 flex space-x-2">
-                                        <button type="button" class="add-pariente inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                        <button type="button"
+                                            class="add-pariente inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
                                             <i class="ri-add-line mr-2"></i> Agregar
                                         </button>
-                                        <button type="button" class="remove-pariente inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                                        <button type="button"
+                                            class="remove-pariente inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                                             <i class="ri-subtract-line mr-2"></i> Eliminar
                                         </button>
                                     </div>
@@ -456,24 +463,31 @@
                             <div class="pariente-item grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
                                 <div class="md:col-span-2">
                                     <label class="block text-sm text-gray-700">Nombre</label>
-                                    <input type="text" name="parientes[][nombre]" class="nombre-pariente w-full px-3 py-2 border rounded-lg" placeholder="Nombre completo">
+                                    <input type="text" name="parientes[][nombre]"
+                                        class="nombre-pariente w-full px-3 py-2 border rounded-lg"
+                                        placeholder="Nombre completo">
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="block text-sm text-gray-700">Celular</label>
-                                    <input type="text" name="parientes[][celular]" class="celular-pariente w-full px-3 py-2 border rounded-lg" placeholder="9 dígitos" maxlength="9" pattern="[0-9]{9}">
+                                    <input type="text" name="parientes[][celular]"
+                                        class="celular-pariente w-full px-3 py-2 border rounded-lg"
+                                        placeholder="9 dígitos" maxlength="9" pattern="[0-9]{9}">
                                 </div>
                                 <div class="md:col-span-2 flex space-x-2">
-                                    <button type="button" id="btn-add-pariente" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                    <button type="button" id="btn-add-pariente"
+                                        class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
                                         <i class="ri-add-line mr-2"></i> Agregar
                                     </button>
-                                    <button type="button" class="remove-pariente inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                                    <button type="button"
+                                        class="remove-pariente inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                                         <i class="ri-subtract-line mr-2"></i> Eliminar
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        <p class="text-xs text-gray-400 mt-3">Nota: deje los campos vacíos si no desea agregar contactos.</p>
+                        <p class="text-xs text-gray-400 mt-3">Nota: deje los campos vacíos si no desea agregar contactos.
+                        </p>
                     </div>
                 </div>
                 <!-- FIN NUEVO: Contactos de emergencia (Parientes) -->
@@ -584,6 +598,7 @@
 
                 console.log('🔍 Configurado para buscar estudiante EXISTENTE');
             }
+
         }
 
         // Función para buscar estudiante existente
@@ -662,19 +677,74 @@
         }
 
         // Función para llenar formulario con datos del estudiante
-        function llenarFormularioEstudiante(estudiante) {
-            document.getElementById('nombre').value = estudiante.nombre || '';
-            document.getElementById('apellidos').value = estudiante.apellidos || '';
-            document.getElementById('dni').value = estudiante.dni || '';
-            document.getElementById('sexo').value = estudiante.sexo || '';
-            document.getElementById('fecha_nacimiento').value = estudiante.fecha_nacimiento || '';
-            document.getElementById('pais').value = estudiante.pais || '';
-            document.getElementById('provincia').value = estudiante.provincia || '';
-            document.getElementById('distrito').value = estudiante.distrito || '';
-            document.getElementById('departamento').value = estudiante.departamento || '';
-            document.getElementById('lengua_materna').value = estudiante.lengua_materna || '';
-            document.getElementById('religion').value = estudiante.religion || '';
-            document.getElementById('address').value = estudiante.address || '';
+        async function llenarFormularioEstudiante(estudiante) {
+            // Declarar referencias a los elementos primero
+            const nombreEl = document.getElementById('nombre');
+            const apellidosEl = document.getElementById('apellidos');
+            const dniEl = document.getElementById('dni');
+            const sexoEl = document.getElementById('sexo');
+            const fechaEl = document.getElementById('fecha_nacimiento');
+            const paisEl = document.getElementById('pais');
+            const departamentoEl = document.getElementById('departamento');
+            const provinciaEl = document.getElementById('provincia');
+            const distritoEl = document.getElementById('distrito');
+            const lenguaEl = document.getElementById('lengua_materna');
+            const religionEl = document.getElementById('religion');
+            const addressEl = document.getElementById('address');
+
+            // Asignar valores simples
+            nombreEl.value = estudiante.nombre || '';
+            apellidosEl.value = estudiante.apellidos || '';
+            dniEl.value = estudiante.dni || '';
+            sexoEl.value = estudiante.sexo || '';
+            fechaEl.value = estudiante.fecha_nacimiento || '';
+            paisEl.value = estudiante.pais || 'Perú';
+
+            // Departamento -> cargar provincias -> asignar provincia -> cargar distritos -> asignar distrito
+            departamentoEl.value = estudiante.departamento || '';
+
+            // Reset y estado por defecto
+            // provinciaEl.innerHTML = '<option value="" disabled selected>Primero seleccione un departamento</option>';
+            // provinciaEl.disabled = true;
+            // distritoEl.innerHTML = '<option value="" disabled selected>Primero seleccione una provincia</option>';
+            // distritoEl.disabled = true;
+            departamentoEl.disabled = true;
+            if (departamentoEl.value) {
+                try {
+                    // cargarProvincias usa el valor del select departamento para poblar provincia
+                    await cargarProvincias();
+
+                    // Si viene provincia en los datos, asignarla y habilitar
+                    if (estudiante.provincia) {
+                        provinciaEl.value = estudiante.provincia;
+                        provinciaEl.disabled = true;
+
+                        // cargarDistritos depende de la provincia seleccionada
+                        await cargarDistritos();
+
+                        if (estudiante.distrito) {
+                            distritoEl.value = estudiante.distrito;
+                            distritoEl.disabled = true;
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error al asignar provincia/distrito:', err);
+                    // mantener selects en estado seguro
+                    provinciaEl.disabled = true;
+                    distritoEl.disabled = true;
+                }
+            }
+
+            // Campos restantes
+            lenguaEl.value = estudiante.lengua_materna || '';
+            religionEl.value = estudiante.religion || '';
+            addressEl.value = estudiante.address || '';
+
+            console.log('🚀 Llenado de formulario completado:', {
+                departamento: departamentoEl.value,
+                provincia: provinciaEl.value,
+                distrito: distritoEl.value
+            });
         }
 
         // Función para limpiar formulario del estudiante
@@ -720,13 +790,13 @@
         // Función para cargar grados según el nivel educativo seleccionado
         function cargarGrados() {
             console.log('🚀 INICIANDO cargarGrados()');
-            const nivelSelect = document.getElementById('nivel_educativo_id'); // ✅ ID correcto
-            const gradoSelect = document.getElementById('grado_id'); // ✅ ID correcto
+            const nivelSelect = document.getElementById('nivel_educativo_id');
+            const gradoSelect = document.getElementById('grado_id');
             const seccionSelect = document.getElementById('seccion_id');
             const nivelId = nivelSelect.value;
 
 
-            console.log('🔄 Cargando grados para nivel ID:', nivelId); // Debug
+            console.log('🔄 Cargando grados para nivel ID:', nivelId);
 
             // Limpiar opciones de grado y sección
             gradoSelect.innerHTML = '<option value="" disabled selected>Cargando grados...</option>';
@@ -919,9 +989,9 @@
             });
         });
 
-      
 
-         async function cargarProvincias() {
+
+        async function cargarProvincias() {
             const departamentoSelect = document.getElementById('departamento');
             const provinciaSelect = document.getElementById('provincia');
             const distritoSelect = document.getElementById('distrito');
@@ -958,7 +1028,7 @@
             }
         }
 
-         async function cargarDistritos() {
+        async function cargarDistritos() {
             const provinciaSelect = document.getElementById('provincia');
             const distritoSelect = document.getElementById('distrito');
             const provincia = provinciaSelect.value;
@@ -988,5 +1058,238 @@
                 }
             }
         }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('parientes-container');
+            const template = document.getElementById('pariente-template');
+
+            // Contador para asegurar índices únicos
+            let parentCounter = 1; // Empezamos en 1 porque el primer item ya existe
+            const MAX_CONTACTOS = 4;
+
+            // Función para actualizar botones de todos los items
+            function actualizarBotones() {
+                const items = container.querySelectorAll('.pariente-item');
+                const totalItems = items.length;
+
+                items.forEach((item, index) => {
+                    const btnAgregar = item.querySelector('.add-pariente, #btn-add-pariente');
+                    const btnEliminar = item.querySelector('.remove-pariente');
+
+                    // Solo el último item muestra el botón agregar
+                    if (index === totalItems - 1) {
+                        if (btnAgregar) {
+                            btnAgregar.style.display = 'inline-flex';
+
+                            // Deshabilitar si se alcanzó el máximo
+                            if (totalItems >= MAX_CONTACTOS) {
+                                btnAgregar.disabled = true;
+                                btnAgregar.classList.add('opacity-50', 'cursor-not-allowed');
+                                btnAgregar.title = `Máximo ${MAX_CONTACTOS} contactos permitidos`;
+                            } else {
+                                btnAgregar.disabled = false;
+                                btnAgregar.classList.remove('opacity-50', 'cursor-not-allowed');
+                                btnAgregar.title = '';
+                            }
+                        }
+                    } else {
+                        // Los demás items ocultan el botón agregar
+                        if (btnAgregar) {
+                            btnAgregar.style.display = 'none';
+                        }
+                    }
+
+                    // Siempre mostrar botón eliminar (excepto si es el único)
+                    if (btnEliminar) {
+                        if (totalItems === 1) {
+                            btnEliminar.disabled = true;
+                            btnEliminar.classList.add('opacity-50', 'cursor-not-allowed');
+                            btnEliminar.title = 'Debe mantener al menos un campo disponible';
+                        } else {
+                            btnEliminar.disabled = false;
+                            btnEliminar.classList.remove('opacity-50', 'cursor-not-allowed');
+                            btnEliminar.title = '';
+                        }
+                    }
+                });
+
+                console.log(`📊 Total contactos: ${totalItems}/${MAX_CONTACTOS}`);
+            }
+
+            // Función para reindexar todos los items
+            function reindexarItems() {
+                const items = container.querySelectorAll('.pariente-item');
+                items.forEach((item, index) => {
+                    const inputs = item.querySelectorAll('input');
+                    inputs.forEach(input => {
+                        const currentName = input.getAttribute('name');
+                        if (currentName) {
+                            // Actualizar el índice en el name attribute
+                            if (currentName.includes('[nombre]')) {
+                                input.setAttribute('name', `parientes[${index}][nombre]`);
+                            } else if (currentName.includes('[celular]')) {
+                                input.setAttribute('name', `parientes[${index}][celular]`);
+                            }
+                        }
+                    });
+                });
+                console.log('🔄 Items reindexados');
+            }
+
+            // Función para agregar un nuevo pariente
+            function agregarPariente() {
+                const totalItems = container.querySelectorAll('.pariente-item').length;
+
+                // Verificar límite máximo
+                if (totalItems >= MAX_CONTACTOS) {
+                    alert(`⚠️ Solo puede agregar un máximo de ${MAX_CONTACTOS} contactos de emergencia.`);
+                    return;
+                }
+
+                // Clonar el template
+                const nuevoPariente = template.content.cloneNode(true);
+
+                // Actualizar los atributos name con índice correcto
+                const inputs = nuevoPariente.querySelectorAll('input');
+                inputs.forEach(input => {
+                    if (input.classList.contains('nombre-pariente')) {
+                        input.setAttribute('name', `parientes[${parentCounter}][nombre]`);
+                    } else if (input.classList.contains('celular-pariente')) {
+                        input.setAttribute('name', `parientes[${parentCounter}][celular]`);
+                    }
+                });
+
+                parentCounter++;
+
+                // Agregar al contenedor
+                container.appendChild(nuevoPariente);
+
+                // Reindexar todos los items para mantener consistencia
+                reindexarItems();
+
+                // Actualizar visibilidad de botones
+                actualizarBotones();
+
+                console.log('✅ Nuevo contacto agregado');
+            }
+
+            // Función para eliminar un pariente
+            function eliminarPariente(button) {
+                const parienteItem = button.closest('.pariente-item');
+                const totalItems = container.querySelectorAll('.pariente-item').length;
+
+                // No permitir eliminar si solo queda uno
+                if (totalItems <= 1) {
+                    alert(
+                        '⚠️ Debe mantener al menos un campo de contacto disponible (puede dejarlo vacío si no desea agregar contactos).');
+                    return;
+                }
+
+                parienteItem.remove();
+
+                // Reindexar todos los items después de eliminar
+                reindexarItems();
+
+                // Actualizar visibilidad de botones
+                actualizarBotones();
+
+                console.log('🗑️ Contacto eliminado. Total restante:', totalItems - 1);
+            }
+
+            // Event delegation para botones
+            container.addEventListener('click', function(e) {
+                // Botón agregar
+                if (e.target.closest('.add-pariente') || e.target.closest('#btn-add-pariente')) {
+                    e.preventDefault();
+                    const button = e.target.closest('.add-pariente') || e.target.closest(
+                        '#btn-add-pariente');
+                    if (!button.disabled) {
+                        agregarPariente();
+                    }
+                }
+
+                // Botón eliminar
+                if (e.target.closest('.remove-pariente')) {
+                    e.preventDefault();
+                    const button = e.target.closest('.remove-pariente');
+                    if (!button.disabled) {
+                        eliminarPariente(button);
+                    }
+                }
+            });
+
+            // Validación opcional: solo números en celular
+            container.addEventListener('input', function(e) {
+                if (e.target.classList.contains('celular-pariente')) {
+                    // Eliminar cualquier caracter que no sea número
+                    e.target.value = e.target.value.replace(/\D/g, '');
+                }
+            });
+
+            // Validación antes de enviar el formulario
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const parientes = container.querySelectorAll('.pariente-item');
+                    let hayErrores = false;
+
+                    parientes.forEach((item, index) => {
+                        const nombre = item.querySelector('.nombre-pariente').value.trim();
+                        const celular = item.querySelector('.celular-pariente').value.trim();
+
+                        // Si uno está lleno pero el otro vacío, es un error
+                        if ((nombre && !celular) || (!nombre && celular)) {
+                            hayErrores = true;
+
+                            // Resaltar campos con error
+                            if (!nombre) {
+                                item.querySelector('.nombre-pariente').classList.add(
+                                    'border-red-500');
+                            }
+                            if (!celular) {
+                                item.querySelector('.celular-pariente').classList.add(
+                                    'border-red-500');
+                            }
+                        }
+
+                        // Validar formato de celular si está presente
+                        if (celular && celular.length !== 9) {
+                            hayErrores = true;
+                            item.querySelector('.celular-pariente').classList.add('border-red-500');
+                        }
+                    });
+
+                    if (hayErrores) {
+                        e.preventDefault();
+                        alert('⚠️ Por favor complete correctamente los contactos de emergencia:\n\n' +
+                            '• Si ingresa un nombre, debe ingresar también el celular\n' +
+                            '• El celular debe tener exactamente 9 dígitos\n' +
+                            '• Puede dejar ambos campos vacíos si no desea agregar contactos');
+
+                        // Scroll al primer error
+                        const primerError = container.querySelector('.border-red-500');
+                        if (primerError) {
+                            primerError.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center'
+                            });
+                        }
+                    }
+                });
+
+                // Limpiar estilos de error al escribir
+                container.addEventListener('input', function(e) {
+                    if (e.target.classList.contains('nombre-pariente') ||
+                        e.target.classList.contains('celular-pariente')) {
+                        e.target.classList.remove('border-red-500');
+                    }
+                });
+            }
+
+            // Inicializar: reindexar el item por defecto y actualizar botones
+            reindexarItems();
+            actualizarBotones();
+        });
     </script>
 @endsection

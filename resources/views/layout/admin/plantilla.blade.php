@@ -308,34 +308,7 @@
                     </ul>
                 </div>
 
-                <!-- Grading Types Management -->
-                <div class="sidebar-item relative group {{ request()->routeIs(['tipos-calificacion.index', 'tipos-calificacion.create']) ? 'selected' : '' }}">
-                    @if(request()->routeIs(['tipos-calificacion.index', 'tipos-calificacion.create']))
-                        <div class="active-indicator"></div>
-                    @endif
-                    <a class="flex items-center py-3 px-4 text-white hover:bg-[#98C560]/20 rounded-lg hover-scale transition-all duration-300 sidebar-dropdown-toggle cursor-pointer group-[.selected]:bg-[#98C560]/30">
-                        <div class="w-8 h-8 bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
-                            <i class="ri-award-line text-white text-sm"></i>
-                        </div>
-                        <span class="text-sm font-medium flex-1">Gestionar Tipos Calificaciones</span>
-                        <i class="ri-arrow-right-s-line submenu-indicator text-lg text-[#98C560]"></i>
-                    </a>
-                    
-                    <ul class="pl-12 mt-2 space-y-2 {{ request()->routeIs(['tipos-calificacion.index', 'tipos-calificacion.create']) ? 'block' : 'hidden' }} group-[.selected]:block">
-                        <li>
-                            <a href="{{ route('tipos-calificacion.index') }}" class="flex items-center py-2 px-3 text-gray-300 hover:text-[#98C560] hover:bg-white/5 rounded-md transition-all duration-200 text-sm {{ request()->routeIs('tipos-calificacion.index') ? 'text-[#98C560] bg-white/5' : '' }}">
-                                <div class="w-2 h-2 bg-pink-400 rounded-full mr-3 opacity-60"></div>
-                                Lista de Tipos Calificación
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('tipos-calificacion.create') }}" class="flex items-center py-2 px-3 text-gray-300 hover:text-[#98C560] hover:bg-white/5 rounded-md transition-all duration-200 text-sm {{ request()->routeIs('tipos-calificacion.create') ? 'text-[#98C560] bg-white/5' : '' }}">
-                                <div class="w-2 h-2 bg-green-400 rounded-full mr-3 opacity-60"></div>
-                                Registrar Tipo Calificación
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+
 
                 <!-- Periods Management -->
                 <div class="sidebar-item relative group {{ request()->routeIs(['periodos.index', 'periodos.create']) ? 'selected' : '' }}">
