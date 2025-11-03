@@ -100,8 +100,14 @@ class DatabaseSeeder extends Seeder
 
         // 4. Asignar asignaturas y secciones a docentes
         $this->call([
+            InstitucionEducativaSeeder::class,
+            AnioEscolarSeeder::class,
+            PeriodoSeeder::class,
+
             AsignaturaSeeder::class,
             SeccionDocenteSeeder::class,
+            CompetenciaSeeder::class,
+          
         ]);
     }
 }
