@@ -20,16 +20,6 @@ class TiposMatriculaSeeder extends Seeder
                 'nombre' => 'Matrícula Regular',
                 'descripcion' => 'Para continuidad de estudios',
             ],
-            [
-                'id_tipo_matricula' => 3,
-                'nombre' => 'Matrícula por Traslado',
-                'descripcion' => 'Para estudiantes que vienen de otra institución',
-            ],
-            [
-                'id_tipo_matricula' => 4,
-                'nombre' => 'Reincorporación',
-                'descripcion' => 'Para estudiantes que regresan después de un tiempo',
-            ],
         ]);
     }
 }

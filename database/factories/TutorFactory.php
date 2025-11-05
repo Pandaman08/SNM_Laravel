@@ -18,7 +18,9 @@ class TutorFactory extends Factory
     {
          return [
             'user_id' => \App\Models\User::factory()->tutor(),
-            'parentesco' => 'Padre',
+            'parentesco' => $this->faker->randomElement(['Padre', 'Madre']),
+            'lugar_trabajo' => $this->faker->company(),
+            'oficio' => $this->faker->jobTitle(),
         ];
     }
 }

@@ -15,28 +15,12 @@ class NivelesEducativosSeeder extends Seeder
     {
         $niveles = [
             [
-                'nombre' => 'Inicial',
-                'codigo' => 'INI',
-                'descripcion' => 'Educación Inicial - Formación temprana y desarrollo integral',
-                'edad_minima' => 3,
-                'edad_maxima' => 5,
-                'activo' => true
-            ],
-            [
                 'nombre' => 'Primaria',
-                'codigo' => 'PRI', 
-                'descripcion' => 'Educación Primaria - Formación básica integral',
-                'edad_minima' => 6,
-                'edad_maxima' => 11,
-                'activo' => true
+                'estado' => true
             ],
             [
                 'nombre' => 'Secundaria',
-                'codigo' => 'SEC',
-                'descripcion' => 'Educación Secundaria - Formación científica, humanística y técnica',
-                'edad_minima' => 12,
-                'edad_maxima' => 17,
-                'activo' => true
+                'estado' => true
             ]
         ];
 

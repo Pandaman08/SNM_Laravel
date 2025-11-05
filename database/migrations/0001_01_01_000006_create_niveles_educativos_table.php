@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tipos_calificacion', function (Blueprint $table) {
-            $table->id('id_tipo_calificacion');
-            $table->string('codigo', 45);
-            $table->string('nombre', 80);
-            $table->string('descripcion', 200);
+        Schema::create('niveles_educativos', function (Blueprint $table) {
+            $table->id('id_nivel_educativo');
+            $table->string('nombre', 50); // 'Inicial', 'Primaria', 'Secundaria'
+            $table->boolean('estado')->default(true);
+            $table->timestamps();
         });
     }
 
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tipos_calificacion');
+        Schema::dropIfExists('niveles_educativos');
     }
 };

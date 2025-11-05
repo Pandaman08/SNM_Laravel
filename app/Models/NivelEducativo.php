@@ -14,17 +14,11 @@ class NivelEducativo extends Model
 
     protected $fillable = [
         'nombre',
-        'codigo',
-        'descripcion',
-        'edad_minima',
-        'edad_maxima',
-        'activo'
+        'estado'
     ];
 
     protected $casts = [
-        'activo' => 'boolean',
-        'edad_minima' => 'integer',
-        'edad_maxima' => 'integer'
+        'estado' => 'boolean',
     ];
 
     // Relación: Un nivel educativo tiene muchos grados
@@ -63,6 +57,11 @@ class NivelEducativo extends Model
     // Scope: Solo niveles activos
     public function scopeActivos($query)
     {
-        return $query->where('activo', true);
+        return $query->where('estado', true);
+    }
+
+    public function docentes()
+    {
+        return $this->hasMany(Docente::class, 'nivel_educativo_id', 'id_nivel_educativo');
     }
 }

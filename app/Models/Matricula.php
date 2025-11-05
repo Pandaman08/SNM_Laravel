@@ -13,20 +13,20 @@ class Matricula extends Model
 
     public $incrementing = false;
     protected $fillable = [
+        'institucion_educativa_codigo_modular',
         'codigo_matricula',
         'codigo_estudiante',
         'id_anio_escolar',
         'id_tipo_matricula',
         'estado',
-        'seccion_id', // ← AGREGAR FK a secciones
-        'fecha'
+        'seccion_id',
+        'fecha',
     ];
 
     protected $casts = [
         'codigo_estudiante' => 'integer',
         'estado' => 'string',
-         'fecha' => 'datetime',
-
+        'fecha' => 'datetime',
     ];
     protected $dates = ['fecha'];
 
@@ -45,7 +45,6 @@ class Matricula extends Model
         return $this->belongsTo(TipoMatricula::class, 'id_tipo_matricula', 'id_tipo_matricula');
     }
 
-    // ← NUEVA RELACIÓN: Matricula pertenece a una Sección
     public function seccion()
     {
         return $this->belongsTo(Seccion::class, 'seccion_id', 'id_seccion');
@@ -75,5 +74,10 @@ class Matricula extends Model
 
         return $generatedCode;
 
+    }
+
+    public function institucionEducativa()
+    {
+        return $this->belongsTo(InstitucionEducativa::class, 'institucion_educativa_codigo_modular', 'codigo_modular');
     }
 }

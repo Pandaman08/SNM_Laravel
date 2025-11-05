@@ -261,9 +261,10 @@
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">-- Seleccione un docente --</option>
                                 @foreach($docentes as $docente)
-                                    <option value="{{ $docente->codigo_docente }}" data-nombre="{{ $docente->user->persona->name ?? 'Nombre no disponible' }}" data-apellido="{{ $docente->user->persona->lastname ?? '' }}">
+                                    <option value="{{ $docente->codigo_docente }}" data-nombre="{{ $docente->user->persona->name ?? 'Nombre no disponible' }}" data-apellido="{{ $docente->user->persona->lastname . ' '.$docente->user->email?? '' }}">
                                         {{ $docente->user->persona->name ?? 'Nombre no disponible' }} 
                                         {{ $docente->user->persona->lastname ?? '' }}
+                                         {{ $docente->user->email ?? '' }}
                                         ({{ $docente->codigo_docente }})
                                     </option>
                                 @endforeach

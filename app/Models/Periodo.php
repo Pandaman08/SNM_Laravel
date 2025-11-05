@@ -28,4 +28,14 @@ class Periodo extends Model
     {
         return $this->hasMany(Asistencia::class, 'id_periodo', 'id_periodo');
     }
+
+    public function scopeEnProceso($query)
+    {
+        return $query->where('estado', 'Proceso');
+    }
+
+    public function scopeFinalizados($query)
+    {
+        return $query->where('estado', 'Finalizado');
+    }
 }

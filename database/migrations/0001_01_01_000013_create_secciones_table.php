@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('secciones', function (Blueprint $table) {
             $table->id('id_seccion');
             $table->unsignedBigInteger('id_grado');
-            $table->string('seccion', 45);
+            $table->string('seccion', 120);
+            $table->integer('vacantes_seccion');
+            $table->boolean('estado_vacantes')->default(true);
             $table->timestamps();
 
             $table->foreign('id_grado')->references('id_grado')->on('grados');

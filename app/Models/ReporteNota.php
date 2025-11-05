@@ -14,25 +14,25 @@ class ReporteNota extends Model
 
     protected $fillable = [
         'id_detalle_asignatura',
-        'id_tipo_calificacion',
         'id_periodo',
         'observacion',
-        'fecha_registro'
+        'fecha_registro',
+        'calificacion_periodo',
     ];
 
+    protected $casts = [
+        'fecha_registro' => 'date',
+    ];
+
+    // Relación con DetalleAsignatura
     public function detalleAsignatura()
     {
-        return $this->belongsTo(DetalleAsignatura::class, 'id_detalle_asignatura');
+        return $this->belongsTo(DetalleAsignatura::class, 'id_detalle_asignatura', 'id_detalle_asignatura');
     }
 
-    public function tipoCalificacion()
-    {
-        return $this->belongsTo(TipoCalificacion::class, 'id_tipo_calificacion');
-    }
-
+    // Relación con Periodo
     public function periodo()
     {
-        return $this->belongsTo(Periodo::class, 'id_periodo');
+        return $this->belongsTo(Periodo::class, 'id_periodo', 'id_periodo');
     }
-
 }

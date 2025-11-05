@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\NivelEducativo;
 use App\Models\Asignatura;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,17 +28,23 @@ class DocenteController extends Controller
     {
         $query = $request->input('search');
 
-        $users = User::with(['persona', 'docente'])
-            ->where('rol', 'docente')
+        // Incluir la relación con nivel educativo
+        $users = User::with(['persona', 'docente.nivelEducativo'])
+            ->where('rol', '=', 'docente')
             ->when($query, function ($queryBuilder) use ($query) {
                 $queryBuilder->whereHas('persona', function ($q) use ($query) {
-                    $q->where('name', 'like', '%' . $query . '%')
-                        ->orWhere('lastname', 'like', '%' . $query . '%');
-                })->orWhere('email', 'like', '%' . $query . '%');
+                    $q->where('name', 'like', "%{$query}%")
+                      ->orWhere('lastname', 'like', "%{$query}%")
+                      ->orWhere('dni', 'like', "%{$query}%");
+                });
             })
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('pages.admin.docentes.index', compact('users'));
+        // Obtener niveles educativos para el formulario
+        $nivelesEducativos = NivelEducativo::all();
+
+        return view('pages.admin.docentes.index', compact('users', 'nivelesEducativos'));
     }
 
     public function showDocente(Request $request)
@@ -61,7 +69,11 @@ class DocenteController extends Controller
     {
         $user = Auth::user();
         $numAsign = AsignaturaDocente::where('codigo_docente', '=', $user->docente->codigo_docente)->get()->count();
-        return view("pages.admin.panels.docente", compact('user', 'numAsign'));
+        
+        // Incluir nivel educativo en los datos del panel
+        $nivelEducativo = $user->docente->nivelEducativo;
+        
+        return view("pages.admin.panels.docente", compact('user', 'numAsign', 'nivelEducativo'));
     }
 
     public function index_asignaturas()
@@ -117,11 +129,9 @@ class DocenteController extends Controller
                 'sexo' => 'required|in:M,F',
                 'address' => 'required|string|max:200',
                 'fecha_nacimiento' => 'required|date',
-                'especialidad' => 'required|string|max:100',
-                'jornada_laboral' => 'required|numeric',
-                'departamento_estudios' => 'required|string|max:100',
-                'fecha_contratacion' => 'required|date',
                 'photo' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
+                'nivel_educativo_id' => 'required|exists:niveles_educativos,id_nivel_educativo',
+                'firma_docente' => 'nullable|string'
             ]);
 
             // Generar email automático
@@ -153,13 +163,11 @@ class DocenteController extends Controller
                 'estado' => true
             ]);
 
-            // Crear Docente
+            // Crear Docente con nivel educativo
             $docente = Docente::create([
                 'user_id' => $user->user_id,
-                'especialidad' => $request->especialidad,
-                'jornada_laboral' => $request->jornada_laboral,
-                'fecha_contratacion' => $request->fecha_contratacion,
-                'departamento_estudios' => $request->departamento_estudios
+                'nivel_educativo_id' => $request->nivel_educativo_id,
+                'firma_docente' => $request->firma_docente ?? null
             ]);
 
             DB::commit();
@@ -167,6 +175,7 @@ class DocenteController extends Controller
             return redirect()->route('docentes.buscar')->with('success', 'Docente creado exitosamente');
 
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Error al crear docente: ' . $e->getMessage());
             return back()->with('error', 'Error al crear docente: ' . $e->getMessage());
         }
@@ -177,8 +186,6 @@ class DocenteController extends Controller
         DB::beginTransaction();
 
         try {
-            $user = User::with(['persona', 'docente'])->findOrFail($user_id);
-
             $request->validate([
                 'edit_name' => 'required|string|max:100',
                 'edit_lastname' => 'required|string|max:100',
@@ -187,12 +194,15 @@ class DocenteController extends Controller
                 'edit_sexo' => 'required|in:M,F',
                 'edit_address' => 'required|string|max:200',
                 'edit_fecha_nacimiento' => 'required|date',
-                'edit_especialidad' => 'required|string|max:100',
-                'edit_jornada_laboral' => 'required|numeric',
-                'edit_departamento_estudios' => 'required|string|max:100',
-                'edit_fecha_contratacion' => 'required|date',
                 'edit_photo' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
+                'edit_nivel_educativo_id' => 'required|exists:niveles_educativos,id_nivel_educativo',
+                'edit_firma_docente' => 'nullable|string'
             ]);
+
+            $user = User::with(['persona', 'docente'])->findOrFail($user_id);
+            
+            // Verificar si el nivel educativo existe
+            $nivelEducativo = NivelEducativo::findOrFail($request->edit_nivel_educativo_id);
 
             // Actualizar Persona
             $personaData = [
@@ -214,17 +224,16 @@ class DocenteController extends Controller
 
             $user->persona->update($personaData);
 
-            // Actualizar Docente
+            // Actualizar docente con nivel educativo
             $user->docente->update([
-                'especialidad' => $request->edit_especialidad,
-                'jornada_laboral' => $request->edit_jornada_laboral,
-                'fecha_contratacion' => $request->edit_fecha_contratacion,
-                'departamento_estudios' => $request->edit_departamento_estudios
+                'nivel_educativo_id' => $nivelEducativo->id_nivel_educativo,
+                'firma_docente' => $request->edit_firma_docente
             ]);
 
             DB::commit();
 
-            return redirect()->route('docentes.buscar')->with('success-update', 'Docente actualizado exitosamente');
+            return redirect()->route('docentes.buscar')
+                ->with('success', 'Docente actualizado exitosamente');
 
         } catch (\Exception $e) {
             DB::rollBack();

@@ -12,16 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reportes_notas', function (Blueprint $table) {
-            $table->id('id_calificacion');
+            $table->id('id_reporte_notas');
             $table->unsignedBigInteger('id_detalle_asignatura');
-            $table->unsignedBigInteger('id_tipo_calificacion');
             $table->unsignedBigInteger('id_periodo');
+            $table->string('calificacion', 2);
             $table->mediumText('observacion')->nullable();
             $table->date('fecha_registro');
             $table->timestamps();
 
             $table->foreign('id_detalle_asignatura')->references('id_detalle_asignatura')->on('detalles_asignatura');
-            $table->foreign('id_tipo_calificacion')->references('id_tipo_calificacion')->on('tipos_calificacion');
             $table->foreign('id_periodo')->references('id_periodo')->on('periodos');
         });
     }

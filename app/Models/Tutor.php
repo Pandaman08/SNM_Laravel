@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User; // ⬅ Asegúrate de importar el modelo User
 
 class Tutor extends Model
 {
@@ -16,22 +15,33 @@ class Tutor extends Model
     protected $fillable = [
         'user_id',
         'parentesco',
+        'lugar_trabajo',
+        'oficio',
     ];
 
-    /**
-     * Relación: cada Tutor pertenece a un User.
-     * Ajusta el segundo y tercer parámetro según tu migración:
-     *  - 'user_id' es la fk en tutores
-     *  - 'user_id' (o 'id' si tu tabla users usa ese nombre) es la pk en users
-     */
+    // Relación con User
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
-     public function detalles()
+    // Relación many-to-many con Estudiantes a través de estudiantes_tutores
+    public function estudiantes()
     {
-         return $this->hasMany(EstudianteTutor::class, 'codigo_estudiante', 'codigo_estudiante');
+        return $this->belongsToMany(Estudiante::class, 'estudiantes_tutores', 'id_tutor', 'codigo_estudiante')
+                    ->withPivot('tipo_relacion')
+                    ->withTimestamps();
+    }
+
+    // Relación directa con tabla pivot estudiantes_tutores
+    public function estudiantesTutores()
+    {
+        return $this->hasMany(EstudianteTutor::class, 'id_tutor', 'id_tutor');
+    }
+
+    // Relación con Parientes del Tutor
+    public function parientes()
+    {
+        return $this->hasMany(ParienteTutor::class, 'tutor_id_tutor', 'id_tutor');
     }
 }
-

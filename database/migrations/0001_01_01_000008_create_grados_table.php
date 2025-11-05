@@ -13,8 +13,14 @@ return new class extends Migration
     {
         Schema::create('grados', function (Blueprint $table) {
             $table->id('id_grado');
-            $table->string('grado', 45);
+            $table->unsignedBigInteger('nivel_educativo_id');
+            $table->integer('grado');
             $table->timestamps();
+            
+            $table->foreign('nivel_educativo_id')
+                ->references('id_nivel_educativo')
+                ->on('niveles_educativos')
+                ->onDelete('cascade');
         });
     }
 

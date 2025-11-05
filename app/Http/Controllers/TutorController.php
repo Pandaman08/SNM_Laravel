@@ -46,6 +46,10 @@ class TutorController extends Controller
                 }
             ])
             ->get();
+
+        // Obtener parientes (contactos de emergencia) del tutor
+        $parientes = $tutor->parientes()->get();
+
         return view("pages.admin.panels.tutor", [
                 'user' => $user,
                 'tutor' => $tutor,
@@ -60,6 +64,7 @@ class TutorController extends Controller
                         'seccion' => $matricula && $matricula->seccion ? $matricula->seccion->seccion : null,
                     ];
                 }),
+                'parientes' => $parientes, // agregado
             ]);
   
     }

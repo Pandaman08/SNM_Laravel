@@ -4,30 +4,23 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Persona>
- */
 class PersonaFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
+        $dni = $this->faker->unique()->numberBetween(10000000, 99999999);
+        $celular = '9' . $this->faker->unique()->numerify('########');
+
         return [
             'name' => $this->faker->firstName(),
             'lastname' => $this->faker->lastName(),
-            'dni' =>$this->faker->numberBetween(0, 99999999),
-            'phone' => $this->faker->numberBetween(0, 999999999),
-            'sexo' => 'M',
-            'estado_civil' => 'C',
+            'dni' => $dni,
+            'phone' => $celular,
+            'sexo' => $this->faker->randomElement(['M', 'F']),
+            'estado_civil' => $this->faker->randomElement(['S', 'C', 'V', 'D']),
             'photo' => null,
-            'address' => $this->faker->address(),
-            'fecha_nacimiento' => $this->faker->dateTimeBetween('-50 years', '-18 years')->format('Y-m-d'),
-             'created_at' => $this->faker->dateTimeBetween('-2 years', 'now'),
-            'updated_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
+            'address' => $this->faker->streetAddress() . ', ' . $this->faker->city(),
+            'fecha_nacimiento' => $this->faker->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'),
         ];
     }
 }
