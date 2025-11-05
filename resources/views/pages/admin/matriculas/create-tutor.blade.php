@@ -416,9 +416,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- NUEVO: Contactos de emergencia (Parientes) -->
+                           <!--  Contactos de emergencia (Parientes) -->
                 <div id="seccion-parientes" class="bg-white rounded-lg shadow-sm border border-gray-200">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h2 class="text-lg font-semibold text-gray-900 flex items-center">
@@ -510,6 +509,11 @@
                         </div>
                     </div>
                 </div>
+
+
+                </div>
+
+         
             </form>
         </div>
     </div>

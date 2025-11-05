@@ -197,6 +197,10 @@ class MatriculaController extends Controller
             'fecha' => 'required|date',
             'tutor_id' => 'required|exists:tutores,id_tutor',
             'tipo_relacion' => 'required|string|max:50',
+            // Parientes opcionales
+            'parientes' => 'nullable|array',
+            'parientes.*.nombre' => 'nullable|string|max:255',
+            'parientes.*.celular' => 'nullable|digits:9',
         ];
 
         $newStudentValidationRules = [
@@ -300,6 +304,10 @@ class MatriculaController extends Controller
                         'seccion_id' => 'No hay vacantes disponibles para activar la matrícula.'
                     ])->withInput();
                 }
+
+                // Reducir vacante en la sección
+                $seccion->reducirVacante();
+
             }
 
             // obtener código modular de la institución (automático)
@@ -339,13 +347,54 @@ class MatriculaController extends Controller
                 ]);
             }
 
-            DB::table('estudiantes_tutores')->insert([
-                'codigo_estudiante' => $codigoEstudiante,
-                'id_tutor' => $validatedData['tutor_id'],
-                'tipo_relacion' => $validatedData['tipo_relacion'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            DB::table('estudiantes_tutores')->updateOrInsert(
+                [
+                    'codigo_estudiante' => $codigoEstudiante,
+                    'id_tutor' => $validatedData['tutor_id']
+                ],
+                [
+                    'tipo_relacion' => $validatedData['tipo_relacion'],
+                    'updated_at' => now()
+                ]
+            );
+
+                  // FILTRAR PARIENTES VACÍOS ANTES DE GUARDAR
+            \Log::info("parientes data:", $validatedData['parientes'] ?? []);
+
+            if (!empty($validatedData['parientes']) && is_array($validatedData['parientes'])) {
+              
+                    // Filtrar parientes que tengan tanto nombre como celular completados
+                    $parientesValidos = array_filter($validatedData['parientes'], function ($p) {
+                        return !empty($p['nombre']) && !empty($p['celular']);
+                    });
+
+                    \Log::info("Parientes válidos filtrados:", [
+                        'total_recibidos' => count($validatedData['parientes']),
+                        'total_validos' => count($parientesValidos),
+                        'parientes_validos' => $parientesValidos
+                    ]);
+
+                    // Solo guardar si hay parientes válidos
+                    if (!empty($parientesValidos)) {
+                        foreach ($parientesValidos as $p) {
+                            ParienteTutor::create([
+                                'tutor_id_tutor' =>  $validatedData['tutor_id'],
+                                'nombre_pariente_tutor' => trim($p['nombre']),
+                                'celular_pariente_tutor' => trim($p['celular']),
+                            ]);
+                        }
+
+                        \Log::info("Parientes guardados correctamente", [
+                            'tutor_id' =>  $validatedData['tutor_id'],
+                            'cantidad' => count($parientesValidos)
+                        ]);
+                    } else {
+                        \Log::info("No se encontraron parientes válidos para guardar");
+                    }
+                
+            } else {
+                \Log::info("No se recibieron datos de parientes o el array está vacío");
+            }
 
             DB::commit();
 
@@ -425,7 +474,7 @@ class MatriculaController extends Controller
             }
 
             // Lógica para matrícula regular (tipos 2, 3, 4)
-            if (in_array($request->id_tipo_matricula, ['2', '3', '4'])) {
+            if (in_array($request->id_tipo_matricula, ['2'])) {
 
                 $validatedData = array_merge(
                     $validatedData,
@@ -503,7 +552,7 @@ class MatriculaController extends Controller
                 ]
             );
 
-            // ✅ FILTRAR PARIENTES VACÍOS ANTES DE GUARDAR
+            //  FILTRAR PARIENTES VACÍOS ANTES DE GUARDAR
             \Log::info("parientes data:", $validatedData['parientes'] ?? []);
 
             if (!empty($validatedData['parientes']) && is_array($validatedData['parientes'])) {
@@ -883,6 +932,8 @@ class MatriculaController extends Controller
                 'estado' => 'activo',
                 'motivo_rechazo' => null // Limpiar motivo de rechazo si existía
             ]);
+
+            $seccion->reducirVacante();
 
             // Actualizar el último pago a estado "Finalizado"
             $ultimoPago = $matricula->pagos->sortByDesc('created_at')->first();
