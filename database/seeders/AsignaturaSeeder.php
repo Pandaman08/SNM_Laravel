@@ -11,7 +11,7 @@ class AsignaturaSeeder extends Seeder
 {
     public function run()
     {
-        Asignatura::factory(120)->create()->each(function ($asignatura) {
+        Asignatura::factory(60)->create()->each(function ($asignatura) {
             $grado = $asignatura->grado;
             $nombre = $grado->nivelEducativo->nombre;
 

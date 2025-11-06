@@ -38,13 +38,15 @@
                     <span class="font-semibold">Grado/Sección:</span>
                     <span class="ml-2">{{ $matricula->seccion->grado->grado }} "{{ $matricula->seccion->seccion }}"</span>
                 </div>
-                 <a href="{{ route('reporte.notas.pdf', $matricula->codigo_matricula) }}" 
-                   class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-                    </svg>
-                    Generar PDF
-                </a>
+                <div class="mt-3">
+                    <a href="{{ route('reporte.notas.pdf', $matricula->codigo_matricula) }}" 
+                       class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center transition-colors duration-200">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                        </svg>
+                        Generar PDF
+                    </a>
+                </div>
             </div>
 
             <div class="overflow-x-auto">
@@ -123,7 +125,7 @@
                                             $reporte = $detalle
                                                 ? $detalle->reportesNotas->where('id_periodo', $periodo)->first()
                                                 : null;
-                                            $nota = $reporte->tipoCalificacion->codigo ?? null;
+                                            $nota = $reporte->calificacion ?? null;
                                             $color = match ($nota) {
                                                 'AD' => 'text-green-600 bg-green-50',
                                                 'A' => 'text-blue-600 bg-blue-50',

@@ -13,8 +13,8 @@ class DetalleAsignatura extends Model
     protected $primaryKey = 'id_detalle_asignatura';
 
     protected $fillable = [
-        'matricula_codigo_matricula',
-        'competencias_id_competencias',
+        'codigo_matricula',
+        'id_competencias',
         'fecha',
         'calificacion_anual',
     ];

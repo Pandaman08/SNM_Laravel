@@ -10,14 +10,14 @@ class ReporteNota extends Model
     use HasFactory;
 
     protected $table = 'reportes_notas';
-    protected $primaryKey = 'id_calificacion';
+    protected $primaryKey = 'id_reporte_notas';
 
     protected $fillable = [
         'id_detalle_asignatura',
         'id_periodo',
         'observacion',
         'fecha_registro',
-        'calificacion_periodo',
+        'calificacion',
     ];
 
     protected $casts = [

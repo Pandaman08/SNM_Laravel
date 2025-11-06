@@ -867,8 +867,9 @@
                             data.secciones.forEach(seccion => {
                                 const option = document.createElement('option');
                                 option.value = seccion.id_seccion;
-                                option.textContent = `Sección ${seccion.seccion}`;
+                                option.textContent = `Sección ${seccion.seccion} - (Capacidad: ${seccion.vacantes_seccion})`;
                                 seccionSelect.appendChild(option);
+
                             });
                             seccionSelect.disabled = false;
                             console.log('✅ Secciones cargadas:', data.secciones.length);
