@@ -431,13 +431,13 @@ class AsignaturaController extends Controller
         
         $asignaturas = $query->get();
         
-        return view('pages.admin.asignaturas.asignTeacher5', compact('nivelesEducativos','grados','asignaturas', 'docentes', 'secciones'));
+        return view('pages.admin.asignaturas.asign', compact('nivelesEducativos','grados','asignaturas', 'docentes', 'secciones'));
     }
     
     // Métodos originales mantenidos para compatibilidad
     public function index()
     {
-        $asignaturas = Asignatura::with('grado')->get();
+        $asignaturas = Asignatura::with('grado.nivelEducativo')->orderBy('id_grado')->orderBy('nombre')->get();
         return view('pages.admin.asignaturas.index', compact('asignaturas'));
     }
 
@@ -454,8 +454,21 @@ class AsignaturaController extends Controller
             'nombre' => 'required|string|max:100',
         ]);
 
-        Asignatura::create($request->all());
+       $grado = \App\Models\Grado::findOrFail($request->id_grado);
 
+        if (Asignatura::whereHas('grado', function($q) use ($grado) {
+                $q->where('nivel_educativo_id', $grado->nivel_educativo_id);
+            })
+            ->where('id_grado', $grado->id_grado)
+            ->whereRaw('LOWER(nombre) = ?', [strtolower($request->nombre)])
+            ->exists()) {
+            return back()
+                ->withInput()
+                ->withErrors(['nombre' => 'Esta asignatura ya existe en este grado y nivel educativo.']);
+        }
+
+
+        Asignatura::create($request->all());
         return redirect()->route('asignaturas.index')->with('success', 'Asignatura registrada correctamente.');
     }
 
@@ -474,8 +487,22 @@ class AsignaturaController extends Controller
         ]);
 
         $asignatura = Asignatura::findOrFail($id);
-        $asignatura->update($request->all());
 
+        $grado = \App\Models\Grado::findOrFail($request->id_grado);
+
+        if (Asignatura::whereHas('grado', function($q) use ($grado) {
+                $q->where('nivel_educativo_id', $grado->nivel_educativo_id);
+            })
+            ->where('id_grado', $grado->id_grado)
+            ->whereRaw('LOWER(nombre) = ?', [strtolower($request->nombre)])
+            ->where('codigo_asignatura', '!=', $id)
+            ->exists()) {
+            return back()
+                ->withInput()
+                ->withErrors(['nombre' => 'Esta asignatura ya existe en este grado y nivel educativo.']);
+        }
+
+        $asignatura->update($request->all());
         return redirect()->route('asignaturas.index')->with('success', 'Asignatura actualizada correctamente.');
     }
 
