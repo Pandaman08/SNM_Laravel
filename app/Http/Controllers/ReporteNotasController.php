@@ -264,13 +264,7 @@ class ReporteNotasController extends Controller
             ])
             ->get();
 
-        // Verificar si hay estudiantes
-        if ($estudiantesTutor->isEmpty()) {
-            return view('pages.admin.reporte_notas.tutor-estudiantes', [
-                'estudiantes' => collect(),
-                'message' => 'No tienes estudiantes asignados actualmente'
-            ]);
-        }
+
 
         $estudiantes = $estudiantesTutor->map(function ($item) {
             // Filtrar y luego obtener la primera matrícula activa del año actual

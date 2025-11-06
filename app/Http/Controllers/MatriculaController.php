@@ -783,7 +783,7 @@ class MatriculaController extends Controller
 
 
                 return response()->json([
-                    'success' => true,
+                    'success' => false,
                     'message' => 'Alumno no encontrado',
 
                 ]);
