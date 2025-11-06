@@ -169,7 +169,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/reporte_notas/{codigo_matricula}/{id_asignatura}/show', [ReporteNotasController::class, 'estudiante_calificaciones'])->name('reporte_notas.show');
     Route::get('/reporte_notas/docente/{id_asignatura}', [ReporteNotasController::class, 'docente_view'])->name('reporte_notas.docente');
     Route::get('/reporte_notas/tutor/estudiantes', [ReporteNotasController::class, 'index_estudiantes_tutor'])->name('reporte_notas.tutor');
-    Route::get('/reporte_notas/tutor/estudiantes/{id_asignatura}', [ReporteNotasController::class, 'verNotasEstudiante'])->name('reporte_notas.tutor.estudiante');
+    Route::get('/reporte_notas/tutor/estudiantes/{id_asignatura}/asignatura', [ReporteNotasController::class, 'verNotasEstudiante'])->name('reporte_notas.tutor.estudiante');
     Route::get('/reporte-notas/pdf/{codigo_matricula}', [ReporteNotasController::class, 'generarReportePdf'])->name('reporte.notas.pdf');
     Route::resource('pagos', PagoController::class)->except(['create']);
 

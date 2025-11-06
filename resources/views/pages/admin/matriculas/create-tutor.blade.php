@@ -416,9 +416,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- NUEVO: Contactos de emergencia (Parientes) -->
+                           <!--  Contactos de emergencia (Parientes) -->
                 <div id="seccion-parientes" class="bg-white rounded-lg shadow-sm border border-gray-200">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h2 class="text-lg font-semibold text-gray-900 flex items-center">
@@ -510,6 +509,11 @@
                         </div>
                     </div>
                 </div>
+
+
+                </div>
+
+         
             </form>
         </div>
     </div>
@@ -869,7 +873,7 @@
                             data.secciones.forEach(seccion => {
                                 const option = document.createElement('option');
                                 option.value = seccion.id_seccion;
-                                option.textContent = `Sección ${seccion.seccion}`;
+                                option.textContent = `Sección ${seccion.seccion} - (Capacidad: ${seccion.vacantes_seccion})`;
                                 seccionSelect.appendChild(option);
                             });
 

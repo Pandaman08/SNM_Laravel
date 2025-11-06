@@ -14,7 +14,7 @@ class PeriodoSeeder extends Seeder
             [
                 'nombre' => 'I',
                 'fecha_inicio' => '2025-03-05 00:00:00',
-                'fecha_final' => '2025-05-15 00:00:00',
+                'fecha_fin' => '2025-05-15 00:00:00',
                 'estado' => 'Proceso',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
@@ -22,7 +22,7 @@ class PeriodoSeeder extends Seeder
             [
                 'nombre' => 'II',
                 'fecha_inicio' => '2025-06-06 00:00:00',
-                'fecha_final' => '2025-08-08 00:00:00',
+                'fecha_fin' => '2025-08-08 00:00:00',
                 'estado' => 'Proceso',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
@@ -30,7 +30,7 @@ class PeriodoSeeder extends Seeder
             [
                 'nombre' => 'III',
                 'fecha_inicio' => '2025-08-05 00:00:00',
-                'fecha_final' => '2025-10-05 00:00:00',
+                'fecha_fin' => '2025-10-05 00:00:00',
                 'estado' => 'Proceso',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
@@ -38,7 +38,7 @@ class PeriodoSeeder extends Seeder
             [
                 'nombre' => 'IV',
                 'fecha_inicio' => '2025-10-05 00:00:00',
-                'fecha_final' => '2025-12-20 00:00:00',
+                'fecha_fin' => '2025-12-20 00:00:00',
                 'estado' => 'Proceso',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),

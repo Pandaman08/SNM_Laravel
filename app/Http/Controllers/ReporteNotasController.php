@@ -10,7 +10,6 @@ use App\Models\DetalleAsignatura;
 use App\Models\Periodo;
 use App\Models\Matricula;
 use App\Models\EstudianteTutor;
-use App\Models\TipoCalificacion;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -56,19 +55,16 @@ class ReporteNotasController extends Controller
         return DetalleAsignatura::with([
             'asignatura',
             'reportesNotas' => function ($query) use ($periodoId) {
-                $query->where('id_periodo', $periodoId)
-                    ->with('tipoCalificacion');
+                $query->where('id_periodo', $periodoId);
             }
         ])
             ->where('codigo_matricula', $matricula->codigo_matricula)
             ->get();
     }
 
-
     public function create($codigo_matricula, $id_asignatura)
     {
         $matricula = Matricula::findOrFail($codigo_matricula);
-        $tipos_cal = TipoCalificacion::all();
         $periodos = Periodo::all();
 
         $competencias = Competencia::with('detallesAsignatura')
@@ -84,15 +80,14 @@ class ReporteNotasController extends Controller
 
         \Log::info('detalle', $detalles_asignatura->toArray());
 
-        return view('pages.admin.reporte_notas.create', compact('matricula', 'detalles_asignatura', 'tipos_cal', 'periodos', 'id_asignatura'));
+        return view('pages.admin.reporte_notas.create', compact('matricula', 'detalles_asignatura', 'periodos', 'id_asignatura'));
     }
-
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'id_detalle_asignatura' => 'required|exists:detalles_asignatura,id_detalle_asignatura',
-            'id_tipo_calificacion' => 'required|exists:tipos_calificacion,id_tipo_calificacion',
+            'calificacion' => 'required|in:AD,A,B,C',
             'id_periodo' => 'required|exists:periodos,id_periodo',
             'observacion' => 'nullable|max:255',
             'fecha_registro' => 'required|date',
@@ -118,23 +113,19 @@ class ReporteNotasController extends Controller
 
         ReporteNota::create([
             'id_detalle_asignatura' => $validated['id_detalle_asignatura'],
-            'id_tipo_calificacion' => $validated['id_tipo_calificacion'],
+            'calificacion' => $validated['calificacion'],
             'id_periodo' => $validated['id_periodo'],
             'observacion' => $validated['observacion'],
             'fecha_registro' => $validated['fecha_registro'],
         ]);
 
-        /*
-        return redirect()
-            ->route('docentes.estudiantes', ['id_asignatura' => $validated['id_asignatura']])
-            ->with('success', 'Nota registrada correctamente.'); */
         return back()->with('success', 'Nota registrada correctamente.');
     }
 
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'id_tipo_calificacion' => 'required|exists:tipos_calificacion,id_tipo_calificacion',
+            'calificacion' => 'required|in:AD,A,B,C',
             'observacion' => 'nullable|max:255',
             'id_periodo' => 'required|exists:periodos,id_periodo',
         ]);
@@ -149,7 +140,7 @@ class ReporteNotasController extends Controller
 
         $reporte = ReporteNota::findOrFail($id);
         $reporte->update([
-            'id_tipo_calificacion' => $validated['id_tipo_calificacion'],
+            'calificacion' => $validated['calificacion'],
             'observacion' => $validated['observacion'],
         ]);
 
@@ -158,32 +149,26 @@ class ReporteNotasController extends Controller
 
     public function getDetalles($id_asignatura)
     {
-        // $asignatura = Asignatura::findOrFail($id_asignatura);
-
         $competencias = Competencia::where('codigo_asignatura', $id_asignatura)->get();
         $competenciaIds = $competencias->pluck('id_competencias');
 
         $detalles = DetalleAsignatura::whereIn('id_competencias', $competenciaIds)->get();
         $detalleIds = $detalles->pluck('id_detalle_asignatura');
 
-
         return ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
             ->with([
                 'detalleAsignatura' => function ($query) {
                     $query->select('*');
                 },
-                'tipoCalificacion',
                 'periodo'
             ])
             ->get();
     }
 
-
     public function estudiante_calificaciones($codigo_matricula, $id_asignatura)
     {
         $matricula = Matricula::with(['estudiante.persona'])->findOrFail($codigo_matricula);
         $asignatura = Asignatura::findOrFail($id_asignatura);
-
 
         $competencias = Competencia::where('codigo_asignatura', $id_asignatura)->get();
 
@@ -197,11 +182,9 @@ class ReporteNotasController extends Controller
             ->get();
         \Log::info('DEATLLE', $detalles->toArray());
 
-
         $detalleIds = $detalles->pluck('id_detalle_asignatura');
 
-
-        $periodos = Periodo::whereIn('id_periodo', [3, 4, 5, 6])
+        $periodos = Periodo::whereIn('id_periodo', [1,2,3, 4 ])
             ->orderBy('id_periodo')
             ->get();
 
@@ -217,8 +200,8 @@ class ReporteNotasController extends Controller
 
         // Obtener todas las notas reportadas para estos detalles
         $reportes = ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
-            ->whereIn('id_periodo', [3, 4, 5, 6])
-            ->with(['tipoCalificacion', 'periodo'])
+            ->whereIn('id_periodo', [1,2,3, 4])
+            ->with(['periodo'])
             ->get()
             ->groupBy('id_detalle_asignatura');
 
@@ -236,7 +219,7 @@ class ReporteNotasController extends Controller
                     $valido = true;
 
                     foreach ($detalle->reportesNotas as $reporte) {
-                        $valor = $this->convertirNotaANumero($reporte->tipoCalificacion->codigo);
+                        $valor = $this->convertirNotaANumero($reporte->calificacion);
                         if ($valor === null) {
                             $valido = false;
                             break;
@@ -251,16 +234,12 @@ class ReporteNotasController extends Controller
             });
         });
 
-        // Tipos de calificación para los selects en los modales
-        $tiposCalificacion = TipoCalificacion::all();
-
         return view('pages.admin.reporte_notas.estudiantes', compact(
             'matricula',
             'competencias',
             'asignatura',
             'periodos',
-            'periodoActual',
-            'tiposCalificacion'
+            'periodoActual'
         ));
     }
 
@@ -285,13 +264,7 @@ class ReporteNotasController extends Controller
             ])
             ->get();
 
-        // Verificar si hay estudiantes
-        if ($estudiantesTutor->isEmpty()) {
-            return view('pages.admin.reporte_notas.tutor-estudiantes', [
-                'estudiantes' => collect(),
-                'message' => 'No tienes estudiantes asignados actualmente'
-            ]);
-        }
+
 
         $estudiantes = $estudiantesTutor->map(function ($item) {
             // Filtrar y luego obtener la primera matrícula activa del año actual
@@ -344,22 +317,18 @@ class ReporteNotasController extends Controller
 
         // Obtener reportes de notas para los bimestres
         $reportes = ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
-            ->whereIn('id_periodo', [3, 4, 5, 6])
-            ->with(['tipoCalificacion', 'periodo'])
+            ->whereIn('id_periodo', [1,2,3, 4])
+            ->with(['periodo'])
             ->get()
             ->groupBy('id_detalle_asignatura');
 
-
         $asignaturas->each(function ($asignatura) use ($competencias, $detalles, $reportes) {
-
             $asignatura->competencias = $competencias->where('codigo_asignatura', $asignatura->codigo_asignatura);
-
 
             $asignatura->competencias->each(function ($competencia) use ($detalles, $reportes) {
                 $competencia->detallesAsignatura = $detalles->where('id_competencias', $competencia->id_competencias);
 
                 $competencia->detallesAsignatura->each(function ($detalle) use ($reportes) {
-
                     $detalle->reportesNotas = $reportes->get($detalle->id_detalle_asignatura, collect());
 
                     if ($detalle->reportesNotas->count() === 4) {
@@ -367,7 +336,7 @@ class ReporteNotasController extends Controller
                         $valido = true;
 
                         foreach ($detalle->reportesNotas as $reporte) {
-                            $valor = $this->convertirNotaANumero($reporte->tipoCalificacion->codigo ?? '');
+                            $valor = $this->convertirNotaANumero($reporte->calificacion ?? '');
                             if ($valor === null) {
                                 $valido = false;
                                 break;
@@ -388,8 +357,6 @@ class ReporteNotasController extends Controller
             'asignaturas' => $asignaturas
         ]);
     }
-
-
 
     public function generarReportePdf($codigo_matricula)
     {
@@ -416,22 +383,18 @@ class ReporteNotasController extends Controller
 
         // Obtener reportes de notas para los bimestres
         $reportes = ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
-            ->whereIn('id_periodo', [3, 4, 5, 6])
-            ->with(['tipoCalificacion', 'periodo'])
+            ->whereIn('id_periodo', [1,2,3, 4])
+            ->with(['periodo'])
             ->get()
             ->groupBy('id_detalle_asignatura');
 
-
         $asignaturas->each(function ($asignatura) use ($competencias, $detalles, $reportes) {
-
             $asignatura->competencias = $competencias->where('codigo_asignatura', $asignatura->codigo_asignatura);
-
 
             $asignatura->competencias->each(function ($competencia) use ($detalles, $reportes) {
                 $competencia->detallesAsignatura = $detalles->where('id_competencias', $competencia->id_competencias);
 
                 $competencia->detallesAsignatura->each(function ($detalle) use ($reportes) {
-
                     $detalle->reportesNotas = $reportes->get($detalle->id_detalle_asignatura, collect());
 
                     if ($detalle->reportesNotas->count() === 4) {
@@ -439,7 +402,7 @@ class ReporteNotasController extends Controller
                         $valido = true;
 
                         foreach ($detalle->reportesNotas as $reporte) {
-                            $valor = $this->convertirNotaANumero($reporte->tipoCalificacion->codigo ?? '');
+                            $valor = $this->convertirNotaANumero($reporte->calificacion ?? '');
                             if ($valor === null) {
                                 $valido = false;
                                 break;
@@ -464,7 +427,6 @@ class ReporteNotasController extends Controller
 
         return $pdf->download('reporte-calificaciones-' . $matricula->estudiante->persona->lastname . '.pdf');
     }
-
 
     private function convertirNotaANumero($nota)
     {
@@ -494,8 +456,6 @@ class ReporteNotasController extends Controller
     {
         $asignatura = Asignatura::findOrFail($id_asignatura);
 
-
-
         $reportes = \DB::table('matriculas as m')->where('m.estado', '=', 'activo')
             ->join('estudiantes as e', 'm.codigo_estudiante', '=', 'e.codigo_estudiante')
             ->join('personas as p', 'e.persona_id', '=', 'p.persona_id')
@@ -510,13 +470,12 @@ class ReporteNotasController extends Controller
             })
             ->leftJoin('reportes_notas as r', 'da.id_detalle_asignatura', '=', 'r.id_detalle_asignatura')
             ->leftJoin('periodos as per', 'r.id_periodo', '=', 'per.id_periodo')
-            ->leftJoin('tipos_calificacion as tc', 'r.id_tipo_calificacion', '=', 'tc.id_tipo_calificacion')
             ->select(
                 'p.persona_id',
                 \DB::raw("CONCAT(p.name, ' ', p.lastname) as estudiante"),
-                \DB::raw("MAX(CASE WHEN per.id_periodo = 1 THEN tc.codigo ELSE NULL END) as periodo1"),
-                \DB::raw("MAX(CASE WHEN per.id_periodo = 2 THEN tc.codigo ELSE NULL END) as periodo2"),
-                \DB::raw("MAX(CASE WHEN per.id_periodo = 3 THEN tc.codigo ELSE NULL END) as periodo3"),
+                \DB::raw("MAX(CASE WHEN per.id_periodo = 1 THEN r.calificacion ELSE NULL END) as periodo1"),
+                \DB::raw("MAX(CASE WHEN per.id_periodo = 2 THEN r.calificacion ELSE NULL END) as periodo2"),
+                \DB::raw("MAX(CASE WHEN per.id_periodo = 3 THEN r.calificacion ELSE NULL END) as periodo3"),
             )
             ->groupBy('p.persona_id', 'p.name', 'p.lastname')
             ->orderBy('p.lastname')
@@ -524,7 +483,4 @@ class ReporteNotasController extends Controller
 
         return view('pages.admin.reporte_notas.docentes-view', compact('reportes', 'asignatura'));
     }
-
-
-
 }
