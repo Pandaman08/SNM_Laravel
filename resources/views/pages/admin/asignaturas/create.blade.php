@@ -19,14 +19,14 @@
             <label for="id_grado" class="block text-gray-800 font-medium">Grado <span class="text-red-500">*</span></label>
             <div class="relative">
                 <select id="id_grado" name="id_grado"
-                    class="w-full appearance-none rounded-xl border border-gray-300 bg-white px-4 py-3 pr-10 shadow-inner
+                    class="w-full appearance-none rounded-xl border @error('id_grado') border-red-500 @else border-gray-300 @enderror bg-white px-4 py-3 pr-10 shadow-inner
                            focus:outline-none focus:ring-2 focus:ring-[#38b2ac] focus:border-transparent transition"
                     required>
                     <option value="" disabled {{ old('id_grado') ? '' : 'selected' }}>Seleccione un grado...</option>
                     @foreach($grados as $g)
                         <option value="{{ $g->id_grado }}"
                             {{ old('id_grado') == $g->id_grado ? 'selected' : '' }}>
-                            {{ $g->grado }}° — {{ $g->nivelEducativo->nombre }}
+                            {{ $g->nivelEducativo->nombre }} - {{ $g->grado }}°
                         </option>
                     @endforeach
                 </select>
@@ -45,9 +45,9 @@
             <div class="relative">
                 <input id="nombre" name="nombre" type="text"
                     value="{{ old('nombre') }}"
-                    class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 shadow-inner
+                    class="w-full rounded-xl border @error('nombre') border-red-500 @else border-gray-300 @enderror bg-white px-4 py-3 shadow-inner
                            focus:outline-none focus:ring-2 focus:ring-[#38b2ac] focus:border-transparent transition"
-                    placeholder="Ingrese el título de la asignatura..." />
+                    placeholder="Ej: Matemática" required />
                 <div class="absolute inset-y-0 right-3 flex items-center text-gray-400">
                     <i class="ri-book-line text-lg"></i>
                 </div>
