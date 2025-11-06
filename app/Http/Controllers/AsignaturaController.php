@@ -21,7 +21,7 @@ class AsignaturaController extends Controller
     {
         $asignatura = Asignatura::where('codigo_asignatura', $id)->firstOrFail();
         $docentes = Docente::with('user.persona')->get();
-        return view('pages.admin.asignaturas.asign', compact('asignatura', 'docentes'));
+        return view('pages.admin.asignaturas.asignTeacher5', compact('asignatura', 'docentes'));
     }
 
     /**
@@ -431,7 +431,7 @@ class AsignaturaController extends Controller
         
         $asignaturas = $query->get();
         
-        return view('pages.admin.asignaturas.asign', compact('nivelesEducativos','grados','asignaturas', 'docentes', 'secciones'));
+        return view('pages.admin.asignaturas.asignTeacher5', compact('nivelesEducativos','grados','asignaturas', 'docentes', 'secciones'));
     }
     
     // Métodos originales mantenidos para compatibilidad
@@ -518,13 +518,5 @@ class AsignaturaController extends Controller
         return redirect()->route('asignaturas.index')->with('success', 'Asignatura eliminada correctamente.');
     }
 
-    public function eliminar($id)
-    {
-        $asignatura = Asignatura::where('codigo_asignatura', $id)
-            ->with(['docentes.user.persona', 'grado'])
-            ->firstOrFail();
-        
-        return view('pages.admin.asignaturas.eliminar', compact('asignatura'));
-    }
 }
 
