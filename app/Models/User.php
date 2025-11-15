@@ -76,6 +76,11 @@ class User extends Authenticatable
         return $this->rol === UserRole::TUTOR;
     }
 
+    public function isAuxiliar(): bool
+    {
+        return $this->rol === UserRole::AUXILIAR;
+    }
+
 
     public function secretaria()
     {
@@ -99,4 +104,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(InstitucionEducativa::class, 'user_id', 'user_id');
     }
+
+    public function auxiliar()
+    {
+        return $this->hasOne(Auxiliar::class, 'user_id', 'user_id');
+    }
+
 }

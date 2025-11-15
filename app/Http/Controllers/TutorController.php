@@ -15,7 +15,7 @@ class TutorController extends Controller
 {
     private const STRING_REQUIRED_MAX_255 = 'required|string|max:255';
 
-        public function index_tutor()
+    public function index_tutor()
     {
         $users = User::where('estado', false)->paginate(10);
 
