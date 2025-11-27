@@ -105,8 +105,6 @@ class DocenteController extends Controller
 
    
 
-
-
     public function store(Request $request)
     {
         DB::beginTransaction();
@@ -268,43 +266,43 @@ class DocenteController extends Controller
     }
 
 
-public function misEstudiantes()
-{
-    $user = Auth::user();
+    public function misEstudiantes()
+    {
+        $user = Auth::user();
 
-    $asignaciones = AsignaturaDocente::with('asignatura.grado')
-        ->where('codigo_docente', $user->docente->codigo_docente)
-        ->get()
-        ->filter(function ($item) {
-            return optional($item->asignatura)->id_grado;
-        })
-        ->unique(fn($item) => $item->asignatura->id_grado)
-        ->values();
+        $asignaciones = AsignaturaDocente::with('asignatura.grado')
+            ->where('codigo_docente', $user->docente->codigo_docente)
+            ->get()
+            ->filter(function ($item) {
+                return optional($item->asignatura)->id_grado;
+            })
+            ->unique(fn($item) => $item->asignatura->id_grado)
+            ->values();
 
-    return view('pages.admin.docentes.mis-estudiantes', compact('asignaciones'));
-}
+        return view('pages.admin.docentes.mis-estudiantes', compact('asignaciones'));
+    }
 
-public function verEstudiantesPorGrado(Request $request, $grado_id)
-{
-    $seccionId = $request->input('seccion_id');
+    public function verEstudiantesPorGrado(Request $request, $grado_id)
+    {
+        $seccionId = $request->input('seccion_id');
 
-    // Obtener las secciones del grado
-    $secciones = Seccion::where('id_grado', $grado_id)->get();
-    $seccionIds = $secciones->pluck('id_seccion')->toArray();
+        // Obtener las secciones del grado
+        $secciones = Seccion::where('id_grado', $grado_id)->get();
+        $seccionIds = $secciones->pluck('id_seccion')->toArray();
 
-    // Consultar las matrículas usando seccion_id
-    $matriculas = Matricula::with(['estudiante.persona'])
-        ->whereIn('seccion_id', $seccionIds)
-        ->when($seccionId, function ($query) use ($seccionId) {
-            $query->where('seccion_id', $seccionId);
-        })
-        ->get();
+        // Consultar las matrículas usando seccion_id
+        $matriculas = Matricula::with(['estudiante.persona'])
+            ->whereIn('seccion_id', $seccionIds)
+            ->when($seccionId, function ($query) use ($seccionId) {
+                $query->where('seccion_id', $seccionId);
+            })
+            ->get();
 
-    $grado = Grado::find($grado_id);
-    $gradoNombre = $grado?->nombre_completo ?? 'Sin grado';
+        $grado = Grado::find($grado_id);
+        $gradoNombre = $grado?->nombre_completo ?? 'Sin grado';
 
-    return view('pages.admin.docentes.estudiantes-por-grado', compact('matriculas', 'gradoNombre', 'secciones'));
-}
+        return view('pages.admin.docentes.estudiantes-por-grado', compact('matriculas', 'gradoNombre', 'secciones'));
+    }
 
 
 }

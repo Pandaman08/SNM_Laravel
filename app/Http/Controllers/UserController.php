@@ -386,8 +386,6 @@ class UserController extends Controller
         return view('pages.admin.users.profile', compact('user'));
     }
 
-
-
     public function update_user(Request $request, $user_id)
     {
         $user = User::with('persona')->where('user_id', $user_id)->firstOrFail();
@@ -425,8 +423,6 @@ class UserController extends Controller
 
     }
 
-
-
     public function update_photo(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -450,7 +446,6 @@ class UserController extends Controller
 
         return redirect()->back()->with('success-photo', 'Perfil actualizado correctamente');
     }
-
 
     public function update_password(Request $request, $id)
     {

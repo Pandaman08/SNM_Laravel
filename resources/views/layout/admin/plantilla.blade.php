@@ -554,7 +554,39 @@
                     </ul>
                 </div>
             </div>
+       @elseif(auth()->user()->isAuxiliar())
+            <div class="space-y-1">
+                <h4 class="text-[#98C560] text-xs font-bold uppercase mb-4 tracking-wider px-3 flex items-center">
+                    <div class="w-6 h-[1px] bg-gradient-to-r from-[#98C560] to-transparent mr-2"></div>
+                    Auxiliar
+                </h4>
+                
+                <!-- Dashboard Principal -->
+                <div class="sidebar-item relative">
+                    <a href="{{ route('home.auxiliar') }}" class="flex items-center py-3 px-4 text-white hover:bg-[#98C560]/20 rounded-lg hover-scale transition-all duration-300 group {{ request()->routeIs('home.auxiliar') ? 'bg-[#98C560]/30' : '' }}">
+                        @if(request()->routeIs('home.auxiliar'))
+                            <div class="active-indicator"></div>
+                        @endif
+                        <div class="w-8 h-8 bg-gradient-to-br from-[#98C560] to-[#7CB342] rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                            <i class="ri-dashboard-3-line text-white text-sm"></i>
+                        </div>
+                        <span class="text-sm font-medium">Dashboard Principal</span>
+                    </a>
+                </div>
 
+                <!-- Gestionar Asistencia -->
+                <div class="sidebar-item relative">
+                    <a href="{{ route('asistencia.scanner') }}" class="flex items-center py-3 px-4 text-white hover:bg-[#98C560]/20 rounded-lg hover-scale transition-all duration-300 group {{ request()->routeIs('asistencia.scanner') ? 'bg-[#98C560]/30' : '' }}">
+                        @if(request()->routeIs('asistencia.scanner'))
+                            <div class="active-indicator"></div>
+                        @endif
+                        <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                            <i class="ri-qr-scan-2-line text-white text-sm"></i>
+                        </div>
+                        <span class="text-sm font-medium">Gestionar Asistencia</span>
+                    </a>
+                </div>
+            </div>
         @elseif(auth()->user()->isTutor())
             <div class="space-y-1">
                 <h4 class="text-[#98C560] text-xs font-bold uppercase mb-4 tracking-wider px-3 flex items-center">
@@ -649,7 +681,6 @@
                     </ul>
                 </div>
 
-              
             </div>
         @endif
     @endauth

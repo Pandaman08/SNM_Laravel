@@ -9,6 +9,7 @@ use App\Models\Periodo;
 use App\Enums\AsistenciaEstado;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
@@ -97,41 +98,6 @@ class AsistenciaQRController extends Controller
                 'apellidos' => $estudiante->persona->lastname
             ]
         ]);
-    }
-
-    // Procesar escaneo de QR desde formulario/cámara
-    public function processScan(Request $request)
-    {
-        $request->validate([
-            'qr_code' => 'required|string',
-            'id_periodo' => 'required|exists:periodos,id_periodo',
-        ]);
-        
-        $estudiante = Estudiante::where('qr_code', $request->qr_code)->first();
-        
-        if (!$estudiante) {
-            return back()->with('error', 'Código QR inválido');
-        }
-        
-        $hoy = Carbon::today();
-        $asistenciaExistente = Asistencia::where('codigo_estudiante', $estudiante->codigo_estudiante)
-            ->where('id_periodo', $request->id_periodo)
-            ->whereDate('fecha', $hoy)
-            ->first();
-        
-        if ($asistenciaExistente) {
-            return back()->with('info', 'El estudiante ya registró asistencia hoy');
-        }
-        
-        Asistencia::create([
-            'codigo_estudiante' => $estudiante->codigo_estudiante,
-            'id_periodo' => $request->id_periodo,
-            'fecha' => $hoy,
-            'estado' => AsistenciaEstado::PRESENTE,
-            'observacion' => 'Registrado mediante QR',
-        ]);
-        
-        return back()->with('success', 'Asistencia registrada para: ' . $estudiante->persona->name);
     }
 
     // Vista para mostrar QR del estudiante

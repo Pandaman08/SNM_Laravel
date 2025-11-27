@@ -293,7 +293,18 @@ class MatriculaController extends Controller
             $estadoMat = !Auth::user()->isTutor() ? 'activo' : 'pendiente';
             $codigoEstudiante = $estudiante->codigo_estudiante;
 
-
+            // Si el usuario es admin y la matrícula va a quedar 'activo', volver a verificar capacidad
+            if ($estadoMat === 'activo') {
+                // refrescar conteo
+                $seccion->refresh();
+                $activos = $seccion->matriculas()->where('estado', 'activo')->count();
+                $vacantes = $seccion->vacantes_seccion;
+                if (!($seccion->estado_vacantes ?? true) || (!is_null($vacantes) && $activos >= $vacantes)) {
+                    return back()->withErrors([
+                        'seccion_id' => 'No hay vacantes disponibles para activar la matrícula.'
+                    ])->withInput();
+                }
+            }
 
             // obtener código modular de la institución (automático)
             $institucionCodigo = $this->resolverCodigoInstitucion();
@@ -486,7 +497,7 @@ class MatriculaController extends Controller
             }
 
             // Lógica para matrícula regular (tipos 2, 3, 4)
-            if (in_array($request->id_tipo_matricula, ['2'])) {
+            if (in_array($request->id_tipo_matricula, ['2', '3', '4'])) {
 
                 $validatedData = array_merge(
                     $validatedData,
@@ -563,8 +574,7 @@ class MatriculaController extends Controller
                     'updated_at' => now()
                 ]
             );
-
-            //  FILTRAR PARIENTES VACÍOS ANTES DE GUARDAR
+          
             \Log::info("parientes data:", $validatedData['parientes'] ?? []);
 
             if (!empty($validatedData['parientes']) && is_array($validatedData['parientes'])) {

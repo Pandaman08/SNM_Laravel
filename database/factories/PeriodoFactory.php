@@ -11,7 +11,8 @@ class PeriodoFactory extends Factory
         return [
             'nombre' => $this->faker->randomElement(['I', 'II', 'III', 'IV']),
             'fecha_inicio' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
-            'fecha_fin' => $this->faker->dateTimeBetween('+2 months', '+4 months'),
+
+            'fecha_final' => $this->faker->dateTimeBetween('+2 months', '+4 months'),
             'estado' => 'Proceso',
         ];
     }
