@@ -46,7 +46,7 @@
                 </div>
             </div>
 
-            @if (isset($message))
+            @if ($estudiantes->isEmpty())
                 <!-- Empty State -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-12">
                     <div class="text-center">
@@ -56,8 +56,14 @@
                                     d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
                         </div>
-                        <h3 class="text-xl font-semibold text-slate-800 mb-2">{{ $message }}</h3>
-                        <p class="text-slate-500">No hay estudiantes asignados en este momento.</p>
+                        <h3 class="text-xl font-semibold text-slate-800 mb-2">No tienes estudiantes asignados</h3>
+                        <p class="text-slate-500 mb-6">Actualmente no hay estudiantes bajo tu tutoría.</p>
+                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Contacta al administrador para más información</span>
+                        </div>
                     </div>
                 </div>
             @else
@@ -79,6 +85,7 @@
                                                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                                 </svg>
                                             </div>
+                                            @if($estudiante['tiene_matricula_activa'])
                                             <div
                                                 class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center">
                                                 <svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -87,6 +94,7 @@
                                                         clip-rule="evenodd" />
                                                 </svg>
                                             </div>
+                                            @endif
                                         </div>
 
                                         <div class="flex-1">
@@ -226,7 +234,7 @@
                     @endforeach
                 </div>
 
-                <!-- Stats Footer (opcional) -->
+                <!-- Stats Footer -->
                 <div class="mt-8 bg-white rounded-xl shadow-sm border border-slate-200/60 p-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="text-center">
@@ -248,7 +256,7 @@
                                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            {{-- <p class="text-2xl font-bold text-slate-800">{{ count(array_filter($estudiantes, fn($e) => $e['codigo_matricula'])) }}</p> --}}
+                            <p class="text-2xl font-bold text-slate-800">{{ $estudiantes->where('tiene_matricula_activa', true)->count() }}</p>
                             <p class="text-sm text-slate-500">Con matrícula activa</p>
                         </div>
                         <div class="text-center">

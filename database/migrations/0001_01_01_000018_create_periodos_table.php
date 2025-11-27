@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('id_periodo');
             $table->string('nombre', 45)->nullable();
             $table->dateTime('fecha_inicio');
-            $table->dateTime('fecha_final');
+            $table->dateTime('fecha_fin');
             $table->enum('estado', ['Proceso', 'Finalizado'])->default('Proceso');
             $table->timestamps();
         });

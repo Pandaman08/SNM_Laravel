@@ -102,6 +102,17 @@ class Seccion extends Model
         return $this->estado_aforo == 1;
     }
 
+    public function reducirVacante()
+    {
+        if ($this->vacantes_seccion > 0) {
+            $this->vacantes_seccion -= 1;
+            if ($this->vacantes_seccion == 0) {
+                $this->estado_aforo = 0; // No hay cupo
+            }
+            $this->save();
+        }
+    }
+
     // Obtener cantidad de estudiantes matriculados
     public function cantidadEstudiantes()
     {

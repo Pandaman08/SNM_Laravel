@@ -103,16 +103,7 @@ class DocenteController extends Controller
         return view('pages.admin.docentes.estudiantes', compact('matriculas', 'asignatura'));
     }
 
-    public function asignar_nota($codigo_matricula)
-    {
-        $matricula = Matricula::with('detalleAsignatura.competencia')->findOrFail($codigo_matricula);
-        $tipos_cal = TipoCalificacion::all();
-        $periodos = Periodo::all();
-
-        $detalles_asignatura = $matricula->detalleAsignatura;
-
-        return view('pages.admin.reporte_notas.create', compact('matricula', 'detalles_asignatura', 'tipos_cal', 'periodos'));
-    }
+   
 
     public function store(Request $request)
     {
