@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name', 80);
             $table->string('lastname', 150);
             $table->char('dni', 8)->unique();
-            $table->char('phone', 9);
+            $table->char('phone', 9)->nullable();
             $table->enum('sexo',['M', 'F'])->default('M');
             $table->enum('estado_civil',['S', 'C','D','V'])->default('S');
             $table->longText('photo')->nullable();
