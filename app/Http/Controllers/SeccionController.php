@@ -7,21 +7,27 @@ use Illuminate\Http\Request;
 
 class SeccionController extends Controller
 {
-    // Mostrar lista de secciones
     public function index()
     {
-        $secciones = Seccion::with(['grado', 'grado.nivelEducativo', 'docentes'])->get();
+        $secciones = Seccion::with(['grado', 'grado.nivelEducativo', 'docentes'])
+            ->orderBy('id_grado')
+            ->orderBy('seccion')
+            ->get();
         return view('pages.admin.secciones.index', compact('secciones'));
     }
 
-    // Mostrar formulario para crear nueva sección
     public function create()
     {
-        $grados = Grado::with('nivelEducativo')->get();
-        return view('pages.admin.secciones.create', compact('grados'));
+        $grados = Grado::with('nivelEducativo')->orderBy('nivel_educativo_id')->orderBy('grado')->get();
+        $seccionesExistentes = Seccion::select('id_grado', 'seccion')
+            ->get()
+            ->groupBy('id_grado')
+            ->map(fn($s) => $s->pluck('seccion')->toArray())
+            ->toArray();
+        
+        return view('pages.admin.secciones.create', compact('grados', 'seccionesExistentes'));
     }
 
-    // Guardar nueva sección
     public function store(Request $request)
     {
         $request->validate([
@@ -31,7 +37,17 @@ class SeccionController extends Controller
             'estado_vacantes' => 'boolean'
         ]);
 
+        // Verificar duplicado
+        if (Seccion::where('id_grado', $request->id_grado)
+                ->where('seccion', strtoupper($request->seccion))
+                ->exists()) {
+            return back()
+                ->withInput()
+                ->withErrors(['seccion' => 'Esta sección ya existe para el grado seleccionado.']);
+        }
+
         $seccion = new Seccion($request->all());
+        $seccion->seccion = strtoupper($request->seccion);
         $seccion->estado_vacantes = $request->has('estado_vacantes');
         $seccion->save();
 
@@ -39,24 +55,19 @@ class SeccionController extends Controller
             ->with('success', 'Sección registrada correctamente.');
     }
 
-    // Mostrar detalles de una sección
-    public function show($id)
-    {
-        $seccion = Seccion::with(['grado', 'grado.nivelEducativo', 'docentes', 'matriculas'])
-            ->findOrFail($id);
-        
-        return view('pages.admin.secciones.show', compact('seccion'));
-    }
-
-    // Mostrar formulario para editar una sección existente
     public function edit($id)
     {
         $seccion = Seccion::with('grado')->findOrFail($id);
-        $grados = Grado::with('nivelEducativo')->get();
-        return view('pages.admin.secciones.edit', compact('seccion', 'grados'));
+        $grados = Grado::with('nivelEducativo')->orderBy('nivel_educativo_id')->orderBy('grado')->get();
+        $seccionesExistentes = Seccion::where('id_seccion', '!=', $id)
+            ->get()
+            ->groupBy('id_grado')
+            ->map(fn($s) => $s->pluck('seccion')->toArray())
+            ->toArray();
+        
+        return view('pages.admin.secciones.edit', compact('seccion', 'grados', 'seccionesExistentes'));
     }
 
-    // Actualizar sección
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -68,7 +79,16 @@ class SeccionController extends Controller
 
         $seccion = Seccion::findOrFail($id);
         
-        // Verificar si hay matrículas antes de actualizar
+        // Verificar duplicado
+        if (Seccion::where('id_grado', $request->id_grado)
+                ->where('seccion', strtoupper($request->seccion))
+                ->where('id_seccion', '!=', $id)
+                ->exists()) {
+            return back()
+                ->withInput()
+                ->withErrors(['seccion' => 'Esta sección ya existe para el grado seleccionado.']);
+        }
+        
         if ($seccion->cantidadEstudiantes() > $request->vacantes_seccion) {
             return back()->withErrors([
                 'vacantes_seccion' => 'No se puede reducir el número de vacantes por debajo del número de estudiantes matriculados.'
@@ -76,6 +96,7 @@ class SeccionController extends Controller
         }
 
         $seccion->fill($request->all());
+        $seccion->seccion = strtoupper($request->seccion);
         $seccion->estado_vacantes = $request->has('estado_vacantes');
         $seccion->save();
 
@@ -83,12 +104,10 @@ class SeccionController extends Controller
             ->with('success', 'Sección actualizada correctamente.');
     }
 
-    // Eliminar sección
     public function destroy($id)
     {
         $seccion = Seccion::findOrFail($id);
 
-        // Verificar si hay matrículas activas
         if ($seccion->cantidadEstudiantes() > 0) {
             return back()->withErrors([
                 'error' => 'No se puede eliminar la sección porque tiene estudiantes matriculados.'
@@ -101,7 +120,6 @@ class SeccionController extends Controller
             ->with('success', 'Sección eliminada correctamente.');
     }
 
-    // Actualizar estado de vacantes
     public function actualizarEstadoVacantes($id)
     {
         $seccion = Seccion::findOrFail($id);
@@ -112,7 +130,6 @@ class SeccionController extends Controller
             ->with('success', 'Estado de vacantes actualizado correctamente.');
     }
 
-    // Obtener secciones por grado
     public function seccionesPorGrado($gradoId)
     {
         $secciones = Seccion::where('id_grado', $gradoId)

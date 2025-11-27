@@ -106,12 +106,7 @@
                                 Panel Docentes
                             </a>
                         </li>
-                        <li>
-                            <a href="{{ route('secretarias.buscar') }}" class="flex items-center py-2 px-3 text-gray-300 hover:text-[#98C560] hover:bg-white/5 rounded-md transition-all duration-200 text-sm {{ request()->routeIs('secretarias.buscar') ? 'text-[#98C560] bg-white/5' : '' }}">
-                                <div class="w-2 h-2 bg-orange-400 rounded-full mr-3 opacity-60"></div>
-                                Panel Secretarios
-                            </a>
-                        </li>
+                       
                         <li>
                             <a href="{{ route('estudiantes.buscar') }}" class="flex items-center py-2 px-3 text-gray-300 hover:text-[#98C560] hover:bg-white/5 rounded-md transition-all duration-200 text-sm {{ request()->routeIs('estudiantes.buscar') ? 'text-[#98C560] bg-white/5' : '' }}">
                                 <div class="w-2 h-2 bg-blue-400 rounded-full mr-3 opacity-60"></div>
@@ -368,6 +363,28 @@
                     </ul>
                 </div>
 
+                                  <div class="sidebar-item relative group {{ request()->routeIs(['asistencia.scanner']) ? 'selected' : '' }}">
+                    @if(request()->routeIs(['asistencia.scanner']))
+                        <div class="active-indicator"></div>
+                    @endif
+                    <a class="flex items-center py-3 px-4 text-white hover:bg-[#98C560]/20 rounded-lg hover-scale transition-all duration-300 sidebar-dropdown-toggle cursor-pointer group-[.selected]:bg-[#98C560]/30">
+                        <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                            <i class="ri-calendar-check-line text-white text-sm"></i>
+                        </div>
+                        <span class="text-sm font-medium flex-1">Gestionar Asistencia</span>
+                        <i class="ri-arrow-right-s-line submenu-indicator text-lg text-[#98C560]"></i>
+                    </a>
+                    
+                    <ul class="pl-12 mt-2 space-y-2 {{ request()->routeIs(['asistencia.scanner']) ? 'block' : 'hidden' }} group-[.selected]:block">
+                        <li>
+                            <a href="{{ route('asistencia.scanner') }}" class="flex items-center py-2 px-3 text-gray-300 hover:text-[#98C560] hover:bg-white/5 rounded-md transition-all duration-200 text-sm {{ request()->routeIs('asistencia.scanner') ? 'text-[#98C560] bg-white/5' : '' }}">
+                                <div class="w-2 h-2 bg-green-400 rounded-full mr-3 opacity-60"></div>
+                                Escanear QR
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
 
         @elseif(auth()->user()->isSecretaria())
@@ -462,6 +479,8 @@
                         <span class="text-sm font-medium">Asignar Docente</span>
                     </a>
                 </div>
+
+  
             </div>
 
         @elseif(auth()->user()->isDocente())
@@ -535,7 +554,39 @@
                     </ul>
                 </div>
             </div>
+       @elseif(auth()->user()->isAuxiliar())
+            <div class="space-y-1">
+                <h4 class="text-[#98C560] text-xs font-bold uppercase mb-4 tracking-wider px-3 flex items-center">
+                    <div class="w-6 h-[1px] bg-gradient-to-r from-[#98C560] to-transparent mr-2"></div>
+                    Auxiliar
+                </h4>
+                
+                <!-- Dashboard Principal -->
+                <div class="sidebar-item relative">
+                    <a href="{{ route('home.auxiliar') }}" class="flex items-center py-3 px-4 text-white hover:bg-[#98C560]/20 rounded-lg hover-scale transition-all duration-300 group {{ request()->routeIs('home.auxiliar') ? 'bg-[#98C560]/30' : '' }}">
+                        @if(request()->routeIs('home.auxiliar'))
+                            <div class="active-indicator"></div>
+                        @endif
+                        <div class="w-8 h-8 bg-gradient-to-br from-[#98C560] to-[#7CB342] rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                            <i class="ri-dashboard-3-line text-white text-sm"></i>
+                        </div>
+                        <span class="text-sm font-medium">Dashboard Principal</span>
+                    </a>
+                </div>
 
+                <!-- Gestionar Asistencia -->
+                <div class="sidebar-item relative">
+                    <a href="{{ route('asistencia.scanner') }}" class="flex items-center py-3 px-4 text-white hover:bg-[#98C560]/20 rounded-lg hover-scale transition-all duration-300 group {{ request()->routeIs('asistencia.scanner') ? 'bg-[#98C560]/30' : '' }}">
+                        @if(request()->routeIs('asistencia.scanner'))
+                            <div class="active-indicator"></div>
+                        @endif
+                        <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                            <i class="ri-qr-scan-2-line text-white text-sm"></i>
+                        </div>
+                        <span class="text-sm font-medium">Gestionar Asistencia</span>
+                    </a>
+                </div>
+            </div>
         @elseif(auth()->user()->isTutor())
             <div class="space-y-1">
                 <h4 class="text-[#98C560] text-xs font-bold uppercase mb-4 tracking-wider px-3 flex items-center">
@@ -630,27 +681,6 @@
                     </ul>
                 </div>
 
-                  <div class="sidebar-item relative group {{ request()->routeIs(['asistencia.scanner']) ? 'selected' : '' }}">
-                    @if(request()->routeIs(['asistencia.scanner']))
-                        <div class="active-indicator"></div>
-                    @endif
-                    <a class="flex items-center py-3 px-4 text-white hover:bg-[#98C560]/20 rounded-lg hover-scale transition-all duration-300 sidebar-dropdown-toggle cursor-pointer group-[.selected]:bg-[#98C560]/30">
-                        <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
-                            <i class="ri-calendar-check-line text-white text-sm"></i>
-                        </div>
-                        <span class="text-sm font-medium flex-1">Gestionar Asistencia</span>
-                        <i class="ri-arrow-right-s-line submenu-indicator text-lg text-[#98C560]"></i>
-                    </a>
-                    
-                    <ul class="pl-12 mt-2 space-y-2 {{ request()->routeIs(['asistencia.scanner']) ? 'block' : 'hidden' }} group-[.selected]:block">
-                        <li>
-                            <a href="{{ route('asistencia.scanner') }}" class="flex items-center py-2 px-3 text-gray-300 hover:text-[#98C560] hover:bg-white/5 rounded-md transition-all duration-200 text-sm {{ request()->routeIs('asistencia.scanner') ? 'text-[#98C560] bg-white/5' : '' }}">
-                                <div class="w-2 h-2 bg-green-400 rounded-full mr-3 opacity-60"></div>
-                                Escanear QR
-                            </a>
-                        </li>
-                    </ul>
-                </div>
             </div>
         @endif
     @endauth
