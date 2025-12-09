@@ -118,4 +118,13 @@ class Seccion extends Model
     {
         return $this->matriculas()->where('estado', 'activo')->count();
     }
+
+    // Obtener seccion de un docente y grado específico
+    public static function obtenerSeccionPorDocenteYGrado($codigoDocente, $idGrado)
+    {
+        return self::whereHas('seccionesDocentes', function ($query) use ($codigoDocente) {
+            $query->where('codigo_docente', $codigoDocente)
+                  ->where('estado', 1); // Solo activos
+        })->where('id_grado', $idGrado)->first();
+    }
 }

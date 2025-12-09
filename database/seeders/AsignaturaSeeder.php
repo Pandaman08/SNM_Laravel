@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Asignatura;
+use App\Models\AsignaturaDocente;
 use App\Models\Docente;
 use App\Models\Seccion;
 use Illuminate\Database\Seeder;
@@ -22,7 +23,11 @@ class AsignaturaSeeder extends Seeder
 
                 $docente = $seccion->todosLosDocentes()->first();
                 if ($docente) {
-                    $asignatura->docentes()->attach($docente->codigo_docente, ['fecha' => now()]);
+                    AsignaturaDocente::create([
+                        'codigo_asignatura' => $asignatura->codigo_asignatura,
+                        'codigo_docente' => $docente->codigo_docente,
+                        'fecha' => now()->toDateString()
+                    ]);
                 }
             } else {
                 // Secundaria: asignar docentes del mismo nivel (pueden estar en cualquier grado)
@@ -32,7 +37,11 @@ class AsignaturaSeeder extends Seeder
                 $cantidad = rand(1, 2);
                 $seleccionados = $docentesDelNivel->shuffle()->take($cantidad);
                 foreach ($seleccionados as $docente) {
-                    $asignatura->docentes()->attach($docente->codigo_docente, ['fecha' => now()]);
+                    AsignaturaDocente::create([
+                        'codigo_asignatura' => $asignatura->codigo_asignatura,
+                        'codigo_docente' => $docente->codigo_docente,
+                        'fecha' => now()->toDateString()
+                    ]);
                 }
             }
         });
