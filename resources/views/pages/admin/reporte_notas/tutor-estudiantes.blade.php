@@ -120,7 +120,7 @@
                                             ->first();
                                     @endphp
 
-                                    @foreach (range(3, 6) as $periodo)
+                                    @foreach (range(1, 4) as $periodo)
                                         @php
                                             $reporte = $detalle
                                                 ? $detalle->reportesNotas->where('id_periodo', $periodo)->first()

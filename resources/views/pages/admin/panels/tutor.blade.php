@@ -79,23 +79,68 @@
 
                 <!-- Estudiantes con Alertas -->
                 <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                    <div class="bg-gradient-to-r from-red-600 to-red-800 p-4 text-white">
-                        <h2 class="text-xl font-bold">Estudiantes con Alertas</h2>
+                    <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 text-white">
+                        <h2 class="text-xl font-bold">Mis Estudiantes</h2>
                     </div>
-                    <div class="p-4 space-y-4">
-                        @foreach ($estudiantes as $estudiante )
-                        
-                        
-                        <div class="flex items-start border-b border-gray-100 pb-4">
-                            <div class="p-2 rounded-full bg-yellow-100 text-yello-600 mr-3">
-                                  <i class="ri-team-fill text-xl"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium">{{$estudiante["nombre"] ?? 'NA'}} {{$estudiante["apellidos"] ?? 'NA'}} </p>
-                                <p class="text-sm text-gray-500">En vista</p>
-                            </div>
-                        </div>
-                        @endforeach()
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Estudiante</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Grado/Sección</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Estado</th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @forelse ($estudiantes as $estudiante)
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <div class="flex items-center">
+                                                <div class="p-2 rounded-full bg-blue-100 text-blue-600 mr-3">
+                                                    <i class="ri-user-fill"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="font-medium text-gray-900">{{ $estudiante['nombre_completo'] }}</p>
+                                                    <p class="text-xs text-gray-500">{{ $estudiante['dni'] }}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                            {{ $estudiante['grado'] }} "{{ $estudiante['seccion'] }}"
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @if($estudiante['tiene_matricula_activa'])
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                                    <i class="ri-check-circle-fill mr-1"></i>Activo
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
+                                                    <i class="ri-close-circle-fill mr-1"></i>Sin Matrícula
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                            @if($estudiante['tiene_matricula_activa'])
+                                                <a href="{{ route('reporte_notas.tutor.estudiante', $estudiante['codigo_matricula']) }}" 
+                                                   class="inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">
+                                                    <i class="ri-file-chart-fill mr-2"></i>Ver Notas
+                                                </a>
+                                            @else
+                                                <span class="text-gray-400 text-xs">No disponible</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                                            <i class="ri-inbox-fill text-4xl mb-2"></i>
+                                            <p class="font-medium">No tienes estudiantes registrados</p>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

@@ -4,11 +4,9 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Grado;
-use App\Models\NivelEducativo;
 
 class AsignaturaFactory extends Factory
 {
-
     private const COMUNICACION = 'Comunicación';
     private const MATEMATICA = 'Matemática';
     private const PERSONAL_SOCIAL = 'Personal Social';
@@ -18,6 +16,8 @@ class AsignaturaFactory extends Factory
     private const EDUCACION_RELIGIOSA = 'Educación Religiosa';
     private const INGLES = 'Inglés';
     
+    private static $asignaturasCreadas = [];
+
     public function definition()
     {
         $gradoId = Grado::inRandomOrder()->first()?->id_grado;
@@ -36,6 +36,10 @@ class AsignaturaFactory extends Factory
 
             $nivel = $grado->nivelEducativo->nombre ?? null;
             $gradoNumero = $grado->grado;
+            $gradoId = $grado->id_grado;
+
+            // Crear una clave única para este grado
+            $claveGrado = "{$nivel}_{$gradoId}";
 
             if ($nivel === 'Primaria') {
                 $asignaturasPrimaria = [
@@ -48,7 +52,16 @@ class AsignaturaFactory extends Factory
                     self::EDUCACION_RELIGIOSA,
                     self::INGLES
                 ];
-                $asignatura->nombre = $this->faker->randomElement($asignaturasPrimaria);
+
+                // Obtener la siguiente asignatura no utilizada para este grado
+                if (!isset(self::$asignaturasCreadas[$claveGrado])) {
+                    self::$asignaturasCreadas[$claveGrado] = 0;
+                }
+
+                $indice = self::$asignaturasCreadas[$claveGrado] % count($asignaturasPrimaria);
+                $asignatura->nombre = $asignaturasPrimaria[$indice];
+                self::$asignaturasCreadas[$claveGrado]++;
+
             } elseif ($nivel === 'Secundaria') {
                 $asignaturasSecundaria = match (true) {
                     in_array($gradoNumero, [1, 2]) => [
@@ -82,7 +95,15 @@ class AsignaturaFactory extends Factory
                     ],
                     default => ['Comunicación']
                 };
-                $asignatura->nombre = $this->faker->randomElement($asignaturasSecundaria);
+
+                // Obtener la siguiente asignatura no utilizada para este grado
+                if (!isset(self::$asignaturasCreadas[$claveGrado])) {
+                    self::$asignaturasCreadas[$claveGrado] = 0;
+                }
+
+                $indice = self::$asignaturasCreadas[$claveGrado] % count($asignaturasSecundaria);
+                $asignatura->nombre = $asignaturasSecundaria[$indice];
+                self::$asignaturasCreadas[$claveGrado]++;
             }
         });
     }

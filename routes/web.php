@@ -177,4 +177,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/asistencia/scan/{qr_code}', function ($qrCode) {
         return view('pages.admin.asistencia.public-scan', compact('qrCode'));
     })->name('asistencia.scan');
+
+    Route::get('/calificaciones-masivas/{id_asignatura}', [ReporteNotasController::class, 'calificacionesMasivas'])->name('reporte_notas.calificaciones-masivas');
+    Route::post('/guardar-calificaciones-masivas', [ReporteNotasController::class, 'guardarCalificacionesMasivas'])->name('reporte_notas.guardar-masivas');
+    Route::post('/actualizar-calificaciones-masivas', [ReporteNotasController::class, 'actualizarCalificacionesMasivas'])->name('reporte_notas.actualizar-masivas');
 });

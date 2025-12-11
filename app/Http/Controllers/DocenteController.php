@@ -79,7 +79,7 @@ class DocenteController extends Controller
     public function index_asignaturas()
     {
         $user = Auth::user();
-       $AsignaturaDocente = AsignaturaDocente::where('codigo_docente', $user->docente->codigo_docente)->get();
+        $AsignaturaDocente = AsignaturaDocente::where('codigo_docente', $user->docente->codigo_docente)->get();
         $detalles = [];
         foreach ($AsignaturaDocente as $asignacion) {
             $asignatura = Asignatura::where('codigo_asignatura', $asignacion->codigo_asignatura)->first();
@@ -100,7 +100,9 @@ class DocenteController extends Controller
         $detalles = collect($detalles)->map(function ($item) {
             return (object) $item;
         });
-
+        Log::info('usuario docente: ', $user->toArray());
+        Log::info('codigo de docente: ', ['codigo_docente' => $user->docente->codigo_docente]);
+        Log::info('asignaturas docentes: ', $AsignaturaDocente->toArray());
         Log::info('Detalles de asignaturas: ', $detalles->toArray());
         return view('pages.admin.docentes.asignaturas', compact('detalles'));
     }

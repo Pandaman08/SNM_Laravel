@@ -483,4 +483,146 @@ class ReporteNotasController extends Controller
 
         return view('pages.admin.reporte_notas.docentes-view', compact('reportes', 'asignatura'));
     }
+
+    /**
+     * Cargar vista masiva de calificaciones para una asignatura
+     * Solo muestra el período activo
+     */
+    public function calificacionesMasivas($id_asignatura)
+    {
+        $asignatura = Asignatura::with('grado')->findOrFail($id_asignatura);
+
+        // Obtener período activo
+        $periodoActual = Periodo::where('estado', 'Proceso')->first();
+
+        if (!$periodoActual) {
+            return back()->with('error', 'No hay período activo en este momento');
+        }
+
+        // Obtener todas las matrículas activas para esta asignatura (por sus secciones)
+        $secciones = $asignatura->grado->secciones;
+        $seccionIds = $secciones->pluck('id_seccion')->toArray();
+
+        $matriculas = Matricula::with(['estudiante.persona'])
+            ->whereIn('seccion_id', $seccionIds)
+            ->where('estado', 'activo')
+            ->orderBy('codigo_matricula')
+            ->get();
+
+        // Obtener competencias de la asignatura
+        $competencias = Competencia::where('codigo_asignatura', $id_asignatura)
+            ->get();
+
+        // Para cada matrícula, obtener los detalles y reportes de notas
+        $competenciaIds = $competencias->pluck('id_competencias')->toArray();
+
+        $detalles = DetalleAsignatura::whereIn('id_competencias', $competenciaIds)
+            ->with([
+                'reportesNotas' => function ($query) use ($periodoActual) {
+                    $query->where('id_periodo', $periodoActual->id_periodo);
+                }
+            ])
+            ->get()
+            ->groupBy('codigo_matricula');
+
+        // Verificar si ya existen notas registradas para este período
+        $notasRegistradas = ReporteNota::whereIn('id_periodo', [$periodoActual->id_periodo])
+            ->whereIn('id_detalle_asignatura', $detalles->flatten()->pluck('id_detalle_asignatura'))
+            ->exists();
+
+        return view('pages.admin.reporte_notas.calificaciones-masivas', [
+            'asignatura' => $asignatura,
+            'periodoActual' => $periodoActual,
+            'matriculas' => $matriculas,
+            'competencias' => $competencias,
+            'detalles' => $detalles,
+            'notasRegistradas' => $notasRegistradas
+        ]);
+    }
+
+    /**
+     * Guardar calificaciones en lote
+     */
+    public function guardarCalificacionesMasivas(Request $request)
+    {
+        $id_asignatura = $request->input('id_asignatura');
+        $id_periodo = $request->input('id_periodo');
+        $calificaciones = $request->input('calificaciones'); // Array: [id_detalle => calificacion]
+
+        $periodo = Periodo::findOrFail($id_periodo);
+
+        // Validar que el período esté activo
+        $hoy = now();
+        if (!$hoy->between($periodo->fecha_inicio, $periodo->fecha_fin)) {
+            return back()->with('error', 'No puedes registrar calificaciones fuera del período activo');
+        }
+
+        // Validar que no existan notas ya registradas
+        $asignatura = Asignatura::findOrFail($id_asignatura);
+        $competencias = Competencia::where('codigo_asignatura', $id_asignatura)->pluck('id_competencias');
+        
+        $existentes = DetalleAsignatura::whereIn('id_competencias', $competencias)
+            ->whereHas('reportesNotas', function ($q) use ($id_periodo) {
+                $q->where('id_periodo', $id_periodo);
+            })
+            ->exists();
+
+        if ($existentes) {
+            return back()->with('error', 'Ya existen calificaciones registradas para este período');
+        }
+
+        try {
+            foreach ($calificaciones as $id_detalle => $calificacion) {
+                // Validar que la calificación sea válida
+                if (!in_array($calificacion, ['AD', 'A', 'B', 'C'])) {
+                    continue; // Saltar si está vacía o inválida
+                }
+
+                // Crear la nota
+                ReporteNota::create([
+                    'id_detalle_asignatura' => $id_detalle,
+                    'id_periodo' => $id_periodo,
+                    'calificacion' => $calificacion,
+                    'fecha_registro' => now()->toDateString(),
+                    'observacion' => null
+                ]);
+            }
+
+            return back()->with('success', 'Calificaciones registradas correctamente');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al registrar calificaciones: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Actualizar calificaciones en lote
+     */
+    public function actualizarCalificacionesMasivas(Request $request)
+    {
+        $id_periodo = $request->input('id_periodo');
+        $calificaciones = $request->input('calificaciones'); // Array: [id_reporte => calificacion]
+
+        $periodo = Periodo::findOrFail($id_periodo);
+
+        // Validar que el período esté activo
+        $hoy = now();
+        if (!$hoy->between($periodo->fecha_inicio, $periodo->fecha_fin)) {
+            return back()->with('error', 'No puedes editar calificaciones fuera del período activo');
+        }
+
+        try {
+            foreach ($calificaciones as $id_reporte => $calificacion) {
+                if (!in_array($calificacion, ['AD', 'A', 'B', 'C'])) {
+                    continue;
+                }
+
+                $reporte = ReporteNota::findOrFail($id_reporte);
+                $reporte->update(['calificacion' => $calificacion]);
+            }
+
+            return back()->with('success', 'Calificaciones actualizadas correctamente');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al actualizar calificaciones: ' . $e->getMessage());
+        }
+    }
 }
