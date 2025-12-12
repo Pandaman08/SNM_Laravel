@@ -139,19 +139,48 @@
                         </th>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
                             <div class="flex justify-center space-x-2">
+                                @php
+                                    // Verificar si hay notas registradas para esta asignatura.
+                                    // Primero intentamos con el periodo activo; si no existe, hacemos
+                                    // un fallback comprobando en cualquier periodo.
+                                    $periodoActual = \App\Models\Periodo::where('estado', 'activo')->first();
+                                    $notasRegistradas = false;
+
+                                    $competencias = \App\Models\Competencia::where('codigo_asignatura', $a->asignatura->codigo_asignatura)->pluck('id_competencias');
+
+                                    if ($competencias->isNotEmpty()) {
+                                        if ($periodoActual) {
+                                            $notasRegistradas = \App\Models\DetalleAsignatura::whereIn('id_competencias', $competencias)
+                                                ->whereHas('reportesNotas', function ($q) use ($periodoActual) {
+                                                    $q->where('id_periodo', $periodoActual->id_periodo);
+                                                })
+                                                ->exists();
+                                        } else {
+                                            // Fallback: verificar existencia de reportes en cualquier periodo
+                                            $notasRegistradas = \App\Models\DetalleAsignatura::whereIn('id_competencias', $competencias)
+                                                ->whereHas('reportesNotas')
+                                                ->exists();
+                                        }
+                                    }
+                                @endphp
+                                
                                 <a href="{{ route('reporte_notas.calificaciones-masivas', ['id_asignatura' => $a->asignatura->codigo_asignatura]) }}"
-                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white {{ $notasRegistradas ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 hover:bg-blue-700' }} focus:outline-none focus:ring-2 focus:ring-offset-2 {{ $notasRegistradas ? 'focus:ring-amber-500' : 'focus:ring-blue-500' }} transition-colors duration-200">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            @if($notasRegistradas)
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            @else
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            @endif
                                         </svg>
-                                    Calificar Asignatura
-                                </a>
+                                        {{ $notasRegistradas ? 'Editar Calificaciones' : 'Calificar Asignatura' }}
+                                    </a>
                             </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="px-6 py-8 text-center">
+                        <td colspan="5" class="px-6 py-8 text-center">
                             <div class="flex flex-col items-center justify-center text-gray-400">
                                 <svg class="h-12 w-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>

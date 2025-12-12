@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asignatura;
+use App\Models\CalificacionFinal;
 use App\Models\Competencia;
 use Illuminate\Http\Request;
 use App\Models\ReporteNota;
@@ -119,6 +120,40 @@ class ReporteNotasController extends Controller
             'fecha_registro' => $validated['fecha_registro'],
         ]);
 
+        // Después de crear la nota, verificar si ya existen reportes para todos los periodos
+        $periodos = Periodo::orderBy('id_periodo')->get();
+        $periodoIds = $periodos->pluck('id_periodo')->toArray();
+
+        $reportesCount = ReporteNota::where('id_detalle_asignatura', $validated['id_detalle_asignatura'])
+            ->whereIn('id_periodo', $periodoIds)
+            ->count();
+
+        if ($reportesCount === count($periodoIds) && count($periodoIds) > 0) {
+            // Calcular promedio y guardar en detalle_asignatura.calificacion_anual
+            $reportes = ReporteNota::where('id_detalle_asignatura', $validated['id_detalle_asignatura'])
+                ->whereIn('id_periodo', $periodoIds)
+                ->get();
+
+            $suma = 0; $valido = true;
+            foreach ($reportes as $r) {
+                $valor = $this->convertirNotaANumero($r->calificacion);
+                if ($valor === null) { $valido = false; break; }
+                $suma += $valor;
+            }
+
+            if ($valido) {
+                $promedioLetra = $this->convertirNumeroANota($suma / count($periodoIds));
+                \App\Models\DetalleAsignatura::where('id_detalle_asignatura', $validated['id_detalle_asignatura'])
+                    ->update(['calificacion_anual' => $promedioLetra]);
+
+                // Recalcular calificacion final de la asignatura para la matrícula
+                $detalle = \App\Models\DetalleAsignatura::find($validated['id_detalle_asignatura']);
+                if ($detalle && $detalle->asignatura) {
+                    $this->recomputeCalificacionFinal($detalle->codigo_matricula, $detalle->asignatura->codigo_asignatura);
+                }
+            }
+        }
+
         return back()->with('success', 'Nota registrada correctamente.');
     }
 
@@ -143,6 +178,39 @@ class ReporteNotasController extends Controller
             'calificacion' => $validated['calificacion'],
             'observacion' => $validated['observacion'],
         ]);
+
+        // Después de actualizar la nota, verificar si ya existen reportes para todos los periodos
+        $periodos = Periodo::orderBy('id_periodo')->get();
+        $periodoIds = $periodos->pluck('id_periodo')->toArray();
+
+        $detalleId = $reporte->id_detalle_asignatura;
+        $reportesCount = ReporteNota::where('id_detalle_asignatura', $detalleId)
+            ->whereIn('id_periodo', $periodoIds)
+            ->count();
+
+        if ($reportesCount === count($periodoIds) && count($periodoIds) > 0) {
+            $reportes = ReporteNota::where('id_detalle_asignatura', $detalleId)
+                ->whereIn('id_periodo', $periodoIds)
+                ->get();
+
+            $suma = 0; $valido = true;
+            foreach ($reportes as $r) {
+                $valor = $this->convertirNotaANumero($r->calificacion);
+                if ($valor === null) { $valido = false; break; }
+                $suma += $valor;
+            }
+
+            if ($valido) {
+                $promedioLetra = $this->convertirNumeroANota($suma / count($periodoIds));
+                \App\Models\DetalleAsignatura::where('id_detalle_asignatura', $detalleId)
+                    ->update(['calificacion_anual' => $promedioLetra]);
+
+                $detalle = \App\Models\DetalleAsignatura::find($detalleId);
+                if ($detalle && $detalle->asignatura) {
+                    $this->recomputeCalificacionFinal($detalle->codigo_matricula, $detalle->asignatura->codigo_asignatura);
+                }
+            }
+        }
 
         return back()->with('success', 'Nota actualizada correctamente.');
     }
@@ -184,9 +252,9 @@ class ReporteNotasController extends Controller
 
         $detalleIds = $detalles->pluck('id_detalle_asignatura');
 
-        $periodos = Periodo::whereIn('id_periodo', [1,2,3, 4 ])
-            ->orderBy('id_periodo')
-            ->get();
+        // Obtener periodos dinámicamente (todos los periodos registrados)
+        $periodos = Periodo::orderBy('id_periodo')->get();
+        $periodoIds = $periodos->pluck('id_periodo')->toArray();
 
         $hoy = now();
         $periodoActual = null;
@@ -198,39 +266,40 @@ class ReporteNotasController extends Controller
             }
         }
 
-        // Obtener todas las notas reportadas para estos detalles
+        // Obtener todas las notas reportadas para estos detalles y periodos
         $reportes = ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
-            ->whereIn('id_periodo', [1,2,3, 4])
+            ->whereIn('id_periodo', $periodoIds)
             ->with(['periodo'])
             ->get()
             ->groupBy('id_detalle_asignatura');
 
         // Organizar los datos para la vista
-        $competencias->each(function ($competencia) use ($detalles, $reportes) {
+        $competencias->each(function ($competencia) use ($detalles, $reportes, $periodoIds) {
             $competencia->detallesAsignatura = $detalles->where('id_competencias', $competencia->id_competencias);
 
-            $competencia->detallesAsignatura->each(function ($detalle) use ($reportes) {
+            $competencia->detallesAsignatura->each(function ($detalle) use ($reportes, $periodoIds) {
                 // Asignar reportes a cada detalle
                 $detalle->reportesNotas = $reportes->get($detalle->id_detalle_asignatura, collect());
 
-                // Calcular promedio si hay 4 notas (uno por cada bimestre)
-                if ($detalle->reportesNotas && $detalle->reportesNotas->count() === 4) {
-                    $suma = 0;
-                    $valido = true;
+                    // Calcular promedio sólo si hay reportes para todos los periodos registrados
+                    $periodosCount = count($periodoIds);
+                    if ($detalle->reportesNotas && $detalle->reportesNotas->count() === $periodosCount && $periodosCount > 0) {
+                        $suma = 0;
+                        $valido = true;
 
-                    foreach ($detalle->reportesNotas as $reporte) {
-                        $valor = $this->convertirNotaANumero($reporte->calificacion);
-                        if ($valor === null) {
-                            $valido = false;
-                            break;
+                        foreach ($detalle->reportesNotas as $reporte) {
+                            $valor = $this->convertirNotaANumero($reporte->calificacion);
+                            if ($valor === null) {
+                                $valido = false;
+                                break;
+                            }
+                            $suma += $valor;
                         }
-                        $suma += $valor;
-                    }
 
-                    $detalle->promedio = $valido ? $this->convertirNumeroANota($suma / 4) : null;
-                } else {
-                    $detalle->promedio = null;
-                }
+                        $detalle->promedio = $valido ? $this->convertirNumeroANota($suma / $periodosCount) : null;
+                    } else {
+                        $detalle->promedio = $detalle->calificacion_anual ?? null;
+                    }
             });
         });
 
@@ -315,23 +384,27 @@ class ReporteNotasController extends Controller
             ->get();
         $detalleIds = $detalles->pluck('id_detalle_asignatura');
 
-        // Obtener reportes de notas para los bimestres
+        // Obtener periodos dinámicamente y los reportes correspondientes
+        $periodos = Periodo::orderBy('id_periodo')->get();
+        $periodoIds = $periodos->pluck('id_periodo')->toArray();
+
         $reportes = ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
-            ->whereIn('id_periodo', [1,2,3, 4])
+            ->whereIn('id_periodo', $periodoIds)
             ->with(['periodo'])
             ->get()
             ->groupBy('id_detalle_asignatura');
 
-        $asignaturas->each(function ($asignatura) use ($competencias, $detalles, $reportes) {
+        $asignaturas->each(function ($asignatura) use ($competencias, $detalles, $reportes, $periodoIds) {
             $asignatura->competencias = $competencias->where('codigo_asignatura', $asignatura->codigo_asignatura);
 
-            $asignatura->competencias->each(function ($competencia) use ($detalles, $reportes) {
+            $asignatura->competencias->each(function ($competencia) use ($detalles, $reportes, $periodoIds) {
                 $competencia->detallesAsignatura = $detalles->where('id_competencias', $competencia->id_competencias);
 
-                $competencia->detallesAsignatura->each(function ($detalle) use ($reportes) {
+                $competencia->detallesAsignatura->each(function ($detalle) use ($reportes, $periodoIds) {
                     $detalle->reportesNotas = $reportes->get($detalle->id_detalle_asignatura, collect());
 
-                    if ($detalle->reportesNotas->count() === 4) {
+                    $periodosCount = count($periodoIds);
+                    if ($detalle->reportesNotas->count() === $periodosCount && $periodosCount > 0) {
                         $suma = 0;
                         $valido = true;
 
@@ -344,9 +417,9 @@ class ReporteNotasController extends Controller
                             $suma += $valor;
                         }
 
-                        $detalle->promedio = $valido ? $this->convertirNumeroANota($suma / 4) : null;
+                        $detalle->promedio = $valido ? $this->convertirNumeroANota($suma / $periodosCount) : null;
                     } else {
-                        $detalle->promedio = null;
+                        $detalle->promedio = $detalle->calificacion_anual ?? null;
                     }
                 });
             });
@@ -356,6 +429,52 @@ class ReporteNotasController extends Controller
             'matricula' => $matricula,
             'asignaturas' => $asignaturas
         ]);
+    }
+
+    /**
+     * Recalcula la calificación final de una asignatura para una matrícula
+     */
+    private function recomputeCalificacionFinal($codigo_matricula, $codigo_asignatura)
+    {
+        if (!$codigo_matricula || !$codigo_asignatura) return;
+
+        // Obtener competencias de la asignatura
+        $competencias = Competencia::where('codigo_asignatura', $codigo_asignatura)->get();
+        $competenciaIds = $competencias->pluck('id_competencias')->toArray();
+
+        // Obtener detalles para esa matrícula y esas competencias
+        $detalles = DetalleAsignatura::whereIn('id_competencias', $competenciaIds)
+            ->where('codigo_matricula', $codigo_matricula)
+            ->get();
+
+        if ($detalles->isEmpty()) {
+            // Borrar si existe
+            CalificacionFinal::where('codigo_matricula', $codigo_matricula)
+                ->where('codigo_asignatura', $codigo_asignatura)
+                ->delete();
+            return;
+        }
+
+        // Reunir calificaciones anuales
+        $valores = [];
+        foreach ($detalles as $d) {
+            if (!empty($d->calificacion_anual)) {
+                $num = $this->convertirNotaANumero($d->calificacion_anual);
+                if ($num !== null) $valores[] = $num;
+            }
+        }
+
+        // Sólo calcular si tenemos calificaciones anuales para todas las competencias
+        if (count($valores) === count($competenciaIds) && count($valores) > 0) {
+            $suma = array_sum($valores);
+            $promedio = $suma / count($valores);
+            $promedioLetra = $this->convertirNumeroANota($promedio);
+
+            CalificacionFinal::updateOrCreate(
+                ['codigo_matricula' => $codigo_matricula, 'codigo_asignatura' => $codigo_asignatura],
+                ['calificacion_final' => $promedioLetra, 'fecha_registro' => now()->toDateString()]
+            );
+        }
     }
 
     public function generarReportePdf($codigo_matricula)
@@ -381,23 +500,27 @@ class ReporteNotasController extends Controller
             ->get();
         $detalleIds = $detalles->pluck('id_detalle_asignatura');
 
-        // Obtener reportes de notas para los bimestres
+        // Obtener periodos dinámicos y reportes correspondientes
+        $periodos = Periodo::orderBy('id_periodo')->get();
+        $periodoIds = $periodos->pluck('id_periodo')->toArray();
+
         $reportes = ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
-            ->whereIn('id_periodo', [1,2,3, 4])
+            ->whereIn('id_periodo', $periodoIds)
             ->with(['periodo'])
             ->get()
             ->groupBy('id_detalle_asignatura');
 
-        $asignaturas->each(function ($asignatura) use ($competencias, $detalles, $reportes) {
+        $asignaturas->each(function ($asignatura) use ($competencias, $detalles, $reportes, $periodoIds) {
             $asignatura->competencias = $competencias->where('codigo_asignatura', $asignatura->codigo_asignatura);
 
-            $asignatura->competencias->each(function ($competencia) use ($detalles, $reportes) {
+            $asignatura->competencias->each(function ($competencia) use ($detalles, $reportes, $periodoIds) {
                 $competencia->detallesAsignatura = $detalles->where('id_competencias', $competencia->id_competencias);
 
-                $competencia->detallesAsignatura->each(function ($detalle) use ($reportes) {
+                $competencia->detallesAsignatura->each(function ($detalle) use ($reportes, $periodoIds) {
                     $detalle->reportesNotas = $reportes->get($detalle->id_detalle_asignatura, collect());
 
-                    if ($detalle->reportesNotas->count() === 4) {
+                    $periodosCount = count($periodoIds);
+                    if ($detalle->reportesNotas->count() === $periodosCount && $periodosCount > 0) {
                         $suma = 0;
                         $valido = true;
 
@@ -410,12 +533,15 @@ class ReporteNotasController extends Controller
                             $suma += $valor;
                         }
 
-                        $detalle->promedio = $valido ? $this->convertirNumeroANota($suma / 4) : null;
+                        $detalle->promedio = $valido ? $this->convertirNumeroANota($suma / $periodosCount) : null;
                     } else {
-                        $detalle->promedio = null;
+                        $detalle->promedio = $detalle->calificacion_anual ?? null;
                     }
                 });
             });
+            // Cargar calificacion final por asignatura si existe
+            $final = CalificacionFinal::where('codigo_matricula', $matricula->codigo_matricula ?? '')->where('codigo_asignatura', $asignatura->codigo_asignatura)->first();
+            $asignatura->calificacion_final = $final->calificacion_final ?? null;
         });
 
         // Configurar PDF
@@ -538,6 +664,128 @@ class ReporteNotasController extends Controller
             'detalles' => $detalles,
             'notasRegistradas' => $notasRegistradas
         ]);
+    }
+
+    /**
+     * Vista de prueba: permitir al docente calificar todos los periodos para una asignatura
+     * mostrando todos los estudiantes y periodos para completar (no verifica periodo activo).
+     */
+    public function calificarTodos($id_asignatura)
+    {
+        $asignatura = Asignatura::with('grado')->findOrFail($id_asignatura);
+
+        // Obtener todas las matrículas activas para esta asignatura (por sus secciones)
+        $secciones = $asignatura->grado->secciones;
+        $seccionIds = $secciones->pluck('id_seccion')->toArray();
+
+        $matriculas = Matricula::with(['estudiante.persona'])
+            ->whereIn('seccion_id', $seccionIds)
+            ->where('estado', 'activo')
+            ->orderBy('codigo_matricula')
+            ->get();
+
+        // Obtener periodos (todos)
+        $periodos = Periodo::orderBy('id_periodo')->get();
+
+        // Obtener competencias y detalles
+        $competencias = Competencia::where('codigo_asignatura', $id_asignatura)->get();
+        $competenciaIds = $competencias->pluck('id_competencias')->toArray();
+
+        $detalles = DetalleAsignatura::whereIn('id_competencias', $competenciaIds)
+            ->whereIn('codigo_matricula', $matriculas->pluck('codigo_matricula')->toArray())
+            ->with('reportesNotas')
+            ->get()
+            ->groupBy('codigo_matricula');
+
+        return view('pages.admin.reporte_notas.calificar-todos', [
+            'asignatura' => $asignatura,
+            'matriculas' => $matriculas,
+            'periodos' => $periodos,
+            'competencias' => $competencias,
+            'detalles' => $detalles,
+        ]);
+    }
+
+    /**
+     * Guardar calificaciones para varios periodos a la vez (testing).
+     * Entrada: calificaciones[periodoId][id_detalle] = 'A' etc.
+     */
+    public function guardarCalificacionesMasivasAllPeriods(Request $request)
+    {
+        $id_asignatura = $request->input('id_asignatura');
+        $calificaciones = $request->input('calificaciones', []); // [periodoId => [id_detalle => calificacion]]
+        $observaciones = $request->input('observaciones', []); // similar structure
+
+        try {
+            $affectedDetalles = [];
+
+            foreach ($calificaciones as $periodoId => $detallesArray) {
+                foreach ($detallesArray as $id_detalle => $calificacion) {
+                    if (!in_array($calificacion, ['AD', 'A', 'B', 'C'])) continue;
+
+                    $observacion = $observaciones[$periodoId][$id_detalle] ?? null;
+                    $observacion = !empty($observacion) ? $observacion : null;
+
+                    $reporte = ReporteNota::where('id_detalle_asignatura', $id_detalle)
+                        ->where('id_periodo', $periodoId)
+                        ->first();
+
+                    if ($reporte) {
+                        $reporte->update([
+                            'calificacion' => $calificacion,
+                            'observacion' => $observacion,
+                            'fecha_registro' => now()->toDateString(),
+                        ]);
+                    } else {
+                        ReporteNota::create([
+                            'id_detalle_asignatura' => $id_detalle,
+                            'id_periodo' => $periodoId,
+                            'calificacion' => $calificacion,
+                            'observacion' => $observacion,
+                            'fecha_registro' => now()->toDateString(),
+                        ]);
+                    }
+
+                    $affectedDetalles[] = $id_detalle;
+                }
+            }
+
+            // Recalcular promedio anual para los detalles afectados
+            $periodos = Periodo::orderBy('id_periodo')->get();
+            $periodoIds = $periodos->pluck('id_periodo')->toArray();
+
+            $uniqueDetalles = array_values(array_unique($affectedDetalles));
+            foreach ($uniqueDetalles as $detalleId) {
+                $reportes = ReporteNota::where('id_detalle_asignatura', $detalleId)
+                    ->whereIn('id_periodo', $periodoIds)
+                    ->get();
+
+                if ($reportes->count() === count($periodoIds) && count($periodoIds) > 0) {
+                    $suma = 0; $valido = true;
+                    foreach ($reportes as $r) {
+                        $valor = $this->convertirNotaANumero($r->calificacion);
+                        if ($valor === null) { $valido = false; break; }
+                        $suma += $valor;
+                    }
+
+                    if ($valido) {
+                        $promedioLetra = $this->convertirNumeroANota($suma / count($periodoIds));
+                        \App\Models\DetalleAsignatura::where('id_detalle_asignatura', $detalleId)
+                            ->update(['calificacion_anual' => $promedioLetra]);
+
+                        // Recalcular la calificacion final por asignatura para esta matrícula
+                        $detalle = \App\Models\DetalleAsignatura::find($detalleId);
+                        if ($detalle && $detalle->asignatura) {
+                            $this->recomputeCalificacionFinal($detalle->codigo_matricula, $detalle->asignatura->codigo_asignatura);
+                        }
+                    }
+                }
+            }
+
+            return redirect()->back()->with('success', 'Calificaciones guardadas (multi-periodo).');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al guardar calificaciones: ' . $e->getMessage());
+        }
     }
 
     /**

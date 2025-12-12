@@ -195,7 +195,7 @@
                                             <option value="C" {{ $reporteActual->calificacion === 'C' ? 'selected' : '' }}>C</option>
                                         </select>
                                         <button type="button" 
-                                            onclick="openModal('{{ $modalId }}')"
+                                            onclick="openObservationModal('{{ $modalId }}')"
                                                 class="p-2 rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
                                                 title="Agregar observación">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -229,56 +229,77 @@
                                     @endif
                                 @endif
 
-                                <!-- Modal para observaciones -->
-                                <dialog id="{{ $modalId }}" class="modal modal-bottom sm:modal-middle">
-                                    <div class="modal-box bg-white rounded-lg shadow-xl p-6">
-                                        <!-- Encabezado -->
-                                        <h3 class="font-bold text-lg flex items-center mb-4 text-gray-800">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            Observación - C{{ $index + 1 }}
-                                        </h3>
-                                        <!-- Campo de observación -->
-                                        <div class="form-control w-full mb-6">
-                                            <label class="label">
-                                                <span class="label-text font-semibold text-gray-700">Descripción del desempeño:</span>
-                                            </label>
-                                            @if($reporteActual)
-                                            <textarea 
-                                                name="observaciones[{{ $reporteActual->id_reporte_notas }}]" 
-                                                class="textarea textarea-bordered h-32 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md"
-                                                placeholder="Describe cómo va el estudiante en esta competencia..."
-                                                >{{ $reporteActual->observacion ?? '' }}</textarea>
-                                            @else
-                                            <textarea 
-                                                name="observaciones[{{ $detalleCompetencia->id_detalle_asignatura }}]" 
-                                                class="textarea textarea-bordered h-32 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md"
-                                                placeholder="Describe cómo va el estudiante en esta competencia..."
-                                                ></textarea>
-                                            @endif
-                                        </div>
+                                <!-- Modal personalizado de observación -->
+                                @if($detalleCompetencia)
+                                <div id="{{ $modalId }}" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+                                    <!-- Overlay -->
+                                    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"></div>
 
-                                        <!-- Botones de acción -->
-                                        <div class="modal-action flex justify-end gap-3 mt-6">
-                                            <button 
-                                                type="button" 
-                                                onclick="closeModal('{{ $modalId }}')"
-                                                class="btn btn-outline btn-sm text-gray-700 hover:bg-gray-100">
-                                                Cancelar
-                                            </button>
-                                            <button 
-                                                type="button" 
-                                                onclick="guardarObservacion(this)"
-                                                class="btn btn-primary btn-sm flex items-center gap-2">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                                Guardar
-                                            </button>
+                                    <!-- Modal box -->
+                                    <div class="relative z-10 w-[92%] max-w-lg mx-4 bg-white rounded-2xl shadow-2xl transform transition-all duration-300">
+                                        <div class="px-6 pt-6 pb-4">
+                                            <div class="flex justify-between items-start mb-4">
+                                                <h3 class="font-bold text-lg text-gray-800 flex items-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    Observación - C{{ $index + 1 }}
+                                                </h3>
+                                                <button type="button" onclick="closeObservationModal('{{ $modalId }}')" 
+                                                        class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+
+                                            <div class="bg-blue-50 p-3 rounded-lg mb-4">
+                                                <p class="text-sm text-blue-800 font-semibold mb-1">Estudiante:</p>
+                                                <p class="text-sm text-blue-900">
+                                                    {{ $matricula->estudiante->persona->name }} {{ $matricula->estudiante->persona->lastname }}
+                                                </p>
+                                            </div>
+
+                                            <div class="form-control w-full mb-6">
+                                                <label class="label">
+                                                    <span class="label-text font-semibold text-gray-700">Descripción del desempeño:</span>
+                                                </label>
+                                                @if($reporteActual)
+                                                    <textarea 
+                                                        id="textarea_{{ $modalId }}"
+                                                        data-name="observaciones[{{ $reporteActual->id_reporte_notas }}]"
+                                                        class="w-full h-32 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                        placeholder="Describe cómo va el estudiante en esta competencia..."
+                                                        >{{ $reporteActual->observacion ?? '' }}</textarea>
+                                                @else
+                                                    <textarea 
+                                                        id="textarea_{{ $modalId }}"
+                                                        data-name="observaciones[{{ $detalleCompetencia->id_detalle_asignatura }}]"
+                                                        class="w-full h-32 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                        placeholder="Describe cómo va el estudiante en esta competencia..."
+                                                        ></textarea>
+                                                @endif
+                                            </div>
+
+                                            <div class="flex justify-end gap-3">
+                                                <button type="button" 
+                                                        onclick="closeObservationModal('{{ $modalId }}')"
+                                                        class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors">
+                                                    Cancelar
+                                                </button>
+                                                <button type="button" 
+                                                        onclick="saveObservation('{{ $modalId }}')"
+                                                        class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors flex items-center gap-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    Guardar
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </dialog>
+                                </div>
+                                @endif
                             </td>
                             @endforeach
                         </tr>
@@ -352,7 +373,6 @@
 </div>
 
 <script>
-    // === MODAL DE CONFIRMACIÓN PERSONALIZADO (ÉXITO/ERROR) ===
     const __resultRedirect = "{{ session('redirect_to') ?? '' }}";
 
     function openResultModal() {
@@ -384,84 +404,99 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        @if(session('success') || session('error'))
-            openResultModal();
-        @endif
-
-        // Eventos para modal de confirmación
-        document.getElementById('resultOk')?.addEventListener('click', closeResultModal);
-        document.getElementById('resultOverlay')?.addEventListener('click', closeResultModal);
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && document.getElementById('resultModal').style.display === 'flex') {
-                closeResultModal();
-            }
-        });
-    });
-
-    // === MODALES DE OBSERVACIÓN (<dialog> de DaisyUI) ===
-
-    // Abrir modal de observación (DaisyUI)
-    function openModal(id) {
+    function openObservationModal(id) {
         const modal = document.getElementById(id);
-        if (modal && typeof modal.showModal === 'function') {
-            modal.showModal();
-        } else if (modal) {
-            modal.setAttribute('open', '');
-        }
-    }
-
-    // Cerrar modal de observación (DaisyUI)
-    function closeModal(id) {
-        const modal = document.getElementById(id);
-        if (modal && typeof modal.close === 'function') {
-            modal.close();
-        } else if (modal) {
-            modal.removeAttribute('open');
-        }
-    }
-
-    // Guardar observación y cerrar
-    function guardarObservacion(button) {
-        const modal = button.closest('dialog');
         if (!modal) return;
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+        document.documentElement.classList.add('overflow-hidden');
 
-        const textarea = modal.querySelector('textarea');
+        // Enfocar textarea
+        setTimeout(() => {
+            const textarea = modal.querySelector('textarea');
+            textarea?.focus();
+        }, 100);
+    }
+
+    function closeObservationModal(id) {
+        const modal = document.getElementById(id);
+        if (!modal) return;
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+        document.documentElement.classList.remove('overflow-hidden');
+    }
+
+    function saveObservation(id) {
+        const modal = document.getElementById(id);
+        const textarea = modal?.querySelector('textarea');
         const mainForm = document.getElementById('formCalificaciones');
-        if (!textarea || !mainForm || !textarea.name) return;
 
-        // Asegurar que la observación se guarde en el formulario principal
-        let input = mainForm.querySelector(`input[name="${CSS.escape(textarea.name)}"]`);
+        if (!textarea || !mainForm) return;
+
+        const fieldName = textarea.getAttribute('data-name');
+        const value = textarea.value.trim();
+
+        // Crear o actualizar input hidden en el formulario principal
+        let input = mainForm.querySelector(`input[name='${CSS.escape(fieldName)}']`);
         if (!input) {
             input = document.createElement('input');
             input.type = 'hidden';
-            input.name = textarea.name;
+            input.name = fieldName;
             mainForm.appendChild(input);
         }
-        input.value = textarea.value.trim();
+        input.value = value;
 
-        // Cerrar el modal (DaisyUI style)
-        closeModal(modal.id);
+        // Cerrar modal
+        closeObservationModal(id);
     }
 
-    // Actualizar observación en tiempo real (opcional)
-    document.querySelectorAll('dialog[id^="modal_"] textarea').forEach(textarea => {
-        const mainForm = document.getElementById('formCalificaciones');
-        if (!mainForm) return;
+    // Cerrar modales al hacer clic en el overlay
+    document.addEventListener('click', function(e) {
+        // Modal de confirmación
+        const resultOverlay = document.getElementById('resultOverlay');
+        if (resultOverlay && e.target === resultOverlay) {
+            closeResultModal();
+        }
 
-        textarea.addEventListener('input', () => {
-            let input = mainForm.querySelector(`input[name="${CSS.escape(textarea.name)}"]`);
-            if (!input) {
-                input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = textarea.name;
-                mainForm.appendChild(input);
+        // Modales de observación
+        const observationModals = document.querySelectorAll('.fixed.inset-0.z-50.flex:not(.hidden)');
+        observationModals.forEach(modal => {
+            const overlay = modal.querySelector('.absolute.inset-0');
+            if (overlay && e.target === overlay) {
+                const id = modal.id;
+                if (id && id.startsWith('modal_')) {
+                    closeObservationModal(id);
+                }
             }
-            input.value = textarea.value;
         });
     });
 
-    // === VALIDACIÓN Y ENVÍO ===
+    // Cerrar con ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            // Cerrar modal de confirmación
+            if (document.getElementById('resultModal')?.style.display === 'flex') {
+                closeResultModal();
+                return;
+            }
+
+            // Cerrar último modal de observación abierto
+            const openModal = document.querySelector('.fixed.inset-0.z-50.flex:not(.hidden)[id^="modal_"]');
+            if (openModal) {
+                closeObservationModal(openModal.id);
+            }
+        }
+    });
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', () => {
+        @if(session('success') || session('error'))
+            openResultModal();
+            document.getElementById('resultOk')?.addEventListener('click', closeResultModal);
+        @endif
+    });
+
+    // === VALIDACIÓN Y EDICIÓN ===
     document.getElementById('formCalificaciones')?.addEventListener('submit', function(e) {
         const selects = this.querySelectorAll('select[name^="calificaciones"]');
         const hasGrade = Array.from(selects).some(sel => sel.value.trim() !== '');
@@ -471,7 +506,6 @@
         }
     });
 
-    // Modo edición
     document.querySelectorAll('select[name^="calificaciones_editar_valores"]').forEach(select => {
         select.addEventListener('change', () => {
             select.classList.add('bg-yellow-50', 'border-yellow-400');
@@ -482,7 +516,6 @@
         const formEditar = document.getElementById('formEditar');
         if (!formEditar) return;
 
-        // Copiar calificaciones editadas
         document.querySelectorAll('select[name^="calificaciones_editar_valores"]').forEach(select => {
             const match = select.name.match(/calificaciones_editar_valores\[(\d+)\]/);
             if (!match) return;
@@ -499,7 +532,6 @@
             input.value = value;
         });
 
-        // Copiar observaciones
         document.querySelectorAll('input[name^="observaciones["]').forEach(orig => {
             let existing = formEditar.querySelector(`input[name="${CSS.escape(orig.name)}"]`);
             if (!existing) {
