@@ -4,23 +4,68 @@
 
 @section('contenido')
 <div class="w-full animate-fade-in">
-    @if (session('success') || session('error'))
-        <div class="notification animate-fade-in-down">
-            <div class="alert alert-{{ session('error') ? 'error' : 'success' }} shadow-lg mb-6">
-                <div>
+
+    @if(session('success') || session('error'))
+    <div id="resultModal" class="fixed inset-0 z-50 flex items-center justify-center">
+        <!-- Overlay -->
+        <div id="resultOverlay" class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"></div>
+
+        <!-- Modal box -->
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="resultTitle"
+                aria-describedby="resultMessage"
+                class="relative z-10 w-[92%] max-w-lg mx-4 bg-white rounded-2xl shadow-2xl transform transition-all duration-300 scale-95 opacity-0"
+                id="resultBox"
+                tabindex="-1"
+            >
+                <div class="px-8 pt-8 pb-6">
+                <!-- Icon -->
+                <div class="flex justify-center -mt-8 mb-4">
                     @if(session('error'))
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <div class="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center">
+                        <!-- X SVG -->
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle cx="12" cy="12" r="11" stroke="#F87171" stroke-width="0"></circle>
+                        <path d="M15 9L9 15M9 9l6 6" stroke="#EF4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
                     @else
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <div class="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center">
+                        <!-- Check SVG -->
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M20 6L9 17l-5-5" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
                     @endif
-                    <span>{{ session('success') ?? session('error') }}</span>
+                </div>
+
+                <!-- Title -->
+                <h3 id="resultTitle" class="text-center font-extrabold text-2xl leading-tight
+                    @if(session('error')) text-red-600 @else text-green-600 @endif">
+                    {{ session('error') ? 'Error' : 'Éxito' }}
+                </h3>
+
+                <!-- Message -->
+                <p id="resultMessage" class="mt-3 text-center text-gray-700 text-base leading-relaxed">
+                    {{ session('error') ?? session('success') }}
+                </p>
+
+                <!-- Actions -->
+                <div class="mt-6">
+                    <button
+                    id="resultOk"
+                    type="button"
+                    class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold
+                            bg-blue-600 hover:bg-blue-700 text-white transition-shadow focus:outline-none focus:ring-4 focus:ring-blue-300"
+                    >
+                    Aceptar
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
     @endif
 
     <!-- Header -->
@@ -47,7 +92,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                Período {{ $periodoActual->numero_periodo }}
+                Período {{ $periodoActual->nombre }}
                 <br>
                 <span class="text-xs">({{ \Carbon\Carbon::parse($periodoActual->fecha_inicio)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($periodoActual->fecha_fin)->format('d/m/Y') }})</span>
             </span>
@@ -129,39 +174,111 @@
                             </td>
 
                             <!-- Inputs de Calificaciones por Competencia -->
-                            @foreach($competencias as $competencia)
+                            @foreach($competencias as $index => $competencia)
                             <td class="px-4 py-4 text-center border-l border-gray-200">
                                 @php
                                     $detallesEstudiante = $detalles->get($matricula->codigo_matricula, collect());
                                     $detalleCompetencia = $detallesEstudiante->firstWhere('id_competencias', $competencia->id_competencias);
                                     $reporteActual = $detalleCompetencia?->reportesNotas->first();
+                                    $modalId = 'modal_' . $matricula->codigo_matricula . '_' . $competencia->id_competencias;
                                 @endphp
 
                                 @if($notasRegistradas && $reporteActual)
                                     <!-- Modo edición: si las notas ya están registradas -->
-                                    <select name="calificaciones_editar_valores[{{ $reporteActual->id_reporte_notas }}]" 
-                                            class="w-full px-2 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent font-semibold">
-                                        <option value="">-</option>
-                                        <option value="AD" {{ $reporteActual->calificacion === 'AD' ? 'selected' : '' }}>AD</option>
-                                        <option value="A" {{ $reporteActual->calificacion === 'A' ? 'selected' : '' }}>A</option>
-                                        <option value="B" {{ $reporteActual->calificacion === 'B' ? 'selected' : '' }}>B</option>
-                                        <option value="C" {{ $reporteActual->calificacion === 'C' ? 'selected' : '' }}>C</option>
-                                    </select>
+                                    <div class="flex gap-2 items-center">
+                                        <select name="calificaciones_editar_valores[{{ $reporteActual->id_reporte_notas }}]" 
+                                                class="flex-1 px-2 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent font-semibold">
+                                            <option value="">-</option>
+                                            <option value="AD" {{ $reporteActual->calificacion === 'AD' ? 'selected' : '' }}>AD</option>
+                                            <option value="A" {{ $reporteActual->calificacion === 'A' ? 'selected' : '' }}>A</option>
+                                            <option value="B" {{ $reporteActual->calificacion === 'B' ? 'selected' : '' }}>B</option>
+                                            <option value="C" {{ $reporteActual->calificacion === 'C' ? 'selected' : '' }}>C</option>
+                                        </select>
+                                        <button type="button" 
+                                            onclick="openModal('{{ $modalId }}')"
+                                                class="p-2 rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
+                                                title="Agregar observación">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3v-6" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 @else
                                     <!-- Modo registro: si aún no hay notas -->
                                     @if($detalleCompetencia)
-                                    <select name="calificaciones[{{ $detalleCompetencia->id_detalle_asignatura }}]" 
-                                            class="w-full px-2 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent font-semibold">
-                                        <option value="">-</option>
-                                        <option value="AD">AD</option>
-                                        <option value="A">A</option>
-                                        <option value="B">B</option>
-                                        <option value="C">C</option>
-                                    </select>
+                                    <div class="flex gap-2 items-center">
+                                        <select name="calificaciones[{{ $detalleCompetencia->id_detalle_asignatura }}]" 
+                                                class="flex-1 px-2 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent font-semibold">
+                                            <option value="">-</option>
+                                            <option value="AD">AD</option>
+                                            <option value="A">A</option>
+                                            <option value="B">B</option>
+                                            <option value="C">C</option>
+                                        </select>
+                                        <button type="button" 
+                                            onclick="openModal('{{ $modalId }}')"
+                                                class="p-2 rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
+                                                title="Agregar observación">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3v-6" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                     @else
                                     <span class="text-gray-400 text-sm">-</span>
                                     @endif
                                 @endif
+
+                                <!-- Modal para observaciones -->
+                                <dialog id="{{ $modalId }}" class="modal modal-bottom sm:modal-middle">
+                                    <div class="modal-box bg-white rounded-lg shadow-xl p-6">
+                                        <!-- Encabezado -->
+                                        <h3 class="font-bold text-lg flex items-center mb-4 text-gray-800">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Observación - C{{ $index + 1 }}
+                                        </h3>
+                                        <!-- Campo de observación -->
+                                        <div class="form-control w-full mb-6">
+                                            <label class="label">
+                                                <span class="label-text font-semibold text-gray-700">Descripción del desempeño:</span>
+                                            </label>
+                                            @if($reporteActual)
+                                            <textarea 
+                                                name="observaciones[{{ $reporteActual->id_reporte_notas }}]" 
+                                                class="textarea textarea-bordered h-32 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md"
+                                                placeholder="Describe cómo va el estudiante en esta competencia..."
+                                                >{{ $reporteActual->observacion ?? '' }}</textarea>
+                                            @else
+                                            <textarea 
+                                                name="observaciones[{{ $detalleCompetencia->id_detalle_asignatura }}]" 
+                                                class="textarea textarea-bordered h-32 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md"
+                                                placeholder="Describe cómo va el estudiante en esta competencia..."
+                                                ></textarea>
+                                            @endif
+                                        </div>
+
+                                        <!-- Botones de acción -->
+                                        <div class="modal-action flex justify-end gap-3 mt-6">
+                                            <button 
+                                                type="button" 
+                                                onclick="closeModal('{{ $modalId }}')"
+                                                class="btn btn-outline btn-sm text-gray-700 hover:bg-gray-100">
+                                                Cancelar
+                                            </button>
+                                            <button 
+                                                type="button" 
+                                                onclick="guardarObservacion(this)"
+                                                class="btn btn-primary btn-sm flex items-center gap-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                Guardar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </dialog>
                             </td>
                             @endforeach
                         </tr>
@@ -195,8 +312,8 @@
                         Registrar Calificaciones
                     </button>
                 @else
-                    <button type="button" 
-                            onclick="document.getElementById('formEditar').submit()"
+                        <button type="button" 
+                            onclick="submitEdits()"
                             class="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -223,6 +340,9 @@
                     @endphp
                     @if($reporteActual)
                         <input type="hidden" name="calificaciones[{{ $reporteActual->id_reporte_notas }}]" value="{{ $reporteActual->calificacion }}">
+                        @if($reporteActual->observacion)
+                        <input type="hidden" name="observaciones[{{ $reporteActual->id_reporte_notas }}]" value="{{ $reporteActual->observacion }}">
+                        @endif
                     @endif
                 @endforeach
             @endforeach
@@ -232,29 +352,165 @@
 </div>
 
 <script>
-    document.getElementById('formCalificaciones').addEventListener('submit', function(e) {
-        // Validar que haya al menos una calificación ingresada
-        const inputs = this.querySelectorAll('select[name^="calificaciones"]');
-        let hayCalificaciones = false;
-        
-        inputs.forEach(input => {
-            if (input.value && input.value !== '') {
-                hayCalificaciones = true;
+    // === MODAL DE CONFIRMACIÓN PERSONALIZADO (ÉXITO/ERROR) ===
+    const __resultRedirect = "{{ session('redirect_to') ?? '' }}";
+
+    function openResultModal() {
+        const modal = document.getElementById('resultModal');
+        if (!modal) return;
+        modal.style.display = 'flex';
+        const box = modal.querySelector('#resultBox');
+        if (box) {
+            box.classList.remove('scale-95', 'opacity-0');
+            box.classList.add('scale-100', 'opacity-100');
+        }
+        document.documentElement.classList.add('overflow-hidden');
+        document.getElementById('resultOk')?.focus();
+    }
+
+    function closeResultModal() {
+        const modal = document.getElementById('resultModal');
+        if (!modal) return;
+        const box = modal.querySelector('#resultBox');
+        if (box) {
+            box.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.documentElement.classList.remove('overflow-hidden');
+                if (__resultRedirect.trim()) {
+                    window.location.href = __resultRedirect;
+                }
+            }, 220);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        @if(session('success') || session('error'))
+            openResultModal();
+        @endif
+
+        // Eventos para modal de confirmación
+        document.getElementById('resultOk')?.addEventListener('click', closeResultModal);
+        document.getElementById('resultOverlay')?.addEventListener('click', closeResultModal);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('resultModal').style.display === 'flex') {
+                closeResultModal();
             }
         });
+    });
 
-        if (!hayCalificaciones) {
+    // === MODALES DE OBSERVACIÓN (<dialog> de DaisyUI) ===
+
+    // Abrir modal de observación (DaisyUI)
+    function openModal(id) {
+        const modal = document.getElementById(id);
+        if (modal && typeof modal.showModal === 'function') {
+            modal.showModal();
+        } else if (modal) {
+            modal.setAttribute('open', '');
+        }
+    }
+
+    // Cerrar modal de observación (DaisyUI)
+    function closeModal(id) {
+        const modal = document.getElementById(id);
+        if (modal && typeof modal.close === 'function') {
+            modal.close();
+        } else if (modal) {
+            modal.removeAttribute('open');
+        }
+    }
+
+    // Guardar observación y cerrar
+    function guardarObservacion(button) {
+        const modal = button.closest('dialog');
+        if (!modal) return;
+
+        const textarea = modal.querySelector('textarea');
+        const mainForm = document.getElementById('formCalificaciones');
+        if (!textarea || !mainForm || !textarea.name) return;
+
+        // Asegurar que la observación se guarde en el formulario principal
+        let input = mainForm.querySelector(`input[name="${CSS.escape(textarea.name)}"]`);
+        if (!input) {
+            input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = textarea.name;
+            mainForm.appendChild(input);
+        }
+        input.value = textarea.value.trim();
+
+        // Cerrar el modal (DaisyUI style)
+        closeModal(modal.id);
+    }
+
+    // Actualizar observación en tiempo real (opcional)
+    document.querySelectorAll('dialog[id^="modal_"] textarea').forEach(textarea => {
+        const mainForm = document.getElementById('formCalificaciones');
+        if (!mainForm) return;
+
+        textarea.addEventListener('input', () => {
+            let input = mainForm.querySelector(`input[name="${CSS.escape(textarea.name)}"]`);
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = textarea.name;
+                mainForm.appendChild(input);
+            }
+            input.value = textarea.value;
+        });
+    });
+
+    // === VALIDACIÓN Y ENVÍO ===
+    document.getElementById('formCalificaciones')?.addEventListener('submit', function(e) {
+        const selects = this.querySelectorAll('select[name^="calificaciones"]');
+        const hasGrade = Array.from(selects).some(sel => sel.value.trim() !== '');
+        if (!hasGrade) {
             e.preventDefault();
-            alert('Debe ingresar al menos una calificación');
+            alert('Debe ingresar al menos una calificación.');
         }
     });
 
-    // Para modo edición: permitir cambios en los selects
+    // Modo edición
     document.querySelectorAll('select[name^="calificaciones_editar_valores"]').forEach(select => {
-        select.addEventListener('change', function() {
-            this.classList.add('bg-yellow-50');
-            this.classList.add('border-yellow-400');
+        select.addEventListener('change', () => {
+            select.classList.add('bg-yellow-50', 'border-yellow-400');
         });
     });
+
+    function submitEdits() {
+        const formEditar = document.getElementById('formEditar');
+        if (!formEditar) return;
+
+        // Copiar calificaciones editadas
+        document.querySelectorAll('select[name^="calificaciones_editar_valores"]').forEach(select => {
+            const match = select.name.match(/calificaciones_editar_valores\[(\d+)\]/);
+            if (!match) return;
+            const id = match[1];
+            const value = select.value || '';
+
+            let input = formEditar.querySelector(`input[name="calificaciones[${CSS.escape(id)}]"]`);
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = `calificaciones[${id}]`;
+                formEditar.appendChild(input);
+            }
+            input.value = value;
+        });
+
+        // Copiar observaciones
+        document.querySelectorAll('input[name^="observaciones["]').forEach(orig => {
+            let existing = formEditar.querySelector(`input[name="${CSS.escape(orig.name)}"]`);
+            if (!existing) {
+                const clone = orig.cloneNode(true);
+                formEditar.appendChild(clone);
+            } else {
+                existing.value = orig.value;
+            }
+        });
+
+        formEditar.submit();
+    }
 </script>
 @endsection

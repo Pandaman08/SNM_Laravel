@@ -548,6 +548,7 @@ class ReporteNotasController extends Controller
         $id_asignatura = $request->input('id_asignatura');
         $id_periodo = $request->input('id_periodo');
         $calificaciones = $request->input('calificaciones'); // Array: [id_detalle => calificacion]
+        $observaciones = $request->input('observaciones', []); // Array: [id_detalle => observacion]
 
         $periodo = Periodo::findOrFail($id_periodo);
 
@@ -578,19 +579,29 @@ class ReporteNotasController extends Controller
                     continue; // Saltar si está vacía o inválida
                 }
 
+                // Obtener observación si existe
+                $observacion = $observaciones[$id_detalle] ?? null;
+                $observacion = !empty($observacion) ? $observacion : null;
+
                 // Crear la nota
                 ReporteNota::create([
                     'id_detalle_asignatura' => $id_detalle,
                     'id_periodo' => $id_periodo,
                     'calificacion' => $calificacion,
                     'fecha_registro' => now()->toDateString(),
-                    'observacion' => null
+                    'observacion' => $observacion
                 ]);
             }
 
-            return back()->with('success', 'Calificaciones registradas correctamente');
+            return redirect()->to(url()->previous())->with([
+                'success' => 'Calificaciones registradas correctamente',
+                'redirect_to' => route('docentes.asignaturas')
+            ]);
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al registrar calificaciones: ' . $e->getMessage());
+            return redirect()->to(url()->previous())->with([
+                'error' => 'Error al registrar calificaciones: ' . $e->getMessage(),
+                'redirect_to' => route('docentes.asignaturas')
+            ]);
         }
     }
 
@@ -601,6 +612,7 @@ class ReporteNotasController extends Controller
     {
         $id_periodo = $request->input('id_periodo');
         $calificaciones = $request->input('calificaciones'); // Array: [id_reporte => calificacion]
+        $observaciones = $request->input('observaciones', []); // Array: [id_reporte => observacion]
 
         $periodo = Periodo::findOrFail($id_periodo);
 
@@ -617,12 +629,26 @@ class ReporteNotasController extends Controller
                 }
 
                 $reporte = ReporteNota::findOrFail($id_reporte);
-                $reporte->update(['calificacion' => $calificacion]);
+                
+                // Obtener observación si existe
+                $observacion = $observaciones[$id_reporte] ?? null;
+                $observacion = !empty($observacion) ? $observacion : null;
+
+                $reporte->update([
+                    'calificacion' => $calificacion,
+                    'observacion' => $observacion
+                ]);
             }
 
-            return back()->with('success', 'Calificaciones actualizadas correctamente');
+            return redirect()->to(url()->previous())->with([
+                'success' => 'Calificaciones actualizadas correctamente',
+                'redirect_to' => route('docentes.asignaturas')
+            ]);
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al actualizar calificaciones: ' . $e->getMessage());
+            return redirect()->to(url()->previous())->with([
+                'error' => 'Error al actualizar calificaciones: ' . $e->getMessage(),
+                'redirect_to' => route('docentes.asignaturas')
+            ]);
         }
     }
 }

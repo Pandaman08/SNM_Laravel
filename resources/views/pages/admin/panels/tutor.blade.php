@@ -101,7 +101,7 @@
                                                     <i class="ri-user-fill"></i>
                                                 </div>
                                                 <div>
-                                                    <p class="font-medium text-gray-900">{{ $estudiante['nombre_completo'] }}</p>
+                                                    <p class="font-medium text-gray-900">{{ $estudiante['nombre'] }} {{ $estudiante['apellidos'] }}</p>
                                                     <p class="text-xs text-gray-500">{{ $estudiante['dni'] }}</p>
                                                 </div>
                                             </div>
@@ -110,7 +110,7 @@
                                             {{ $estudiante['grado'] }} "{{ $estudiante['seccion'] }}"
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($estudiante['tiene_matricula_activa'])
+                                            @if($estudiante['matricula_estado'] === 'activo')
                                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
                                                     <i class="ri-check-circle-fill mr-1"></i>Activo
                                                 </span>
@@ -121,7 +121,7 @@
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                            @if($estudiante['tiene_matricula_activa'])
+                                            @if($estudiante['matricula_estado'] === 'activo')
                                                 <a href="{{ route('reporte_notas.tutor.estudiante', $estudiante['codigo_matricula']) }}" 
                                                    class="inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">
                                                     <i class="ri-file-chart-fill mr-2"></i>Ver Notas
