@@ -524,7 +524,7 @@ class ReporteNotasController extends Controller
             ->get()
             ->groupBy('id_detalle_asignatura');
 
-        $asignaturas->each(function ($asignatura) use ($competencias, $detalles, $reportes, $periodoIds) {
+        $asignaturas->each(function ($asignatura) use ($codigo_matricula, $competencias, $detalles, $reportes, $periodoIds) {
             $asignatura->competencias = $competencias->where('codigo_asignatura', $asignatura->codigo_asignatura);
 
             $asignatura->competencias->each(function ($competencia) use ($detalles, $reportes, $periodoIds) {
@@ -554,7 +554,7 @@ class ReporteNotasController extends Controller
                 });
             });
             // Cargar calificacion final por asignatura si existe
-            $final = CalificacionFinal::where('codigo_matricula', $matricula->codigo_matricula ?? '')->where('codigo_asignatura', $asignatura->codigo_asignatura)->first();
+            $final = CalificacionFinal::where('codigo_matricula', $codigo_matricula)->where('codigo_asignatura', $asignatura->codigo_asignatura)->first();
             $asignatura->calificacion_final = $final->calificacion_final ?? null;
         });
 
@@ -562,6 +562,7 @@ class ReporteNotasController extends Controller
         $pdf = Pdf::loadView('pages.admin.reporte_notas.reporte-pdf', [
             'matricula' => $matricula,
             'asignaturas' => $asignaturas,
+            'periodos' => $periodos,
             'fecha' => Carbon::parse(now())->format('d/m/Y')
         ]);
 

@@ -6,45 +6,46 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            font-size: 9px;
+            font-size: 8px;
             margin: 0;
-            padding: 10px;
+            padding: 5px;
         }
         .header {
             text-align: center;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
         .title {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
         }
         .subtitle {
-            font-size: 11px;
-            margin-bottom: 8px;
+            font-size: 10px;
+            margin-bottom: 5px;
         }
         .student-info {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             border: 1px solid #ddd;
-            padding: 5px;
+            padding: 3px;
             background-color: #f9f9f9;
         }
         .info-row {
             display: flex;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
         .info-label {
             font-weight: bold;
-            width: 100px;
+            width: 90px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             table-layout: fixed;
+            font-size: 7.5px;
         }
         th, td {
             border: 1px solid #000;
-            padding: 4px;
+            padding: 2px 1px;
             vertical-align: middle;
         }
         th {
@@ -55,38 +56,47 @@
         .area-cell {
             font-weight: bold;
             background-color: #e6e6e6;
-            width: 15%;
+            width: 11%;
             word-wrap: break-word;
             vertical-align: middle;
         }
         .competencia-cell {
-            width: 25%;
+            width: 18%;
             word-wrap: break-word;
         }
         .nota-cell {
-            width: 4%;
+            width: 3%;
             text-align: center;
+            padding: 1px;
         }
         .conclusion-cell {
-            width: 8%;
+            width: 5%;
             word-wrap: break-word;
+            font-size: 7px;
+        }
+        .promedio-cell {
+            width: 3.5%;
+            text-align: center;
+            font-weight: bold;
+            background-color: #f0f0f0;
         }
         .final-cell {
-            width: 5%;
+            width: 3.5%;
             text-align: center;
         }
         .signature-section {
-            margin-top: 20px;
+            margin-top: 15px;
             display: flex;
             justify-content: space-between;
         }
         .signature-box {
             width: 45%;
             text-align: center;
+            font-size: 7px;
         }
         .signature-line {
             border-top: 1px solid #000;
-            margin: 40px auto 5px;
+            margin: 25px auto 3px;
             width: 80%;
         }
         .page-break {
@@ -128,21 +138,17 @@
             <tr>
                 <th rowspan="2" class="area-cell">Área curricular</th>
                 <th rowspan="2" class="competencia-cell">Competencias</th>
-                <th colspan="2">PRIMER BIMESTRE</th>
-                <th colspan="2">SEGUNDO BIMESTRE</th>
-                <th colspan="2">TERCER BIMESTRE</th>
-                <th colspan="2">CUARTO BIMESTRE</th>
-                <th rowspan="2" class="final-cell">NL final</th>
+                @foreach($periodos as $periodo)
+                <th colspan="2">PERÍODO {{ $loop->iteration }}</th>
+                @endforeach
+                <th rowspan="2" class="promedio-cell">NL Anual</th>
+                <th rowspan="2" class="final-cell">NL Final</th>
             </tr>
             <tr>
+                @foreach($periodos as $periodo)
                 <th class="nota-cell">NL</th>
                 <th class="conclusion-cell">Conclusión</th>
-                <th class="nota-cell">NL</th>
-                <th class="conclusion-cell">Conclusión</th>
-                <th class="nota-cell">NL</th>
-                <th class="conclusion-cell">Conclusión</th>
-                <th class="nota-cell">NL</th>
-                <th class="conclusion-cell">Conclusión</th>
+                @endforeach
             </tr>
         </thead>
         <tbody>
@@ -161,11 +167,11 @@
                 
                 <td class="competencia-cell">{{ $competencia->descripcion }}</td>
                 
-                @foreach(range(3, 6) as $periodo)
+                @php $detalle = $competencia->detallesAsignatura->first(); @endphp
+                @foreach($periodos as $periodo)
                 @php
-                    $detalle = $competencia->detallesAsignatura->first();
-                    $reporte = $detalle ? $detalle->reportesNotas->where('id_periodo', $periodo)->first() : null;
-                    $nota = $reporte->tipoCalificacion->codigo ?? '';
+                    $reporte = $detalle ? $detalle->reportesNotas->where('id_periodo', $periodo->id_periodo)->first() : null;
+                    $nota = $reporte->calificacion ?? '';
                     $color = $nota === 'AD' ? 'color: #1e8449;' : 
                             ($nota === 'A' ? 'color: #2874a6;' : 
                             ($nota === 'B' ? 'color: #9a7d0a;' : 
@@ -181,8 +187,17 @@
                                    ($promedio === 'A' ? 'color: #2874a6;' : 
                                    ($promedio === 'B' ? 'color: #9a7d0a;' : 
                                    ($promedio === 'C' ? 'color: #ba4a00;' : '')));
+                    $finalAsig = $asignatura->calificacion_final ?? '';
+                    $colorFinalAsignatura = $finalAsig === 'AD' ? 'color: #1e8449;' : 
+                                           ($finalAsig === 'A' ? 'color: #2874a6;' : 
+                                           ($finalAsig === 'B' ? 'color: #9a7d0a;' : 
+                                           ($finalAsig === 'C' ? 'color: #ba4a00;' : '')));
                 @endphp
-                <td class="final-cell" style="{{ $colorPromedio }}">{{ $promedio }}</td>
+                <td class="promedio-cell" style="{{ $colorPromedio }}">{{ $promedio }}</td>
+
+                @if($loop->first)
+                    <td rowspan="{{ $competenciaCount }}" class="final-cell" style="{{ $colorFinalAsignatura }}">{{ $finalAsig }}</td>
+                @endif
             </tr>
             @endforeach
             @endforeach
