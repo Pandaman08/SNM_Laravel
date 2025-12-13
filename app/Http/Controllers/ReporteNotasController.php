@@ -303,6 +303,12 @@ class ReporteNotasController extends Controller
             });
         });
 
+        // Adjuntar calificación final de la asignatura (si existe)
+        $final = CalificacionFinal::where('codigo_matricula', $codigo_matricula)
+            ->where('codigo_asignatura', $asignatura->codigo_asignatura)
+            ->first();
+        $asignatura->calificacion_final = $final->calificacion_final ?? null;
+
         return view('pages.admin.reporte_notas.estudiantes', compact(
             'matricula',
             'competencias',
@@ -423,7 +429,15 @@ class ReporteNotasController extends Controller
                     }
                 });
             });
+            // Attach calificacion_final later outside closure
         });
+
+        // Adjuntar calificaciones finales por asignatura
+        $finales = CalificacionFinal::where('codigo_matricula', $codigo_matricula)->get()->keyBy('codigo_asignatura');
+        foreach ($asignaturas as $asig) {
+            $fila = $finales->get($asig->codigo_asignatura);
+            $asig->calificacion_final = $fila->calificacion_final ?? null;
+        }
 
         return view('pages.admin.reporte_notas.tutor-estudiantes', [
             'matricula' => $matricula,
