@@ -23,25 +23,25 @@ class DetalleAsignatura extends Model
         'fecha' => 'datetime',
     ];
 
-    // Relación con Competencia
+    // Relación con Competencia - CORREGIDA
     public function competencia()
     {
-        return $this->belongsTo(Competencia::class, 'competencias_id_competencias', 'id_competencias');
+        return $this->belongsTo(Competencia::class, 'id_competencias', 'id_competencias');
     }
 
-    // Relación con Matrícula
+    // Relación con Matrícula - CORREGIDA
     public function matricula()
     {
-        return $this->belongsTo(Matricula::class, 'matricula_codigo_matricula', 'codigo_matricula');
+        return $this->belongsTo(Matricula::class, 'codigo_matricula', 'codigo_matricula');
     }
 
-    // Relación con Reportes de Notas
+    // Relación con Reportes de Notas - CORREGIDA
     public function reportesNotas()
     {
-        return $this->hasMany(ReporteNota::class, 'detalle_asignatura_id_detalle_asignatura', 'id_detalle_asignatura');
+        return $this->hasMany(ReporteNota::class, 'id_detalle_asignatura', 'id_detalle_asignatura');
     }
 
-    // Obtener estudiante a través de matrícula
+    // Obtener estudiante a través de matrícula - CORREGIDA
     public function estudiante()
     {
         return $this->hasOneThrough(
@@ -49,12 +49,12 @@ class DetalleAsignatura extends Model
             Matricula::class,
             'codigo_matricula',
             'codigo_estudiante',
-            'matricula_codigo_matricula',
-            'estudiante_codigo_estudiante'
+            'codigo_matricula',
+            'codigo_estudiante'
         );
     }
 
-    // Obtener asignatura a través de competencia
+    // Obtener asignatura a través de competencia - CORREGIDA
     public function asignatura()
     {
         return $this->hasOneThrough(
@@ -62,8 +62,8 @@ class DetalleAsignatura extends Model
             Competencia::class,
             'id_competencias',
             'codigo_asignatura',
-            'competencias_id_competencias',
-            'asignatura_codigo_asignatura'
+            'id_competencias',
+            'codigo_asignatura'
         );
     }
 }
