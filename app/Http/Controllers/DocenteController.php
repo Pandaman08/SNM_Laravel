@@ -79,9 +79,27 @@ class DocenteController extends Controller
     public function index_asignaturas()
     {
         $user = Auth::user();
-        $detalles = AsignaturaDocente::where('codigo_docente', $user->docente->codigo_docente)->get();
+        $AsignaturaDocente = AsignaturaDocente::where('codigo_docente', $user->docente->codigo_docente)->get();
+        $detalles = [];
+        foreach ($AsignaturaDocente as $asignacion) {
+            $asignatura = Asignatura::where('codigo_asignatura', $asignacion->codigo_asignatura)->first();
+            if ($asignatura) {
+                $grado = $asignatura->grado;
+                $seccion = Seccion::obtenerSeccionPorDocenteYGrado($user->docente->codigo_docente, $grado->id_grado);
+                
+                $detalles[] = [
+                    'asignatura' => $asignatura,
+                    'grado' => $grado->grado,
+                    'seccion' => $seccion,
+                    'asignacion' => $asignacion
+                ];
+            }
+        }
 
-
+        
+        $detalles = collect($detalles)->map(function ($item) {
+            return (object) $item;
+        });
         return view('pages.admin.docentes.asignaturas', compact('detalles'));
     }
 
@@ -103,18 +121,7 @@ class DocenteController extends Controller
         return view('pages.admin.docentes.estudiantes', compact('matriculas', 'asignatura'));
     }
 
-    public function asignar_nota($codigo_matricula)
-    {
-        $matricula = Matricula::with('detalleAsignatura.competencia')->findOrFail($codigo_matricula);
-        $tipos_cal = TipoCalificacion::all();
-        $periodos = Periodo::all();
-
-        $detalles_asignatura = $matricula->detalleAsignatura;
-
-        return view('pages.admin.reporte_notas.create', compact('matricula', 'detalles_asignatura', 'tipos_cal', 'periodos'));
-    }
-
-
+   
 
     public function store(Request $request)
     {
@@ -277,43 +284,43 @@ class DocenteController extends Controller
     }
 
 
-public function misEstudiantes()
-{
-    $user = Auth::user();
+    public function misEstudiantes()
+    {
+        $user = Auth::user();
 
-    $asignaciones = AsignaturaDocente::with('asignatura.grado')
-        ->where('codigo_docente', $user->docente->codigo_docente)
-        ->get()
-        ->filter(function ($item) {
-            return optional($item->asignatura)->id_grado;
-        })
-        ->unique(fn($item) => $item->asignatura->id_grado)
-        ->values();
+        $asignaciones = AsignaturaDocente::with('asignatura.grado')
+            ->where('codigo_docente', $user->docente->codigo_docente)
+            ->get()
+            ->filter(function ($item) {
+                return optional($item->asignatura)->id_grado;
+            })
+            ->unique(fn($item) => $item->asignatura->id_grado)
+            ->values();
 
-    return view('pages.admin.docentes.mis-estudiantes', compact('asignaciones'));
-}
+        return view('pages.admin.docentes.mis-estudiantes', compact('asignaciones'));
+    }
 
-public function verEstudiantesPorGrado(Request $request, $grado_id)
-{
-    $seccionId = $request->input('seccion_id');
+    public function verEstudiantesPorGrado(Request $request, $grado_id)
+    {
+        $seccionId = $request->input('seccion_id');
 
-    // Obtener las secciones del grado
-    $secciones = Seccion::where('id_grado', $grado_id)->get();
-    $seccionIds = $secciones->pluck('id_seccion')->toArray();
+        // Obtener las secciones del grado
+        $secciones = Seccion::where('id_grado', $grado_id)->get();
+        $seccionIds = $secciones->pluck('id_seccion')->toArray();
 
-    // Consultar las matrículas usando seccion_id
-    $matriculas = Matricula::with(['estudiante.persona'])
-        ->whereIn('seccion_id', $seccionIds)
-        ->when($seccionId, function ($query) use ($seccionId) {
-            $query->where('seccion_id', $seccionId);
-        })
-        ->get();
+        // Consultar las matrículas usando seccion_id
+        $matriculas = Matricula::with(['estudiante.persona'])
+            ->whereIn('seccion_id', $seccionIds)
+            ->when($seccionId, function ($query) use ($seccionId) {
+                $query->where('seccion_id', $seccionId);
+            })
+            ->get();
 
-    $grado = Grado::find($grado_id);
-    $gradoNombre = $grado?->nombre_completo ?? 'Sin grado';
+        $grado = Grado::find($grado_id);
+        $gradoNombre = $grado?->nombre_completo ?? 'Sin grado';
 
-    return view('pages.admin.docentes.estudiantes-por-grado', compact('matriculas', 'gradoNombre', 'secciones'));
-}
+        return view('pages.admin.docentes.estudiantes-por-grado', compact('matriculas', 'gradoNombre', 'secciones'));
+    }
 
 
 }

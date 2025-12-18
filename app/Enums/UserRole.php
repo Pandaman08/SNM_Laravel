@@ -36,7 +36,7 @@ enum UserRole: string
             self::DOCENTE => 'bg-blue-100 text-blue-800',
             self::AUXILIAR => 'bg-red-100 text-red-800',
             self::TUTOR => 'bg-green-100 text-green-800',
-            self::ESTUDIANTE => 'bg-yellow-100 text-yellow-800', // Added color for estudiante
+            self::ESTUDIANTE => 'bg-yellow-100 text-yellow-800',
         };
     }
 
@@ -48,7 +48,7 @@ enum UserRole: string
             self::DOCENTE => '<svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
             self::AUXILIAR => '<svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5z"></path></svg>',
             self::TUTOR => '<svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>',
-            self::ESTUDIANTE => '<svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path></svg>', // Added icon for estudiante
+            self::ESTUDIANTE => '<svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path></svg>',
         };
     }
 
@@ -60,7 +60,7 @@ enum UserRole: string
             self::DOCENTE->value => 'Docentes',
             self::AUXILIAR->value => 'Auxiliares',
             self::TUTOR->value => 'Tutores',
-            self::ESTUDIANTE->value => 'Estudiantes', // Added label for estudiante
+            self::ESTUDIANTE->value => 'Estudiantes',
         ];
     }
 
@@ -72,7 +72,7 @@ enum UserRole: string
             self::DOCENTE => 'home.docente',
             self::AUXILIAR => 'home.auxiliar',
             self::TUTOR => 'home.tutor',
-            self::ESTUDIANTE => 'home.estudiante', // Added route for estudiante
+            self::ESTUDIANTE => 'home.estudiante',
         };
     }
 }

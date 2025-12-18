@@ -102,9 +102,29 @@ class Seccion extends Model
         return $this->estado_aforo == 1;
     }
 
+    public function reducirVacante()
+    {
+        if ($this->vacantes_seccion > 0) {
+            $this->vacantes_seccion -= 1;
+            if ($this->vacantes_seccion == 0) {
+                $this->estado_aforo = 0; // No hay cupo
+            }
+            $this->save();
+        }
+    }
+
     // Obtener cantidad de estudiantes matriculados
     public function cantidadEstudiantes()
     {
         return $this->matriculas()->where('estado', 'activo')->count();
+    }
+
+    // Obtener seccion de un docente y grado específico
+    public static function obtenerSeccionPorDocenteYGrado($codigoDocente, $idGrado)
+    {
+        return self::whereHas('seccionesDocentes', function ($query) use ($codigoDocente) {
+            $query->where('codigo_docente', $codigoDocente)
+                  ->where('estado', 1); // Solo activos
+        })->where('id_grado', $idGrado)->first();
     }
 }

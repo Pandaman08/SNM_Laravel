@@ -116,9 +116,9 @@
                         @foreach($periodos as $periodo)
                         @php
                             $reporte = $detalle->reportesNotas->where('id_periodo', $periodo->id_periodo)->first();
-                            $nota = $reporte ? $reporte->tipoCalificacion->codigo : null;
+                            $nota = $reporte ? $reporte->calificacion : null;
                             $observacion = $reporte ? $reporte->observacion : null;
-                            $idReporte = $reporte ? $reporte->id_calificacion : null;
+                            $idReporte = $reporte ? $reporte->id_reporte_notas : null;
                             $esPeriodoActual = $periodoActual && $periodoActual->id_periodo == $periodo->id_periodo;
                             
                             $color = match($nota) {
@@ -215,7 +215,7 @@
 </div>
 
 <!-- Modal para Registrar Nota -->
-<div id="registerModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+<div id="registerModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3 text-center">
             <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar Nota</h3>
@@ -224,24 +224,26 @@
                 <input type="hidden" name="id_detalle_asignatura" id="modalDetalleId">
                 <input type="hidden" name="id_periodo" id="modalPeriodoId">
                 <input type="hidden" name="id_asignatura" id="modalAsignaturaId">
-                <input type="hidden" name="fecha_registro" value="{{ now() }}">
+                <input type="hidden" name="fecha_registro" value="{{ now()->format('Y-m-d') }}">
                 
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="id_tipo_calificacion">
+                <div class="mb-4 text-left">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="calificacion">
                         Calificación
                     </label>
-                    <select name="id_tipo_calificacion" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                        @foreach($tiposCalificacion as $tipo)
-                            <option value="{{ $tipo->id_tipo_calificacion }}">{{ $tipo->codigo }} - {{ $tipo->nombre }}</option>
-                        @endforeach
+                    <select name="calificacion" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <option value="">Seleccionar calificación</option>
+                        <option value="AD">AD - Logro Destacado</option>
+                        <option value="A">A - Logro Esperado</option>
+                        <option value="B">B - En Proceso</option>
+                        <option value="C">C - En Inicio</option>
                     </select>
                 </div>
                 
-                <div class="mb-4">
+                <div class="mb-4 text-left">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="observacion">
                         Observación
                     </label>
-                    <textarea name="observacion" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows="3"></textarea>
+                    <textarea name="observacion" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows="3" placeholder="Observaciones opcionales"></textarea>
                 </div>
                 
                 <div class="items-center px-4 py-3">
@@ -258,7 +260,7 @@
 </div>
 
 <!-- Modal para Editar Nota -->
-<div id="editModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+<div id="editModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3 text-center">
             <h3 class="text-lg leading-6 font-medium text-gray-900">Editar Nota</h3>
@@ -267,22 +269,24 @@
                 @method('PUT')
                 <input type="hidden" name="id_periodo" id="editPeriodoId">
                 
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="edit_tipo_calificacion">
+                <div class="mb-4 text-left">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="edit_calificacion">
                         Calificación
                     </label>
-                    <select name="id_tipo_calificacion" id="editTipoCalificacion" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                        @foreach($tiposCalificacion as $tipo)
-                            <option value="{{ $tipo->id_tipo_calificacion }}">{{ $tipo->codigo }} - {{ $tipo->nombre }}</option>
-                        @endforeach
+                    <select name="calificacion" id="editCalificacion" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <option value="">Seleccionar calificación</option>
+                        <option value="AD">AD - Logro Destacado</option>
+                        <option value="A">A - Logro Esperado</option>
+                        <option value="B">B - En Proceso</option>
+                        <option value="C">C - En Inicio</option>
                     </select>
                 </div>
                 
-                <div class="mb-4">
+                <div class="mb-4 text-left">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="edit_observacion">
                         Observación
                     </label>
-                    <textarea name="observacion" id="editObservacion" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows="3"></textarea>
+                    <textarea name="observacion" id="editObservacion" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows="3" placeholder="Observaciones opcionales"></textarea>
                 </div>
                 
                 <div class="items-center px-4 py-3">
@@ -308,16 +312,7 @@
     
     function openEditModal(reporteId, nota, observacion, periodoId) {
         document.getElementById('editForm').action = `/reporte_notas/${reporteId}`;
-        
-        // Seleccionar la opción correcta en el select
-        const select = document.getElementById('editTipoCalificacion');
-        for (let i = 0; i < select.options.length; i++) {
-            if (select.options[i].text.startsWith(nota)) {
-                select.selectedIndex = i;
-                break;
-            }
-        }
-        
+        document.getElementById('editCalificacion').value = nota;
         document.getElementById('editObservacion').value = observacion || '';
         document.getElementById('editPeriodoId').value = periodoId;
         document.getElementById('editModal').classList.remove('hidden');
@@ -337,7 +332,7 @@
         }
     }
 
-     @if(session('success'))
+    @if(session('success'))
         Swal.fire({
             title: '¡Éxito!',
             text: '{{ session('success') }}',

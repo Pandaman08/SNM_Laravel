@@ -5,54 +5,104 @@ namespace Database\Seeders;
 
 use App\Models\Seccion;
 use App\Models\Docente;
+use App\Models\AsignaturaDocente;
 use Illuminate\Database\Seeder;
 
 class SeccionDocenteSeeder extends Seeder
 {
     public function run()
     {
-        // Obtener todos los docentes por nivel
-        $docentesPrimaria = Docente::where('nivel_educativo_id', function ($query) {
-            $query->select('id_nivel_educativo')
-                  ->from('niveles_educativos')
-                  ->where('nombre', 'Primaria');
-        })->get();
+        // Cargar asignaciones y relaciones necesarias
+        $asignacionesDocentes = AsignaturaDocente::with(['asignatura.grado.nivelEducativo'])->get();
 
-        $docentesSecundaria = Docente::where('nivel_educativo_id', function ($query) {
-            $query->select('id_nivel_educativo')
-                  ->from('niveles_educativos')
-                  ->where('nombre', 'Secundaria');
-        })->get();
+        // Agrupar por docente: guardar grados y nivel
+        $docentesPorGrado = [];
 
-        // Asignar docentes a secciones de PRIMARIA: 1 docente por sección
-        $seccionesPrimaria = Seccion::whereHas('grado.nivelEducativo', fn($q) => $q->where('nombre', 'Primaria'))->get();
-        $docentesPrimaria = $docentesPrimaria->shuffle()->values();
-        $index = 0;
+        foreach ($asignacionesDocentes as $asignacion) {
+            if (! optional($asignacion->asignatura)->grado) continue;
 
-        foreach ($seccionesPrimaria as $seccion) {
-            if ($index >= $docentesPrimaria->count()) break;
-            $docente = $docentesPrimaria[$index];
-            $seccion->todosLosDocentes()->attach($docente->codigo_docente, [
-                'estado' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-            $index++;
+            $codigoDocente = $asignacion->codigo_docente;
+            $grado = $asignacion->asignatura->grado;
+            $gradoId = $grado->id_grado;
+            $nivelNombre = $grado->nivelEducativo->nombre ?? null;
+
+            if (! isset($docentesPorGrado[$codigoDocente])) {
+                $docentesPorGrado[$codigoDocente] = [];
+            }
+
+            // Evitar duplicados de grado para un mismo docente
+            $existeGrado = collect($docentesPorGrado[$codigoDocente])->contains(fn($g) => $g['id_grado'] === $gradoId);
+            if (! $existeGrado) {
+                $docentesPorGrado[$codigoDocente][] = [
+                    'id_grado' => $gradoId,
+                    'nivel' => $nivelNombre
+                ];
+            }
         }
 
-        // Asignar docentes a secciones de SECUNDARIA: 3-5 docentes por sección (reutilizando docentes)
-        $seccionesSecundaria = Seccion::whereHas('grado.nivelEducativo', fn($q) => $q->where('nombre', 'Secundaria'))->get();
+        // Asignar secciones según la información agregada
+        foreach ($docentesPorGrado as $codigoDocente => $gradosInfo) {
+            $docente = Docente::find($codigoDocente);
+            if (! $docente) continue;
 
-        foreach ($seccionesSecundaria as $seccion) {
-            if ($docentesSecundaria->isEmpty()) continue;
-            $cantidad = rand(3, 5);
-            $seleccionados = $docentesSecundaria->shuffle()->take($cantidad);
-            foreach ($seleccionados as $docente) {
-                $seccion->todosLosDocentes()->attach($docente->codigo_docente, [
-                    'estado' => true,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+            // Obtener si el docente ya tiene sección asignada (si es primaria no le daremos más de una sección)
+            $tieneSeccionAsignada = $docente->seccionesDocentes()->exists();
+
+            foreach ($gradosInfo as $gradoInfo) {
+                $gradoId = $gradoInfo['id_grado'];
+                $nivelNombre = $gradoInfo['nivel'];
+
+                $secciones = Seccion::where('id_grado', $gradoId)->get();
+                if ($secciones->isEmpty()) continue;
+
+                if ($nivelNombre === 'Primaria') {
+                    // Si el docente ya tiene una sección (de cualquier grado) saltamos: docente de primaria debe tener solo UNA sección
+                    if ($tieneSeccionAsignada) break;
+
+                    // Buscar secciones del grado que NO tengan docente asignado (prioridad)
+                    $seccionLibre = $secciones->first(function ($s) {
+                        return ! $s->seccionesDocentes()->where('estado', true)->exists();
+                    });
+
+                    // Si no hay seccion libre, intentar cualquiera (fallback)
+                    if (! $seccionLibre) {
+                        $seccionLibre = $secciones->shuffle()->first();
+                    }
+
+                    // Verificar si el docente ya está asignado a esa sección (por seguridad)
+                    if ($seccionLibre && ! $seccionLibre->seccionesDocentes()->where('codigo_docente', $codigoDocente)->exists()) {
+                        $seccionLibre->todosLosDocentes()->attach($codigoDocente, [
+                            'estado' => true,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                        // marcar que el docente ya tiene sección asignada
+                        $tieneSeccionAsignada = true;
+                        // como docente de primaria solo debe tener una sección, rompemos
+                        break;
+                    }
+                } else {
+                    // Secundaria: comportamiento flexible — asignar 1 a N secciones aleatorias,
+                    // pero evitamos duplicar la misma asignación.
+                    $maxSecciones = $secciones->count();
+                    $cantidadSecciones = rand(1, max(1, min(3, $maxSecciones))); // limitar para no saturar
+
+                    $seccionesSeleccionadas = $secciones->shuffle()->take($cantidadSecciones);
+
+                    foreach ($seccionesSeleccionadas as $seccion) {
+                        $existe = $seccion->todosLosDocentes()
+                            ->where('secciones_docentes.codigo_docente', $codigoDocente)
+                            ->exists();
+
+                        if (! $existe) {
+                            $seccion->todosLosDocentes()->attach($codigoDocente, [
+                                'estado' => true,
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
+                        }
+                    }
+                }
             }
         }
     }

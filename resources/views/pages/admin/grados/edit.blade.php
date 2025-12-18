@@ -136,4 +136,36 @@
         </div>
     </div>
 </div>
+
+<script>
+    const gradosExistentes = @json($gradosExistentes ?? []);
+    const nivelSelect = document.getElementById('nivel_educativo_id');
+    const gradoSelect = document.getElementById('grado');
+    const warning = document.getElementById('grado-warning');
+    const submitBtn = document.getElementById('submit-btn');
+
+    nivelSelect.addEventListener('change', verificarGrado);
+    gradoSelect.addEventListener('change', verificarGrado);
+
+    function verificarGrado() {
+        const nivelId = nivelSelect.value;
+        const grado = gradoSelect.value;
+
+        if (nivelId && grado) {
+            const existe = gradosExistentes[nivelId]?.includes(parseInt(grado));
+            
+            if (existe) {
+                warning.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                gradoSelect.classList.add('border-amber-500');
+            } else {
+                warning.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                gradoSelect.classList.remove('border-amber-500');
+            }
+        }
+    }
+</script>
 @endsection

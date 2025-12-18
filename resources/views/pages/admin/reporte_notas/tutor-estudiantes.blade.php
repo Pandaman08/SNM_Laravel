@@ -38,13 +38,15 @@
                     <span class="font-semibold">Grado/Sección:</span>
                     <span class="ml-2">{{ $matricula->seccion->grado->grado }} "{{ $matricula->seccion->seccion }}"</span>
                 </div>
-                 <a href="{{ route('reporte.notas.pdf', $matricula->codigo_matricula) }}" 
-                   class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-                    </svg>
-                    Generar PDF
-                </a>
+                <div class="mt-3">
+                    <a href="{{ route('reporte.notas.pdf', $matricula->codigo_matricula) }}" 
+                       class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center transition-colors duration-200">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                        </svg>
+                        Generar PDF
+                    </a>
+                </div>
             </div>
 
             <div class="overflow-x-auto">
@@ -65,28 +67,24 @@
                                     {{ $bimestre }}
                                 </th>
                             @endforeach
-                            <th rowspan="2"
+                            <th colspan="2"
                                 class="px-6 py-3 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider bg-gray-100">
                                 NL FINAL
                             </th>
                         </tr>
                         <tr class="bg-gray-50">
                             @foreach (range(1, 4) as $bimestre)
-                                <th
-                                    class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200">
-                                    NL
-                                </th>
-                                <th
-                                    class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider @if ($bimestre < 4) border-r border-gray-200 @endif">
-                                    Conclusión
-                                </th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200"></th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider @if ($bimestre < 4) border-r border-gray-200 @endif"></th>
                             @endforeach
+                            <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider"></th>
+                            <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider"></th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @foreach ($asignaturas as $asignatura)
                             @php
-                                $rowCount = count($asignatura->competencias);
+                                $rowCount = count($asignatura->competencias) ?: 1;
                                 $firstCompetencia = true;
                             @endphp
 
@@ -97,7 +95,6 @@
                                             class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 border-r border-gray-200 align-top">
                                             {{ $asignatura->nombre }}
                                         </td>
-                                        @php $firstCompetencia = false; @endphp
                                     @endif
 
                                     <td class="px-6 py-4 whitespace-normal text-sm text-gray-700 border-r border-gray-200">
@@ -118,12 +115,12 @@
                                             ->first();
                                     @endphp
 
-                                    @foreach (range(3, 6) as $periodo)
+                                    @foreach (range(1, 4) as $periodo)
                                         @php
                                             $reporte = $detalle
                                                 ? $detalle->reportesNotas->where('id_periodo', $periodo)->first()
                                                 : null;
-                                            $nota = $reporte->tipoCalificacion->codigo ?? null;
+                                            $nota = $reporte->calificacion ?? null;
                                             $color = match ($nota) {
                                                 'AD' => 'text-green-600 bg-green-50',
                                                 'A' => 'text-blue-600 bg-blue-50',
@@ -149,11 +146,15 @@
                                         </td>
                                     @endforeach
 
-                                    <!-- Columna de Promedio Final -->
+                                    <!-- Columna NL por Competencia -->
                                     <td class="px-4 py-4 text-center text-sm font-medium">
-                                        @if ($detalle && $detalle->promedio)
+                                        @php
+                                            $valorCompetencia = $detalle->promedio ?? null;
+                                        @endphp
+
+                                        @if ($valorCompetencia)
                                             @php
-                                                $colorPromedio = match ($detalle->promedio) {
+                                                $colorPromedio = match ($valorCompetencia) {
                                                     'AD' => 'text-green-600 bg-green-50',
                                                     'A' => 'text-blue-600 bg-blue-50',
                                                     'B' => 'text-yellow-600 bg-yellow-50',
@@ -161,14 +162,36 @@
                                                     default => 'text-gray-600 bg-gray-50',
                                                 };
                                             @endphp
-                                            <span
-                                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ $colorPromedio }}">
-                                                {{ $detalle->promedio }}
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ $colorPromedio }}">
+                                                {{ $valorCompetencia }}
                                             </span>
                                         @else
                                             <span class="text-gray-400">-</span>
                                         @endif
                                     </td>
+
+                                    {{-- Celda única con rowspan para la calificación final de la asignatura --}}
+                                    @if ($firstCompetencia)
+                                        <td rowspan="{{ $rowCount }}" class="px-4 py-4 text-center text-sm font-medium align-middle border-l border-gray-200">
+                                            @if(!empty($asignatura->calificacion_final))
+                                                @php
+                                                    $colorFinalAsignatura = match ($asignatura->calificacion_final) {
+                                                        'AD' => 'text-green-600 bg-green-50',
+                                                        'A' => 'text-blue-600 bg-blue-50',
+                                                        'B' => 'text-yellow-600 bg-yellow-50',
+                                                        'C' => 'text-orange-600 bg-orange-50',
+                                                        default => 'text-gray-600 bg-gray-50',
+                                                    };
+                                                @endphp
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ $colorFinalAsignatura }}">
+                                                    {{ $asignatura->calificacion_final }}
+                                                </span>
+                                            @else
+                                                <span class="text-gray-400">-</span>
+                                            @endif
+                                        </td>
+                                        @php $firstCompetencia = false; @endphp
+                                    @endif
                                 </tr>
                             @endforeach
                         @endforeach

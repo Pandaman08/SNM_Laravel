@@ -15,7 +15,7 @@ class TutorController extends Controller
 {
     private const STRING_REQUIRED_MAX_255 = 'required|string|max:255';
 
-        public function index_tutor()
+    public function index_tutor()
     {
         $users = User::where('estado', false)->paginate(10);
 
@@ -49,7 +49,6 @@ class TutorController extends Controller
 
         // Obtener parientes (contactos de emergencia) del tutor
         $parientes = $tutor->parientes()->get();
-
         return view("pages.admin.panels.tutor", [
                 'user' => $user,
                 'tutor' => $tutor,
@@ -59,7 +58,9 @@ class TutorController extends Controller
                         'codigo_estudiante' => $et->estudiante->codigo_estudiante,
                         'nombre' => $et->estudiante->persona->name,
                         'apellidos' => $et->estudiante->persona->lastname,
+                        'dni' => $et->estudiante->persona->dni,
                         'codigo_matricula' => $matricula ? $matricula->codigo_matricula : null,
+                        'matricula_estado' => $matricula ? $matricula->estado : null,
                         'grado' => $matricula && $matricula->seccion ? $matricula->seccion->grado->nombre_completo : null,
                         'seccion' => $matricula && $matricula->seccion ? $matricula->seccion->seccion : null,
                     ];
