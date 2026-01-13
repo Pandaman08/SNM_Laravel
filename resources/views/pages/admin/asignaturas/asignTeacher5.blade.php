@@ -214,7 +214,7 @@
     </div>
 </div>
 
-<!-- Modal para Gestionar Docentes (Mejorado) -->
+<!-- Modal para Gestionar Docentes (Mejorado con búsqueda por DNI) -->
 <div id="manageModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
     <div class="relative top-10 mx-auto p-5 border w-11/12 md:w-4/5 lg:w-3/4 xl:w-2/3 shadow-lg rounded-lg bg-white">
         <!-- Header del Modal -->
@@ -222,7 +222,7 @@
             <div>
                 <h3 class="text-xl font-semibold text-gray-900">Gestionar Docentes</h3>
                 <p id="modalAsignaturaInfo" class="text-sm text-gray-600 mt-1"></p>
-                <p id="modalGradoSeccionInfo" class="text-sm text-gray-600 mt-1"></p> <!-- Nueva línea -->
+                <p id="modalGradoSeccionInfo" class="text-sm text-gray-600 mt-1"></p>
             </div>
             <button onclick="closeManageModal()" class="text-gray-400 hover:text-gray-600 transition duration-200">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -245,7 +245,8 @@
                     <form id="addDocenteForm">
                         @csrf
                         <input type="hidden" id="modal_codigo_asignatura" name="codigo_asignatura">
-                        <input type="hidden" id="modal_id_grado" name="id_grado"> <!-- Campo oculto para el grado -->
+                        <input type="hidden" id="modal_id_grado" name="id_grado">
+                        <input type="hidden" id="modal_codigo_docente_seleccionado" name="codigo_docente">
 
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Seleccionar Sección:</label>
@@ -256,22 +257,48 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Seleccionar Docente:</label>
-                            <select id="modal_nuevo_docente" name="codigo_docente" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">-- Seleccione un docente --</option>
-                                @foreach($docentes as $docente)
-                                    <option value="{{ $docente->codigo_docente }}" data-nombre="{{ $docente->user->persona->name ?? 'Nombre no disponible' }}" data-apellido="{{ $docente->user->persona->lastname . ' '.$docente->user->email?? '' }}">
-                                        {{ $docente->user->persona->name ?? 'Nombre no disponible' }} 
-                                        {{ $docente->user->persona->lastname ?? '' }}
-                                         {{ $docente->user->email ?? '' }}
-                                        ({{ $docente->codigo_docente }})
-                                    </option>
-                                @endforeach
-                            </select>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Buscar Docente por DNI:</label>
+                            <input 
+                                type="text" 
+                                id="buscar_dni_docente" 
+                                placeholder="Ingrese DNI del docente"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                autocomplete="off">
+                            
+                            <!-- Tabla de resultados de búsqueda -->
+                            <div id="resultados_busqueda_docente" class="mt-2 hidden">
+                                <div class="border border-gray-300 rounded-md max-h-60 overflow-y-auto bg-white shadow-sm">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">DNI</th>
+                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                                                <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase">Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tabla_docentes_encontrados" class="bg-white divide-y divide-gray-200">
+                                            <!-- Los resultados se cargarán aquí dinámicamente -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Mensaje cuando no hay resultados -->
+                            <div id="sin_resultados_busqueda" class="mt-2 hidden text-sm text-gray-500 text-center py-2">
+                                No se encontraron docentes con ese DNI
+                            </div>
+
+                            <!-- Docente seleccionado -->
+                            <div id="docente_seleccionado_info" class="mt-3 hidden">
+                                <div class="bg-green-50 border border-green-200 rounded-md p-3">
+                                    <p class="text-sm font-medium text-green-900">Docente seleccionado:</p>
+                                    <p id="info_docente_seleccionado" class="text-sm text-green-700 mt-1"></p>
+                                </div>
+                            </div>
                         </div>
 
-                        <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200 flex items-center justify-center">
+                        <button type="submit" id="btn_agregar_docente" disabled class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200 flex items-center justify-center disabled:bg-gray-300 disabled:cursor-not-allowed">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
@@ -362,373 +389,405 @@
     let asignaturaActual = null;
     let docenteAEliminar = null;
 
-    function openManageModal(codigoAsignatura) {
-        const button = event.currentTarget;
-        const asignaturaData = JSON.parse(button.getAttribute('data-asignatura'));
+    // Búsqueda dinámica de docentes por DNI
+    document.getElementById('buscar_dni_docente').addEventListener('input', function() {
+        const dni = this.value.trim();
+        const resultadosDiv = document.getElementById('resultados_busqueda_docente');
+        const sinResultadosDiv = document.getElementById('sin_resultados_busqueda');
+        const tablaBody = document.getElementById('tabla_docentes_encontrados');
 
-        asignaturaActual = {
-            codigo: asignaturaData.codigo_asignatura,
-            nombre: asignaturaData.nombre,
-            id_grado: asignaturaData.id_grado,
-            docentes: [], // Se llenará con la llamada AJAX
-            seccion: null
-        };
+        if (dni.length === 0) {
+            resultadosDiv.classList.add('hidden');
+            sinResultadosDiv.classList.add('hidden');
+            return;
+        }
 
-        document.getElementById('modal_codigo_asignatura').value = asignaturaActual.codigo;
-        document.getElementById('modalAsignaturaInfo').textContent = `${asignaturaActual.codigo} - ${asignaturaActual.nombre}`;
-        
-        const gradoNombre = asignaturaData.grado?.grado || 'N/A';
-        document.getElementById('modalGradoSeccionInfo').textContent = `Grado: ${gradoNombre}`;
-
-        // Cargar las secciones del grado
-        cargarSecciones(asignaturaActual.id_grado);
-
-        // 👇 Cargar docentes activos en cualquier sección
-        cargarDocentesActivos(asignaturaActual.codigo);
-
-        // Abrir el modal
-        document.getElementById('manageModal').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeManageModal() {
-        document.getElementById('manageModal').classList.add('hidden');
-        document.body.style.overflow = 'auto';
-        asignaturaActual = null;
-        cancelarEliminacion();
-    }
-
-    function cargarSecciones(idGrado) {
-        const select = document.getElementById('modal_seccion');
-        select.innerHTML = '<option value="">-- Todas las secciones --</option>'; // ← Añade opción "Todas"
-
-        const seccionesDelGrado = secciones.filter(s => s.id_grado == idGrado);
-        seccionesDelGrado.forEach(seccion => {
-            const option = document.createElement('option');
-            option.value = seccion.id_seccion;
-            option.textContent = `${seccion.seccion} (${seccion.grado?.grado || 'N/A'}°)`;
-            select.appendChild(option);
+        // Filtrar docentes que coincidan con el DNI
+        const docentesEncontrados = docentes.filter(d => {
+            const dniDocente = d.user?.persona?.dni || '';
+            return dniDocente.includes(dni);
         });
 
-        // Cuando el usuario seleccione una sección
-        select.onchange = function() {
-            const idSeccionSeleccionada = this.value;
-            if (idSeccionSeleccionada) {
-                // Cargar docentes de la sección específica
-                cargarDocentesDeSeccion(idSeccionSeleccionada);
-            } else {
-                // Si selecciona "Todas las secciones", cargar todos los activos
-                cargarDocentesActivos(asignaturaActual.codigo);
-            }
+        if (docentesEncontrados.length > 0) {
+            sinResultadosDiv.classList.add('hidden');
+            resultadosDiv.classList.remove('hidden');
+            
+            tablaBody.innerHTML = docentesEncontrados.map(docente => `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-3 py-2 text-sm text-gray-900">${docente.user?.persona?.dni || 'N/A'}</td>
+                    <td class="px-3 py-2 text-sm text-gray-900">
+                        ${docente.user?.persona?.name || 'N/A'} ${docente.user?.persona?.lastname || ''}
+                    </td>
+                    <td class="px-3 py-2 text-sm text-gray-500">${docente.user?.email || 'N/A'}</td>
+                    <td class="px-3 py-2 text-center">
+                        <button 
+                            onclick="seleccionarDocente('${docente.codigo_docente}', '${docente.user?.persona?.dni || ''}', '${docente.user?.persona?.name || ''} ${docente.user?.persona?.lastname || ''}')"
+                            class="text-blue-600 hover:text-blue-800 text-xs font-medium">
+                            Seleccionar
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        } else {
+            resultadosDiv.classList.add('hidden');
+            sinResultadosDiv.classList.remove('hidden');
+        }
+    });
+
+    function seleccionarDocente(codigoDocente, dni, nombreCompleto) {
+        docenteSeleccionado = {
+            codigo: codigoDocente,
+            dni: dni,
+            nombre: nombreCompleto
         };
-    }
 
-    function cargarDocentesDeSeccion(idSeccion) {
-        if (!asignaturaActual || !idSeccion) {
-            document.getElementById('listaDocentesAsignados').innerHTML = '';
-            document.getElementById('sinDocentes').classList.remove('hidden');
-            return;
+        // Actualizar UI
+        document.getElementById('modal_codigo_docente_seleccionado').value = codigoDocente;
+        document.getElementById('info_docente_seleccionado').textContent = `${nombreCompleto} (DNI: ${dni})`;
+        document.getElementById('docente_seleccionado_info').classList.remove('hidden');
+        document.getElementById('btn_agregar_docente').disabled = false;
+        // Ocultar resultados de búsqueda
+    document.getElementById('resultados_busqueda_docente').classList.add('hidden');
+    document.getElementById('buscar_dni_docente').value = dni;
+}
+
+function openManageModal(codigoAsignatura) {
+    const button = event.currentTarget;
+    const asignaturaData = JSON.parse(button.getAttribute('data-asignatura'));
+
+    asignaturaActual = {
+        codigo: asignaturaData.codigo_asignatura,
+        nombre: asignaturaData.nombre,
+        id_grado: asignaturaData.id_grado,
+        docentes: [],
+        seccion: null
+    };
+
+    // Reiniciar búsqueda
+    docenteSeleccionado = null;
+    document.getElementById('buscar_dni_docente').value = '';
+    document.getElementById('resultados_busqueda_docente').classList.add('hidden');
+    document.getElementById('sin_resultados_busqueda').classList.add('hidden');
+    document.getElementById('docente_seleccionado_info').classList.add('hidden');
+    document.getElementById('btn_agregar_docente').disabled = true;
+
+    document.getElementById('modal_codigo_asignatura').value = asignaturaActual.codigo;
+    document.getElementById('modalAsignaturaInfo').textContent = `${asignaturaActual.codigo} - ${asignaturaActual.nombre}`;
+    
+    const gradoNombre = asignaturaData.grado?.grado || 'N/A';
+    document.getElementById('modalGradoSeccionInfo').textContent = `Grado: ${gradoNombre}`;
+
+    cargarSecciones(asignaturaActual.id_grado);
+    cargarDocentesActivos(asignaturaActual.codigo);
+
+    document.getElementById('manageModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeManageModal() {
+    document.getElementById('manageModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    asignaturaActual = null;
+    docenteSeleccionado = null;
+    cancelarEliminacion();
+}
+
+function cargarSecciones(idGrado) {
+    const select = document.getElementById('modal_seccion');
+    select.innerHTML = '<option value="">-- Todas las secciones --</option>';
+
+    const seccionesDelGrado = secciones.filter(s => s.id_grado == idGrado);
+    seccionesDelGrado.forEach(seccion => {
+        const option = document.createElement('option');
+        option.value = seccion.id_seccion;
+        option.textContent = `${seccion.seccion} (${seccion.grado?.grado || 'N/A'}°)`;
+        select.appendChild(option);
+    });
+
+    select.onchange = function() {
+        const idSeccionSeleccionada = this.value;
+        if (idSeccionSeleccionada) {
+            cargarDocentesDeSeccion(idSeccionSeleccionada);
+        } else {
+            cargarDocentesActivos(asignaturaActual.codigo);
         }
+    };
+}
 
-        fetch(`/asignaturas/${asignaturaActual.codigo}/seccion/${idSeccion}/docentes-activos`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    asignaturaActual.docentes = data.docentes; // Actualizar la lista local
-                    mostrarDocentesAsignados();
-                    actualizarDocentesDisponibles();
-                    actualizarEstadisticas();
-                } else {
-                    console.error('Error:', data.message);
-                    asignaturaActual.docentes = [];
-                    mostrarDocentesAsignados();
-                }
-            })
-            .catch(error => {
-                console.error('Error al cargar docentes:', error);
-                asignaturaActual.docentes = [];
-                mostrarDocentesAsignados();
-            });
-    }
-    function mostrarDocentesAsignados() {
-        const container = document.getElementById('listaDocentesAsignados');
-        const sinDocentes = document.getElementById('sinDocentes');
-
-        if (!asignaturaActual.docentes || asignaturaActual.docentes.length === 0) {
-            container.innerHTML = '';
-            sinDocentes.classList.remove('hidden');
-            return;
-        }
-
-        sinDocentes.classList.add('hidden');
-        container.innerHTML = asignaturaActual.docentes.map(docente => `
-            <div class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition duration-200">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 h-10 w-10">
-                        <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
-                            <span class="text-sm font-medium text-white">
-                                ${(docente.nombre || 'N').charAt(0)}${(docente.apellido || 'A').charAt(0)}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm font-medium text-gray-900">
-                            ${docente.nombre || 'Nombre no disponible'} 
-                            ${docente.apellido || ''}
-                        </p>
-                        <p class="text-xs text-gray-500">
-                            ${docente.codigo_docente} • Asignado: ${docente.fecha_asignacion ? new Date(docente.fecha_asignacion).toLocaleDateString() : 'N/A'}
-                            ${docente.secciones_activas ? `• Secciones: ${docente.secciones_activas}` : ''}
-                        </p>
-                    </div>
-                </div>
-                <button onclick="prepararEliminacion('${docente.codigo_docente}', '${(docente.nombre || 'Nombre no disponible')} ${docente.apellido || ''}')" 
-                        class="text-red-500 hover:text-red-700 transition duration-200" 
-                        title="Eliminar docente">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                    </svg>
-                </button>
-            </div>
-        `).join('');
+function cargarDocentesDeSeccion(idSeccion) {
+    if (!asignaturaActual || !idSeccion) {
+        document.getElementById('listaDocentesAsignados').innerHTML = '';
+        document.getElementById('sinDocentes').classList.remove('hidden');
+        return;
     }
 
-    // Manejar envío del formulario de agregar docente
-    document.getElementById('addDocenteForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData();
-        formData.append('codigo_asignatura', document.getElementById('modal_codigo_asignatura').value);
-        formData.append('id_seccion', document.getElementById('modal_seccion').value);
-        formData.append('codigo_docente', document.getElementById('modal_nuevo_docente').value);
-        formData.append('_token', '{{ csrf_token() }}');
-
-        fetch('{{ route("asignaturas.storeAsignacion") }}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Accept': 'application/json'
-            }
-        })
+    fetch(`/asignaturas/${asignaturaActual.codigo}/seccion/${idSeccion}/docentes-activos`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // ✅ Actualizar sin recargar
-                const idSeccion = document.getElementById('modal_seccion').value;
-                cargarDocentesDeSeccion(idSeccion);
-                
-                // Limpiar formulario
-                document.getElementById('modal_nuevo_docente').value = '';
-                alert(data.message);
+                asignaturaActual.docentes = data.docentes;
+                mostrarDocentesAsignados();
+                actualizarEstadisticas();
             } else {
-                alert(data.message);
+                console.error('Error:', data.message);
+                asignaturaActual.docentes = [];
+                mostrarDocentesAsignados();
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('Error al agregar el docente');
+            console.error('Error al cargar docentes:', error);
+            asignaturaActual.docentes = [];
+            mostrarDocentesAsignados();
         });
-    });
+}
 
-    function cargarDocentesActivos(codigoAsignatura) {
-        fetch(`/asignaturas/${codigoAsignatura}/docentes-activos`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    asignaturaActual.docentes = data.docentes;
-                } else {
-                    asignaturaActual.docentes = [];
-                }
-                mostrarDocentesAsignados();
-                actualizarDocentesDisponibles();
-                actualizarEstadisticas();
-            })
-            .catch(error => {
-                console.error('Error al cargar docentes activos:', error);
-                asignaturaActual.docentes = [];
-                mostrarDocentesAsignados();
-            });
+function mostrarDocentesAsignados() {
+    const container = document.getElementById('listaDocentesAsignados');
+    const sinDocentes = document.getElementById('sinDocentes');
+
+    if (!asignaturaActual.docentes || asignaturaActual.docentes.length === 0) {
+        container.innerHTML = '';
+        sinDocentes.classList.remove('hidden');
+        return;
     }
 
-    function prepararEliminacion(codigoDocente, nombreDocente) {
-        const idSeccion = document.getElementById('modal_seccion').value;
-        if (!idSeccion) {
-            alert('Por favor, seleccione una sección antes de eliminar un docente.');
-            return;
+    sinDocentes.classList.add('hidden');
+    container.innerHTML = asignaturaActual.docentes.map(docente => `
+        <div class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition duration-200">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 h-10 w-10">
+                    <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+                        <span class="text-sm font-medium text-white">
+                            ${(docente.nombre || 'N').charAt(0)}${(docente.apellido || 'A').charAt(0)}
+                        </span>
+                    </div>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-900">
+                        ${docente.nombre || 'Nombre no disponible'} 
+                        ${docente.apellido || ''}
+                    </p>
+                    <p class="text-xs text-gray-500">
+                        ${docente.codigo_docente} • Asignado: ${docente.fecha_asignacion ? new Date(docente.fecha_asignacion).toLocaleDateString() : 'N/A'}
+                        ${docente.secciones_activas ? `• Secciones: ${docente.secciones_activas}` : ''}
+                    </p>
+                </div>
+            </div>
+            <button onclick="prepararEliminacion('${docente.codigo_docente}', '${(docente.nombre || 'Nombre no disponible')} ${docente.apellido || ''}')" 
+                    class="text-red-500 hover:text-red-700 transition duration-200" 
+                    title="Eliminar docente">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+            </button>
+        </div>
+    `).join('');
+}
+
+document.getElementById('addDocenteForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (!docenteSeleccionado) {
+        alert('Por favor, seleccione un docente');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('codigo_asignatura', document.getElementById('modal_codigo_asignatura').value);
+    formData.append('id_seccion', document.getElementById('modal_seccion').value);
+    formData.append('codigo_docente', docenteSeleccionado.codigo);
+    formData.append('_token', '{{ csrf_token() }}');
+
+    fetch('{{ route("asignaturas.storeAsignacion") }}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Accept': 'application/json'
         }
-
-        docenteAEliminar = {
-            codigo: codigoDocente,
-            nombre: nombreDocente,
-            seccion: idSeccion
-        };
-
-        document.getElementById('mensajeConfirmacion').textContent = 
-            `¿Está seguro de que desea eliminar a ${nombreDocente} de esta sección?`;
-        document.getElementById('confirmarEliminarModal').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function actualizarDocentesDisponibles() {
-        const select = document.getElementById('modal_nuevo_docente');
-        const docentesAsignados = asignaturaActual.docentes.map(d => d.codigo_docente);
-
-        // Limpiar opciones
-        select.innerHTML = '<option value="">-- Seleccione un docente --</option>';
-
-        // Agregar docentes no asignados
-        docentes.forEach(docente => {
-            if (!docentesAsignados.includes(docente.codigo_docente)) {
-                const option = document.createElement('option');
-                option.value = docente.codigo_docente;
-                option.textContent = `${docente.user?.persona?.name || 'Nombre no disponible'} ${docente.user?.persona?.lastname || ''} (${docente.codigo_docente})`;
-                select.appendChild(option);
-            }
-        });
-    }
-
-    function actualizarEstadisticas() {
-        document.getElementById('totalDocentes').textContent = asignaturaActual.docentes ? asignaturaActual.docentes.length : 0;
-        
-        if (asignaturaActual.docentes && asignaturaActual.docentes.length > 0) {
-            const fechas = asignaturaActual.docentes
-                .map(d => d.pivot?.fecha ? new Date(d.pivot.fecha) : new Date())
-                .filter(date => !isNaN(date));
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const idSeccion = document.getElementById('modal_seccion').value;
+            cargarDocentesDeSeccion(idSeccion);
             
-            if (fechas.length > 0) {
-                const ultimaFecha = new Date(Math.max(...fechas));
-                document.getElementById('ultimaActualizacion').textContent = ultimaFecha.toLocaleDateString();
+            // Limpiar formulario
+            docenteSeleccionado = null;
+            document.getElementById('buscar_dni_docente').value = '';
+            document.getElementById('docente_seleccionado_info').classList.add('hidden');
+            document.getElementById('btn_agregar_docente').disabled = true;
+            
+            alert(data.message);
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al agregar el docente');
+    });
+});
+
+function cargarDocentesActivos(codigoAsignatura) {
+    fetch(`/asignaturas/${codigoAsignatura}/docentes-activos`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                asignaturaActual.docentes = data.docentes;
             } else {
-                document.getElementById('ultimaActualizacion').textContent = '--';
+                asignaturaActual.docentes = [];
             }
+            mostrarDocentesAsignados();
+            actualizarEstadisticas();
+        })
+        .catch(error => {
+            console.error('Error al cargar docentes activos:', error);
+            asignaturaActual.docentes = [];
+            mostrarDocentesAsignados();
+        });
+}
+
+function prepararEliminacion(codigoDocente, nombreDocente) {
+    const idSeccion = document.getElementById('modal_seccion').value;
+    if (!idSeccion) {
+        alert('Por favor, seleccione una sección antes de eliminar un docente.');
+        return;
+    }
+
+    docenteAEliminar = {
+        codigo: codigoDocente,
+        nombre: nombreDocente,
+        seccion: idSeccion
+    };
+
+    document.getElementById('mensajeConfirmacion').textContent = 
+        `¿Está seguro de que desea eliminar a ${nombreDocente} de esta sección?`;
+    document.getElementById('confirmarEliminarModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function actualizarEstadisticas() {
+    document.getElementById('totalDocentes').textContent = asignaturaActual.docentes ? asignaturaActual.docentes.length : 0;
+    
+    if (asignaturaActual.docentes && asignaturaActual.docentes.length > 0) {
+        const fechas = asignaturaActual.docentes
+            .map(d => d.pivot?.fecha ? new Date(d.pivot.fecha) : new Date())
+            .filter(date => !isNaN(date));
+        
+        if (fechas.length > 0) {
+            const ultimaFecha = new Date(Math.max(...fechas));
+            document.getElementById('ultimaActualizacion').textContent = ultimaFecha.toLocaleDateString();
         } else {
             document.getElementById('ultimaActualizacion').textContent = '--';
         }
+    } else {
+        document.getElementById('ultimaActualizacion').textContent = '--';
     }
-    function confirmarEliminacion() {
-        if (!docenteAEliminar || !asignaturaActual) return;
+}
 
-        const formData = new FormData();
-        formData.append('id_seccion', docenteAEliminar.seccion);
-        formData.append('codigo_docente', docenteAEliminar.codigo);
-        formData.append('_token', '{{ csrf_token() }}');
+function confirmarEliminacion() {
+    if (!docenteAEliminar || !asignaturaActual) return;
 
-        fetch('{{ route("asignaturas.removeAsignacion") }}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // ✅ Actualizar sin recargar
-                const idSeccion = docenteAEliminar.seccion;
-                cargarDocentesDeSeccion(idSeccion);
-                alert(data.message);
-            } else {
-                alert(data.message);
-            }
-            cancelarEliminacion();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error al eliminar el docente');
-            cancelarEliminacion();
-        });
-    }
+    const formData = new FormData();
+    formData.append('id_seccion', docenteAEliminar.seccion);
+    formData.append('codigo_docente', docenteAEliminar.codigo);
+    formData.append('_token', '{{ csrf_token() }}');
 
-    function cancelarEliminacion() {
-        docenteAEliminar = null;
-        document.getElementById('confirmarEliminarModal').classList.add('hidden');
-        if (!document.getElementById('manageModal').classList.contains('hidden')) {
-            document.body.style.overflow = 'hidden';
+    fetch('{{ route("asignaturas.removeAsignacion") }}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const idSeccion = docenteAEliminar.seccion;
+            cargarDocentesDeSeccion(idSeccion);
+            alert(data.message);
         } else {
-            document.body.style.overflow = 'auto';
+            alert(data.message);
         }
-    }
-
-    // Cerrar modales con tecla Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            if (!document.getElementById('confirmarEliminarModal').classList.contains('hidden')) {
-                cancelarEliminacion();
-            } else if (!document.getElementById('manageModal').classList.contains('hidden')) {
-                closeManageModal();
-            }
-        }
+        cancelarEliminacion();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al eliminar el docente');
+        cancelarEliminacion();
     });
+}
 
-    // Cerrar modales al hacer click fuera de ellos
-    document.getElementById('manageModal').addEventListener('click', function(e) {
-        if (e.target === this) {
+function cancelarEliminacion() {
+    docenteAEliminar = null;
+    document.getElementById('confirmarEliminarModal').classList.add('hidden');
+    if (!document.getElementById('manageModal').classList.contains('hidden')) {
+        document.body.style.overflow = 'hidden';
+    } else {
+        document.body.style.overflow = 'auto';
+    }
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        if (!document.getElementById('confirmarEliminarModal').classList.contains('hidden')) {
+            cancelarEliminacion();
+        } else if (!document.getElementById('manageModal').classList.contains('hidden')) {
             closeManageModal();
         }
-    });
+    }
+});
 
-    document.getElementById('confirmarEliminarModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            cancelarEliminacion();
-        }
-    });
+document.getElementById('manageModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeManageModal();
+    }
+});
 
-    // Agregar event listeners directamente a los botones de eliminación (opcional, pero más robusto)
-    // Esto se ejecuta cada vez que se actualiza la lista de docentes
-    function agregarEventosEliminacion() {
-        document.querySelectorAll('.btn-eliminar-docente').forEach(button => {
-            button.addEventListener('click', function() {
-                const codigoDocente = this.getAttribute('data-codigo');
-                const nombreDocente = this.getAttribute('data-nombre');
-                prepararEliminacion(codigoDocente, nombreDocente);
-            });
-        });
+document.getElementById('confirmarEliminarModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cancelarEliminacion();
+    }
+});
+
+document.getElementById('nivelEducativo').addEventListener('change', function () {
+    const nivelId = parseInt(this.value);
+    const gradoSelect = document.getElementById('grado');
+
+    gradoSelect.innerHTML = '';
+
+    if (isNaN(nivelId)) {
+        gradoSelect.disabled = true;
+        gradoSelect.innerHTML = '<option value="">Primero seleccione un nivel educativo</option>';
+        return;
     }
 
-    // Llamar a esta función después de mostrar los docentes asignados
-    // Puedes llamarla dentro de `mostrarDocentesAsignados()` si quieres que se ejecute siempre
-    // Pero como ya tienes `onclick` en línea, no es estrictamente necesario.
+    const gradosFiltrados = grados.filter(g => g.nivel_educativo_id === nivelId);
 
-    // Inicialización de filtros (código original mantenido)
-    document.getElementById('nivelEducativo').addEventListener('change', function () {
-        const nivelId = parseInt(this.value);
-        const gradoSelect = document.getElementById('grado');
+    if (gradosFiltrados.length > 0) { 
+        gradoSelect.disabled = false;
+        gradoSelect.innerHTML = '<option value="">Seleccione un grado</option>';
 
-        gradoSelect.innerHTML = '';
-
-        if (isNaN(nivelId)) {
-            gradoSelect.disabled = true;
-            gradoSelect.innerHTML = '<option value="">Primero seleccione un nivel educativo</option>';
-            return;
+        gradosFiltrados.forEach(grado => {
+            gradoSelect.innerHTML += `<option value="${grado.id_grado}">${grado.grado}°</option>`;
+        });
+        
+        const gradoSeleccionado = '{{ request("grado") }}';
+        if (gradoSeleccionado) {
+            gradoSelect.value = gradoSeleccionado;
         }
+    } else {
+        gradoSelect.disabled = true;
+        gradoSelect.innerHTML = '<option value="">No hay grados disponibles</option>';
+    }
+});
 
-        const gradosFiltrados = grados.filter(g => g.nivel_educativo_id === nivelId);
-
-        if (gradosFiltrados.length > 0) { 
-            gradoSelect.disabled = false;
-            gradoSelect.innerHTML = '<option value="">Seleccione un grado</option>';
-
-            gradosFiltrados.forEach(grado => {
-                gradoSelect.innerHTML += `<option value="${grado.id_grado}">${grado.grado}°</option>`;
-            });
-            
-            const gradoSeleccionado = '{{ request("grado") }}';
-            if (gradoSeleccionado) {
-                gradoSelect.value = gradoSeleccionado;
-            }
-        } else {
-            gradoSelect.disabled = true;
-            gradoSelect.innerHTML = '<option value="">No hay grados disponibles</option>';
-        }
-    });
-
-    // Inicializar dropdown de grados si hay un nivel preseleccionado
-    document.addEventListener('DOMContentLoaded', function() {
-        const nivelSelect = document.getElementById('nivelEducativo');
-        if (nivelSelect.value) {
-            nivelSelect.dispatchEvent(new Event('change'));
-        }
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    const nivelSelect = document.getElementById('nivelEducativo');
+    if (nivelSelect.value) {
+        nivelSelect.dispatchEvent(new Event('change'));
+    }
+});
 </script>
 
 @endsection
