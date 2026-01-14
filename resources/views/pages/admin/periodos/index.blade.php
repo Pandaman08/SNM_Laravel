@@ -120,6 +120,12 @@
                                     <span>Acciones</span>
                                 </div>
                             </th>
+                            <th class="px-6 py-3 text-left font-medium">Nombre</th>
+                            <th class="px-6 py-3 text-left font-medium">Año Escolar</th>
+                            <th class="px-6 py-3 text-left font-medium">Fecha Inicio</th>
+                            <th class="px-6 py-3 text-left font-medium">Fecha Fin</th>
+                            <th class="px-6 py-3 text-center font-medium">Estado</th>
+                            <th class="px-6 py-3 text-center font-medium">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -174,6 +180,29 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
                                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium {{ $statusColor }}">
                                         <i class="{{ $statusIcon }}"></i>
+                                <td class="px-6 py-4 text-gray-700">
+                                    {{ $periodo->anioEscolar ? $periodo->anioEscolar->anio : 'N/A' }}
+                                </td>
+                                <td class="px-6 py-4">{{ \Carbon\Carbon::parse($periodo->fecha_inicio)->format('d/m/Y') }}</td>
+                                <td class="px-6 py-4">{{ \Carbon\Carbon::parse($periodo->fecha_fin)->format('d/m/Y') }}</td>
+                                <td class="px-6 py-4 text-center">
+                                    @php
+                                        $now = now();
+                                        $start = \Carbon\Carbon::parse($periodo->fecha_inicio);
+                                        $end = \Carbon\Carbon::parse($periodo->fecha_fin);
+                                        
+                                        if ($now->between($start, $end)) {
+                                            $status = 'Activo';
+                                            $color = 'bg-green-100 text-green-800';
+                                        } elseif ($now->lt($start)) {
+                                            $status = 'Pendiente';
+                                            $color = 'bg-yellow-100 text-yellow-800';
+                                        } else {
+                                            $status = 'Finalizado';
+                                            $color = 'bg-gray-100 text-gray-800';
+                                        }
+                                    @endphp
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $color }}">
                                         {{ $status }}
                                     </span>
                                 </td>

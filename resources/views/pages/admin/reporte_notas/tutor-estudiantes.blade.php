@@ -62,23 +62,25 @@
                                 Competencias
                             </th>
                             @foreach (['PRIMER BIMESTRE', 'SEGUNDO BIMESTRE', 'TERCER BIMESTRE', 'CUARTO BIMESTRE'] as $bimestre)
-                                <th colspan="2"
-                                    class="px-6 py-3 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider bg-gray-100 @if (!$loop->last) border-r border-gray-200 @endif">
+                                <th class="px-6 py-3 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider bg-gray-100 @if (!$loop->last) border-r border-gray-200 @endif">
                                     {{ $bimestre }}
                                 </th>
                             @endforeach
-                            <th colspan="2"
-                                class="px-6 py-3 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider bg-gray-100">
+                            <th rowspan="2"
+                                class="px-6 py-3 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider bg-gray-100 border-l border-gray-200">
+                                PROMEDIO
+                            </th>
+                            <th rowspan="2"
+                                class="px-6 py-3 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider bg-gray-100 border-l border-gray-200">
                                 NL FINAL
                             </th>
                         </tr>
                         <tr class="bg-gray-50">
                             @foreach (range(1, 4) as $bimestre)
-                                <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider border-r border-gray-200"></th>
-                                <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider @if ($bimestre < 4) border-r border-gray-200 @endif"></th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider @if ($bimestre < 4) border-r border-gray-200 @endif">
+                                    Nota
+                                </th>
                             @endforeach
-                            <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider"></th>
-                            <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider"></th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -115,10 +117,10 @@
                                             ->first();
                                     @endphp
 
-                                    @foreach (range(1, 4) as $periodo)
+                                    @foreach ($periodos as $periodo)
                                         @php
                                             $reporte = $detalle
-                                                ? $detalle->reportesNotas->where('id_periodo', $periodo)->first()
+                                                ? $detalle->reportesNotas->where('id_periodo', $periodo->id_periodo)->first()
                                                 : null;
                                             $nota = $reporte->calificacion ?? null;
                                             $color = match ($nota) {
@@ -130,7 +132,7 @@
                                             };
                                         @endphp
 
-                                        <td class="px-4 py-4 text-center text-sm font-medium border-r border-gray-200">
+                                        <td class="px-4 py-4 text-center text-sm font-medium @if ($loop->last) border-r border-gray-200 @else border-r border-gray-200 @endif">
                                             @if ($nota)
                                                 <span
                                                     class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ $color }}">
@@ -140,14 +142,10 @@
                                                 <span class="text-gray-400">-</span>
                                             @endif
                                         </td>
-                                        <td
-                                            class="px-4 py-4 text-center text-sm text-gray-600 @if ($periodo < 6) border-r border-gray-200 @endif">
-                                            {{ $reporte->observacion ?? '-' }}
-                                        </td>
                                     @endforeach
 
-                                    <!-- Columna NL por Competencia -->
-                                    <td class="px-4 py-4 text-center text-sm font-medium">
+                                    <!-- Columna Promedio por Competencia -->
+                                    <td class="px-4 py-4 text-center text-sm font-medium border-l border-gray-200">
                                         @php
                                             $valorCompetencia = $detalle->promedio ?? null;
                                         @endphp

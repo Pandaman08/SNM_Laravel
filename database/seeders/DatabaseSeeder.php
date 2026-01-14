@@ -76,6 +76,8 @@ class DatabaseSeeder extends Seeder
             GradosSeeder::class,
             SeccionesSeeder::class,
             TiposMatriculaSeeder::class,
+            AnioEscolarSeeder::class,
+            PeriodoSeeder::class,
         ]);
 
         // 2. Crear docentes (requiere niveles ya creados)

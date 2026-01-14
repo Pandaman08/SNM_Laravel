@@ -16,6 +16,9 @@ use App\Http\Controllers\AsignaturaController;
 use App\Http\Controllers\MatriculaController;
 use App\Http\Controllers\PeriodoController;
 use App\Http\Controllers\AnioEscolarController;
+
+Route::get('/anios-escolares/{id}/periodos', [AnioEscolarController::class, 'periodos'])->name('anios-escolares.periodos');
+
 use App\Http\Controllers\TipoCalificacionController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\CompetenciaController;
@@ -145,6 +148,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('reporte_notas', ReporteNotasController::class)->except(['show']);
     Route::get('/reporte_notas/{codigo_matricula}/{id_asignatura}/show', [ReporteNotasController::class, 'estudiante_calificaciones'])->name('reporte_notas.show');
     Route::get('/reporte_notas/docente/{id_asignatura}', [ReporteNotasController::class, 'docente_view'])->name('reporte_notas.docente');
+    Route::get('/reporte_notas/export/{id_asignatura}', [ReporteNotasController::class, 'export'])->name('reporte_notas.export');
     Route::get('/reporte_notas/tutor/estudiantes', [ReporteNotasController::class, 'index_estudiantes_tutor'])->name('reporte_notas.tutor');
     Route::get('/reporte_notas/tutor/estudiantes/{id_asignatura}/asignatura', [ReporteNotasController::class, 'verNotasEstudiante'])->name('reporte_notas.tutor.estudiante');
     Route::get('/reporte-notas/pdf/{codigo_matricula}', [ReporteNotasController::class, 'generarReportePdf'])->name('reporte.notas.pdf');
@@ -180,9 +184,16 @@ Route::middleware('auth')->group(function () {
     })->name('asistencia.scan');
 
     Route::get('/calificaciones-masivas/{id_asignatura}', [ReporteNotasController::class, 'calificacionesMasivas'])->name('reporte_notas.calificaciones-masivas');
-    Route::post('/guardar-calificaciones-masivas', [ReporteNotasController::class, 'guardarCalificacionesMasivas'])->name('reporte_notas.guardar-masivas');
+    // Ruta para mostrar la vista
+    Route::get('/calificaciones-masivas/{id_asignatura}', [ReporteNotasController::class, 'calificacionesMasivas'])
+        ->name('reporte_notas.calificaciones-masivas');
+    // Ruta API para cargar datos por competencia
+    Route::get('/api/notas-competencia/{id_asignatura}/{id_competencia}', [ReporteNotasController::class, 'obtenerNotasCompetencia'])
+        ->name('api.notas-competencia');
     Route::post('/actualizar-calificaciones-masivas', [ReporteNotasController::class, 'actualizarCalificacionesMasivas'])->name('reporte_notas.actualizar-masivas');
     // Rutas de prueba: calificar todos los periodos para una asignatura (uso docente para testing)
     Route::get('/calificar-todos/{id_asignatura}', [ReporteNotasController::class, 'calificarTodos'])->name('reporte_notas.calificar-todos');
     Route::post('/guardar-calificaciones-todos', [ReporteNotasController::class, 'guardarCalificacionesMasivasAllPeriods'])->name('reporte_notas.guardar-todos');
+    Route::post('/guardar-notas-competencia', [ReporteNotasController::class, 'guardarNotasPorCompetencia'])
+    ->name('reporte_notas.guardar-competencia');
 });

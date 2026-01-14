@@ -26,5 +26,10 @@ class AnioEscolar extends Model
     {
         return $this->hasMany(Matricula::class, 'id_anio_escolar', 'id_anio_escolar');
     }
+
+    public function periodos()
+    {
+        return $this->hasMany(Periodo::class, 'id_anio_escolar', 'id_anio_escolar');
+    }
    
 }
