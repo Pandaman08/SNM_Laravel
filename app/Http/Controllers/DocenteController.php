@@ -16,6 +16,7 @@ use App\Models\TipoCalificacion;
 use App\Models\Matricula;
 use App\Enums\UserRole;
 use App\Models\Periodo;
+use App\Models\Especialidad;
 use App\Models\Grado;
 use App\Models\Seccion;
 use Illuminate\Support\Facades\Log;
@@ -29,22 +30,24 @@ class DocenteController extends Controller
         $query = $request->input('search');
 
         // Incluir la relación con nivel educativo
-        $users = User::with(['persona', 'docente.nivelEducativo'])
+        $users = User::with(['persona', 'docente.nivelEducativo','docente.especialidades','docente.secciones'])
             ->where('rol', '=', 'docente')
             ->when($query, function ($queryBuilder) use ($query) {
                 $queryBuilder->whereHas('persona', function ($q) use ($query) {
                     $q->where('name', 'like', "%{$query}%")
-                      ->orWhere('lastname', 'like', "%{$query}%")
-                      ->orWhere('dni', 'like', "%{$query}%");
+                        ->orWhere('lastname', 'like', "%{$query}%")
+                        ->orWhere('dni', 'like', "%{$query}%");
                 });
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        // Obtener niveles educativos para el formulario
+        // Obtener niveles educativos y secciones para el formulario
         $nivelesEducativos = NivelEducativo::all();
+        $secciones = Seccion::all();
+        $especialidades = Especialidad::all();
 
-        return view('pages.admin.docentes.index', compact('users', 'nivelesEducativos'));
+        return view('pages.admin.docentes.index', compact('users', 'nivelesEducativos', 'especialidades', 'secciones'));
     }
 
     public function showDocente(Request $request)
@@ -65,14 +68,14 @@ class DocenteController extends Controller
         return view('pages.admin.docentes.index', compact('users', 'roles'));
     }
 
-     public function panel_docente()
+    public function panel_docente()
     {
         $user = Auth::user();
         $numAsign = AsignaturaDocente::where('codigo_docente', '=', $user->docente->codigo_docente)->get()->count();
-        
+
         // Incluir nivel educativo en los datos del panel
         $nivelEducativo = $user->docente->nivelEducativo;
-        
+
         return view("pages.admin.panels.docente", compact('user', 'numAsign', 'nivelEducativo'));
     }
 
@@ -86,7 +89,7 @@ class DocenteController extends Controller
             if ($asignatura) {
                 $grado = $asignatura->grado;
                 $seccion = Seccion::obtenerSeccionPorDocenteYGrado($user->docente->codigo_docente, $grado->id_grado);
-                
+
                 $detalles[] = [
                     'asignatura' => $asignatura,
                     'grado' => $grado->grado,
@@ -96,7 +99,7 @@ class DocenteController extends Controller
             }
         }
 
-        
+
         $detalles = collect($detalles)->map(function ($item) {
             return (object) $item;
         });
@@ -121,7 +124,7 @@ class DocenteController extends Controller
         return view('pages.admin.docentes.estudiantes', compact('matriculas', 'asignatura'));
     }
 
-   
+
 
     public function store(Request $request)
     {
@@ -138,7 +141,9 @@ class DocenteController extends Controller
                 'fecha_nacimiento' => 'required|date',
                 'photo' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
                 'nivel_educativo_id' => 'required|exists:niveles_educativos,id_nivel_educativo',
-                'firma_docente' => 'nullable|string'
+                'firma_docente' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
+                'especialidades' => 'nullable|array',
+                'especialidades.*' => 'exists:especialidades,id_especialidad'
             ]);
 
             // Generar email automático
@@ -170,12 +175,25 @@ class DocenteController extends Controller
                 'estado' => true
             ]);
 
+            // Guardar firma si existe
+            $firmaPath = null;
+            if ($request->hasFile('firma_docente')) {
+                $firmaPath = $request->file('firma_docente')->store('firmas_docentes', 'public');
+            }
+
             // Crear Docente con nivel educativo
             $docente = Docente::create([
                 'user_id' => $user->user_id,
                 'nivel_educativo_id' => $request->nivel_educativo_id,
-                'firma_docente' => $request->firma_docente ?? null
+                'firma_docente' => $firmaPath,
             ]);
+
+            // Asignar especialidades al docente
+            if ($request->has('especialidades')) {
+                foreach ($request->especialidades as $especialidadId) {
+                    $docente->especialidades()->attach($especialidadId, ['estado' => 'Activo']);
+                }
+            }
 
             DB::commit();
 
@@ -203,11 +221,13 @@ class DocenteController extends Controller
                 'edit_fecha_nacimiento' => 'required|date',
                 'edit_photo' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
                 'edit_nivel_educativo_id' => 'required|exists:niveles_educativos,id_nivel_educativo',
-                'edit_firma_docente' => 'nullable|string'
+                'edit_firma_docente' => 'nullable|image|max:4096|mimes:jpg,png,jpeg',
+                'edit_especialidades' => 'nullable|array',
+                'edit_especialidades.*' => 'exists:especialidades,id_especialidad'
             ]);
 
             $user = User::with(['persona', 'docente'])->findOrFail($user_id);
-            
+
             // Verificar si el nivel educativo existe
             $nivelEducativo = NivelEducativo::findOrFail($request->edit_nivel_educativo_id);
 
@@ -231,11 +251,31 @@ class DocenteController extends Controller
 
             $user->persona->update($personaData);
 
+            // Actualizar firma si existe
+            $firmaPath = $user->docente->firma_docente;
+            if ($request->hasFile('edit_firma_docente')) {
+                if ($firmaPath) {
+                    Storage::disk('public')->delete($firmaPath);
+                }
+                $firmaPath = $request->file('edit_firma_docente')->store('firmas_docentes', 'public');
+            }
+
             // Actualizar docente con nivel educativo
             $user->docente->update([
                 'nivel_educativo_id' => $nivelEducativo->id_nivel_educativo,
-                'firma_docente' => $request->edit_firma_docente
+                'firma_docente' => $firmaPath,
             ]);
+
+            // Sincronizar especialidades
+            if ($request->has('edit_especialidades')) {
+                $especialidadesData = [];
+                foreach ($request->edit_especialidades as $especialidadId) {
+                    $especialidadesData[$especialidadId] = ['estado' => 'Activo'];
+                }
+                $user->docente->especialidades()->sync($especialidadesData);
+            } else {
+                $user->docente->especialidades()->detach();
+            }
 
             DB::commit();
 

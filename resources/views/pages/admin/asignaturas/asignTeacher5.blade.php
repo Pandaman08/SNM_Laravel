@@ -199,35 +199,21 @@
                                     @else
                                         <div class="space-y-1">
                                             @foreach ($a->docentes->take(2) as $docente)
-                                                <div class="flex items-center justify-between group">
-                                                    <div class="flex items-center flex-1">
-                                                        <div class="flex-shrink-0 h-6 w-6">
-                                                            <div
-                                                                class="h-6 w-6 rounded-full bg-blue-500 flex items-center justify-center">
-                                                                <span class="text-xs font-medium text-white">
-                                                                    {{ substr($docente->user->persona->name ?? 'N', 0, 1) }}{{ substr($docente->user->persona->lastname ?? 'A', 0, 1) }}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="ml-2">
-                                                            <p class="text-xs font-medium text-gray-900">
-                                                                {{ $docente->user->persona->name ?? 'Nombre no disponible' }}
-                                                                {{ $docente->user->persona->lastname ?? '' }}
-                                                            </p>
+                                                <div class="flex items-center flex-1">
+                                                    <div class="flex-shrink-0 h-6 w-6">
+                                                        <div
+                                                            class="h-6 w-6 rounded-full bg-blue-500 flex items-center justify-center">
+                                                            <span class="text-xs font-medium text-white">
+                                                                {{ substr($docente->user->persona->name ?? 'N', 0, 1) }}{{ substr($docente->user->persona->lastname ?? 'A', 0, 1) }}
+                                                            </span>
                                                         </div>
                                                     </div>
-                                                    <button
-                                                        onclick="removerDocenteDirecto('{{ $docente->codigo_docente }}', '{{ $a->codigo_asignatura }}', '{{ $docente->user->persona->name ?? 'Docente' }} {{ $docente->user->persona->lastname ?? '' }}')"
-                                                        class="ml-2 text-red-400 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-all duration-200"
-                                                        title="Remover asignación">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v3M4 7h16">
-                                                            </path>
-                                                        </svg>
-                                                    </button>
+                                                    <div class="ml-2">
+                                                        <p class="text-xs font-medium text-gray-900">
+                                                            {{ $docente->user->persona->name ?? 'Nombre no disponible' }}
+                                                            {{ $docente->user->persona->lastname ?? '' }}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             @endforeach
                                             @if ($a->docentes->count() > 2)
@@ -503,8 +489,6 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <!-- Paginación -->
-                                        <div id="paginacion_docentes" class="border-t border-gray-200"></div>
                                     </div>
 
                                     <!-- Mensaje cuando no hay resultados -->
@@ -706,11 +690,10 @@
         let asignaturaActual = null;
         let docenteAEliminar = null;
         let docenteSeleccionado = null;
-        let currentPage = 1;
-        let totalPages = 1;
         let currentSearchTerm = '';
         let seccionSeleccionadaId = '';
         let especialidadesRequeridas = [];
+        let docentesDisponibles = [];
 
         // Función para mostrar notificaciones toast
         function mostrarNotificacion(mensaje, tipo = 'success') {
@@ -782,7 +765,6 @@
                 const valorBusqueda = e.target.value || '';
                 console.log('Valor de búsqueda:', valorBusqueda);
                 currentSearchTerm = valorBusqueda.trim();
-                currentPage = 1;
 
                 if (currentSearchTerm.length >= 1 || currentSearchTerm.length === 0) {
                     buscarDocentesCompatibles();
@@ -790,78 +772,41 @@
             }, 300));
         }
 
-        // Función para buscar docentes compatibles
-        function buscarDocentesCompatibles(page = 1) {
+        // Función para buscar docentes compatibles (búsqueda local en frontend)
+        function buscarDocentesCompatibles() {
             if (!asignaturaActual) return;
 
-            currentPage = page;
-
-            // Mostrar loader
             const resultadosDiv = document.getElementById('resultados_busqueda_docente');
             const sinResultadosDiv = document.getElementById('sin_resultados_busqueda');
-            resultadosDiv.classList.add('hidden');
-            sinResultadosDiv.classList.add('hidden');
-
-            const loader = document.getElementById('loader_busqueda');
-            if (loader) loader.classList.remove('hidden');
-
-            // Construir URL con parámetros
-            const params = new URLSearchParams({
-                page: currentPage,
-                search: currentSearchTerm,
-                seccion_id: seccionSeleccionadaId
-            });
-            console.log('URL de búsqueda:', `/asignaturas/${asignaturaActual.codigo}/docentes-disponibles?${params}`);
-            fetch(`/asignaturas/${asignaturaActual.codigo}/docentes-disponibles?${params}`, {
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => {
-                    // Verificar si la respuesta es JSON válido
-                    const contentType = response.headers.get('content-type');
-                    if (!contentType || !contentType.includes('application/json')) {
-                        throw new Error('La respuesta del servidor no es JSON');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Ocultar loader
-                    const loader = document.getElementById('loader_busqueda');
-                    if (loader) loader.classList.add('hidden');
-
-                    if (data && data.success && data.docentes && data.docentes.length > 0) {
-                        mostrarResultadosBusqueda(data);
-                        if (data.especialidades_requeridas) {
-                            especialidadesRequeridas = data.especialidades_requeridas;
-                            mostrarInfoEspecialidades();
-                        }
-                    } else {
-                        sinResultadosDiv.classList.remove('hidden');
-                        sinResultadosDiv.innerHTML = `
+            
+            // Filtrar docentes basado en el término de búsqueda
+            let docentesFiltrados = docentesDisponibles;
+            
+            if (currentSearchTerm.length > 0) {
+                docentesFiltrados = docentesDisponibles.filter(docente => {
+                    const dni = (docente.dni || '').toLowerCase();
+                    const nombre = (docente.nombre || '').toLowerCase();
+                    const apellido = (docente.apellido || '').toLowerCase();
+                    const busqueda = currentSearchTerm.toLowerCase();
+                    
+                    return dni.includes(busqueda) || nombre.includes(busqueda) || apellido.includes(busqueda);
+                });
+            }
+            
+            if (docentesFiltrados.length > 0) {
+                mostrarResultadosBusqueda(docentesFiltrados);
+                sinResultadosDiv.classList.add('hidden');
+            } else {
+                resultadosDiv.classList.add('hidden');
+                sinResultadosDiv.classList.remove('hidden');
+                sinResultadosDiv.innerHTML = `
                 <div class="text-center py-4">
                     <i class="fas fa-user-slash text-gray-400 text-2xl mb-2"></i>
-                    <p class="text-gray-500">${data && data.message ? data.message : 'No se encontraron docentes compatibles'}</p>
+                    <p class="text-gray-500">No se encontraron docentes compatibles</p>
                     ${currentSearchTerm ? '<p class="text-sm text-gray-400 mt-1">Intente con otro criterio de búsqueda</p>' : ''}
                 </div>
             `;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error en búsqueda:', error);
-                    const loader = document.getElementById('loader_busqueda');
-                    if (loader) loader.classList.add('hidden');
-
-                    sinResultadosDiv.classList.remove('hidden');
-                    sinResultadosDiv.innerHTML = `
-            <div class="text-center py-4">
-                <i class="fas fa-exclamation-triangle text-yellow-400 text-2xl mb-2"></i>
-                <p class="text-gray-700">Error al conectar con el servidor</p>
-                <p class="text-sm text-gray-500 mt-1">Por favor, intente nuevamente</p>
-            </div>
-        `;
-                });
+            }
         }
 
 
@@ -883,17 +828,12 @@
         }
 
         // Mostrar resultados de búsqueda
-        function mostrarResultadosBusqueda(data) {
+        function mostrarResultadosBusqueda(docentes) {
             const tablaBody = document.getElementById('tabla_docentes_encontrados');
             const resultadosDiv = document.getElementById('resultados_busqueda_docente');
-            const paginationDiv = document.getElementById('paginacion_docentes');
-
-             console.log('Respuesta completa del servidor:', data); // AGREGAR ESTO
-    console.log('¿Tiene docentes?', data.docentes); // AGREGAR ESTO
-    console.log('Cantidad de docentes:', data.docentes?.length);
 
             // Mostrar docentes
-            tablaBody.innerHTML = data.docentes.map(docente => {
+            tablaBody.innerHTML = docentes.map(docente => {
                 const nombreCompleto = `${docente.nombre || ''} ${docente.apellido || ''}`.trim();
                 const especialidadesJSON = JSON.stringify(docente.especialidades || []).replace(/"/g, '&quot;');
                 return `
@@ -924,105 +864,7 @@
         `
             }).join('');
 
-            // Actualizar paginación
-            if (data.pagination && data.pagination.last_page > 1) {
-                paginationDiv.innerHTML = crearPaginacion(data.pagination);
-                paginationDiv.classList.remove('hidden');
-            } else {
-                paginationDiv.classList.add('hidden');
-            }
-
             resultadosDiv.classList.remove('hidden');
-        }
-
-        // Crear paginación
-        function crearPaginacion(pagination) {
-            let html = `
-            <div class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-                <div class="flex flex-1 justify-between sm:hidden">
-                    <button onclick="cambiarPagina(${pagination.current_page - 1})" 
-                            ${pagination.current_page <= 1 ? 'disabled' : ''}
-                            class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Anterior
-                    </button>
-                    <span class="text-sm text-gray-700 px-4 py-2">
-                        Página ${pagination.current_page} de ${pagination.last_page}
-                    </span>
-                    <button onclick="cambiarPagina(${pagination.current_page + 1})"
-                            ${pagination.current_page >= pagination.last_page ? 'disabled' : ''}
-                            class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Siguiente
-                    </button>
-                </div>
-                <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-sm text-gray-700">
-                            Mostrando <span class="font-medium">${pagination.from}</span> a 
-                            <span class="font-medium">${pagination.to}</span> de 
-                            <span class="font-medium">${pagination.total}</span> docentes
-                        </p>
-                    </div>
-                    <div>
-                        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-        `;
-
-            // Botón anterior
-            html += `
-            <button onclick="cambiarPagina(${pagination.current_page - 1})"
-                    ${pagination.current_page <= 1 ? 'disabled' : ''}
-                    class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed">
-                <span class="sr-only">Anterior</span>
-                <i class="fas fa-chevron-left h-5 w-5"></i>
-            </button>
-        `;
-
-            // Números de página
-            for (let i = 1; i <= pagination.last_page; i++) {
-                if (i === pagination.current_page) {
-                    html += `
-                    <button aria-current="page"
-                            class="relative z-10 inline-flex items-center bg-blue-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                        ${i}
-                    </button>
-                `;
-                } else if (i === 1 || i === pagination.last_page ||
-                    (i >= pagination.current_page - 2 && i <= pagination.current_page + 2)) {
-                    html += `
-                    <button onclick="cambiarPagina(${i})"
-                            class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-                        ${i}
-                    </button>
-                `;
-                } else if (i === pagination.current_page - 3 || i === pagination.current_page + 3) {
-                    html +=
-                        `<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700">...</span>`;
-                }
-            }
-
-            // Botón siguiente
-            html += `
-            <button onclick="cambiarPagina(${pagination.current_page + 1})"
-                    ${pagination.current_page >= pagination.last_page ? 'disabled' : ''}
-                    class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed">
-                <span class="sr-only">Siguiente</span>
-                <i class="fas fa-chevron-right h-5 w-5"></i>
-            </button>
-        `;
-
-            html += `
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        `;
-
-            return html;
-        }
-
-        // Cambiar página
-        function cambiarPagina(page) {
-            if (page < 1 || page > totalPages) return;
-            buscarDocentesCompatibles(page);
         }
 
         // Seleccionar docente
@@ -1085,16 +927,14 @@
             docenteSeleccionado = null;
             seccionSeleccionadaId = '';
             currentSearchTerm = '';
-            currentPage = 1;
             especialidadesRequeridas = [];
+            docentesDisponibles = [];
 
             document.getElementById('buscar_dni_docente').value = '';
             document.getElementById('resultados_busqueda_docente').classList.add('hidden');
             document.getElementById('sin_resultados_busqueda').classList.add('hidden');
             document.getElementById('docente_seleccionado_info').classList.add('hidden');
             document.getElementById('btn_agregar_docente').disabled = true;
-            document.getElementById('paginacion_docentes').innerHTML = '';
-            document.getElementById('paginacion_docentes').classList.add('hidden');
             document.getElementById('modalEspecialidadesInfo').innerHTML = '';
 
             document.getElementById('modal_codigo_asignatura').value = asignaturaActual.codigo;
@@ -1106,6 +946,7 @@
 
             cargarSecciones(asignaturaActual.id_grado);
             cargarDocentesActivos(asignaturaActual.codigo);
+            cargarDocentesDisponibles(asignaturaActual.codigo);
 
             document.getElementById('manageModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
@@ -1138,7 +979,7 @@
                 if (seccionSeleccionadaId) {
                     mostrarNotificacion('Mostrando solo docentes compatibles con esta sección', 'info');
                     cargarDocentesDeSeccion(seccionSeleccionadaId);
-                    buscarDocentesCompatibles(1);
+                    buscarDocentesCompatibles();
                 } else {
                     cargarDocentesActivos(asignaturaActual.codigo);
                 }
@@ -1257,7 +1098,10 @@
                 <button onclick="prepararEliminacion('${docente.codigo_docente}', '${(docente.nombre || 'Nombre no disponible')} ${docente.apellido || ''}')" 
                         class="text-red-500 hover:text-red-700 transition duration-200 p-2 rounded-full hover:bg-red-50 ml-2 flex-shrink-0" 
                         title="Eliminar docente">
-                    <i class="fas fa-trash-alt"></i>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v3M4 7h16">
+                                                </path>
+                                            </svg>
                 </button>
             </div>
         `).join('');
@@ -1364,6 +1208,38 @@
         });
 
 
+        // Cargar docentes disponibles (para búsqueda en frontend)
+        function cargarDocentesDisponibles(codigoAsignatura) {
+            fetch(`/asignaturas/${codigoAsignatura}/docentes-disponibles`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error('La respuesta del servidor no es JSON');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.success && data.docentes) {
+                        docentesDisponibles = data.docentes || [];
+                        if (data.especialidades_requeridas) {
+                            especialidadesRequeridas = data.especialidades_requeridas;
+                            mostrarInfoEspecialidades();
+                        }
+                    } else {
+                        docentesDisponibles = [];
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar docentes disponibles:', error);
+                    docentesDisponibles = [];
+                });
+        }
+
         // Cargar docentes activos
         function cargarDocentesActivos(codigoAsignatura) {
             fetch(`/asignaturas/${codigoAsignatura}/docentes-activos`, {
@@ -1469,61 +1345,6 @@
                 btnConfirmar.innerHTML = originalText;
                 btnConfirmar.disabled = false;
             }
-        }
-
-        // Función para remover docente directamente desde la tabla
-        function removerDocenteDirecto(codigoDocente, codigoAsignatura, nombreDocente) {
-            if (!confirm(
-                    `¿Está seguro de remover la asignación del docente ${nombreDocente}?\n\nEsta acción eliminará todas sus asignaciones en esta asignatura.`
-                )) {
-                return;
-            }
-
-            // Mostrar loader
-            mostrarNotificacion('Removiendo asignación...', 'info');
-
-            const formData = new FormData();
-            formData.append('codigo_docente', codigoDocente);
-            formData.append('codigo_asignatura', codigoAsignatura);
-            formData.append('_token', '{{ csrf_token() }}');
-
-            fetch('{{ route('asignaturas.removeAsignacion') }}', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    const contentType = response.headers.get('content-type');
-                    if (!contentType || !contentType.includes('application/json')) {
-                        return response.text().then(text => {
-                            console.error('Respuesta no JSON:', text);
-                            throw new Error('La respuesta del servidor no es JSON');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data && data.success) {
-                        mostrarNotificacion(data.message || 'Asignación removida exitosamente', 'success');
-                        // Recargar la página después de 1 segundo
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
-                    } else {
-                        mostrarNotificacion(data && data.message ? data.message : 'Error al remover asignación',
-                            'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    mostrarNotificacion('Error de conexión al remover la asignación', 'error');
-                });
         }
 
         // Cancelar eliminación
