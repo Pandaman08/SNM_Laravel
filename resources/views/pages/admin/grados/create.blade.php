@@ -3,83 +3,137 @@
 @section('titulo', 'Registrar grado')
 
 @section('contenido')
-<div class="max-w-lg mx-auto bg-white p-8 rounded-2xl shadow-lg border border-gray-200 animate-fade-in">
-    <h1 class="text-4xl font-extrabold text-gray-800 mb-6 flex items-center justify-center gap-3 border-b pb-4">
-        <i class="ri-graduation-cap-fill text-3xl text-[#d97706]"></i>
-        Registrar Grado
-    </h1>
-
-    <form action="{{ route('grados.store') }}" method="POST" class="space-y-6" novalidate>
-        @csrf
-
-        {{-- Campo: Nivel educativo (primero para filtrar) --}}
-        <div>
-            <label for="nivel_educativo_id" class="block text-gray-700 font-semibold mb-2">
-                Nivel educativo <span class="text-red-500">*</span>
-            </label>
-            <select
-                name="nivel_educativo_id"
-                id="nivel_educativo_id"
-                class="w-full rounded-lg border @error('nivel_educativo_id') border-red-500 @else border-gray-300 @enderror p-3 shadow-sm
-                       focus:outline-none focus:ring-2 focus:ring-[#fbbf24] focus:border-[#fbbf24] transition"
-                required
-            >
-                <option value="" disabled {{ old('nivel_educativo_id') ? '' : 'selected' }}>Seleccione un nivel</option>
-                @foreach($nivelesEducativos as $nivel)
-                    <option value="{{ $nivel->id_nivel_educativo }}"
-                        {{ old('nivel_educativo_id') == $nivel->id_nivel_educativo ? 'selected' : '' }}>
-                        {{ $nivel->nombre }}
-                    </option>
-                @endforeach
-            </select>
-            @error('nivel_educativo_id')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-            @enderror
+<div class="min-h-screen py-8 px-4">
+    <div class="max-w-2xl mx-auto">
+        {{-- Encabezado --}}
+        <div class="mb-8">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="ri-graduation-cap-fill text-2xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Registrar Grado</h1>
+                    <p class="text-sm text-gray-500 mt-1">Complete el formulario para agregar un nuevo grado</p>
+                </div>
+            </div>
         </div>
 
-        {{-- Campo: Grado --}}
-        <div>
-            <label for="grado" class="block text-gray-700 font-semibold mb-2">
-                Grado <span class="text-red-500">*</span>
-            </label>
-            <select
-                name="grado"
-                id="grado"
-                class="w-full rounded-lg border @error('grado') border-red-500 @else border-gray-300 @enderror p-3 shadow-sm
-                       focus:outline-none focus:ring-2 focus:ring-[#fbbf24] focus:border-[#fbbf24] transition"
-                required
-                {{ old('nivel_educativo_id') ? '' : 'disabled' }}
-            >
-                <option value="" disabled selected>Primero seleccione un nivel</option>
-                @for($i = 1; $i <= 6; $i++)
-                    <option value="{{ $i }}" {{ old('grado') == $i ? 'selected' : '' }}>
-                        {{ $i }}° 
-                    </option>
-                @endfor
-            </select>
-            @error('grado')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-            @enderror
-            <p id="grado-warning" class="text-amber-600 text-sm mt-1 hidden">
-                <i class="ri-alert-line"></i> Este grado ya está registrado para este nivel
-            </p>
-        </div>
+        {{-- Formulario --}}
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            <div class="p-8">
+                <form action="{{ route('grados.store') }}" method="POST" class="space-y-6" novalidate>
+                    @csrf
 
-        {{-- Botones --}}
-        <div class="flex justify-end gap-4 pt-6 border-t">
-            <a href="{{ route('grados.index') }}"
-               class="inline-flex items-center px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700
-                      font-medium rounded-lg shadow-sm transition transform hover:-translate-y-0.5">
-                Cancelar
-            </a>
-            <button type="submit" id="submit-btn"
-                    class="inline-flex items-center px-6 py-2 bg-gradient-to-r from-[#fbbf24] to-[#d97706]
-                           hover:from-[#d97706] hover:to-[#f59e0b] text-white font-semibold rounded-lg shadow-md
-                           transition transform hover:-translate-y-0.5">
-                Guardar
-            </button>
+                    {{-- Campo: Grado --}}
+                    <div class="space-y-2">
+                        <label for="grado" class="block text-sm font-semibold text-gray-700">
+                            Grado académico
+                            <span class="text-red-500 ml-1">*</span>
+                        </label>
+                        <div class="relative">
+                            <select
+                                name="grado"
+                                id="grado"
+                                class="w-full rounded-xl border @error('grado') border-red-300 bg-red-50 @else border-gray-200 @enderror 
+                                       px-4 py-3.5 text-gray-900 shadow-sm appearance-none cursor-pointer
+                                       focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent
+                                       transition-all duration-200 hover:border-amber-300"
+                                required
+                            >
+                                <option value="" disabled {{ old('grado') ? '' : 'selected' }}>Seleccione el grado</option>
+                                @for($i = 1; $i <= 6; $i++)
+                                    <option value="{{ $i }}" {{ old('grado') == $i ? 'selected' : '' }}>
+                                        {{ $i }}° Grado
+                                    </option>
+                                @endfor
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                                <i class="ri-arrow-down-s-line text-xl"></i>
+                            </div>
+                        </div>
+                        @error('grado')
+                            <div class="flex items-center gap-2 text-red-600 text-sm mt-2">
+                                <i class="ri-error-warning-line"></i>
+                                <span>{{ $message }}</span>
+                            </div>
+                        @enderror
+                    </div>
+
+                    {{-- Campo: Nivel educativo --}}
+                    <div class="space-y-2">
+                        <label for="nivel_educativo_id" class="block text-sm font-semibold text-gray-700">
+                            Nivel educativo
+                            <span class="text-red-500 ml-1">*</span>
+                        </label>
+                        <div class="relative">
+                            <select
+                                name="nivel_educativo_id"
+                                id="nivel_educativo_id"
+                                class="w-full rounded-xl border @error('nivel_educativo_id') border-red-300 bg-red-50 @else border-gray-200 @enderror 
+                                       px-4 py-3.5 text-gray-900 shadow-sm appearance-none cursor-pointer
+                                       focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent
+                                       transition-all duration-200 hover:border-amber-300"
+                                required
+                            >
+                                <option value="" disabled {{ old('nivel_educativo_id') ? '' : 'selected' }}>Seleccione el nivel</option>
+                                @foreach($nivelesEducativos as $nivel)
+                                    <option value="{{ $nivel->id_nivel_educativo }}"
+                                        {{ old('nivel_educativo_id') == $nivel->id_nivel_educativo ? 'selected' : '' }}>
+                                        {{ $nivel->nombre }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                                <i class="ri-arrow-down-s-line text-xl"></i>
+                            </div>
+                        </div>
+                        @error('nivel_educativo_id')
+                            <div class="flex items-center gap-2 text-red-600 text-sm mt-2">
+                                <i class="ri-error-warning-line"></i>
+                                <span>{{ $message }}</span>
+                            </div>
+                        @enderror
+                    </div>
+
+                    {{-- Nota informativa --}}
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                        <div class="flex gap-3">
+                            <i class="ri-information-line text-amber-600 text-xl flex-shrink-0 mt-0.5"></i>
+                            <div class="text-sm text-amber-800">
+                                <p class="font-medium mb-1">Información importante</p>
+                                <p class="text-amber-700">Asegúrese de seleccionar el nivel educativo correcto para el grado que está registrando.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Botones de acción --}}
+                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
+                        <a
+                            href="{{ route('grados.index') }}"
+                            class="inline-flex items-center justify-center gap-2 px-6 py-3 
+                                   bg-white border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50
+                                   text-gray-700 font-semibold rounded-xl
+                                   transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                        >
+                            <i class="ri-arrow-left-line text-lg"></i>
+                            <span>Cancelar</span>
+                        </a>
+                        <button
+                            type="submit"
+                            class="inline-flex items-center justify-center gap-2 px-6 py-3
+                                   bg-gradient-to-r from-amber-500 to-amber-600 
+                                   hover:from-amber-600 hover:to-amber-700
+                                   text-white font-semibold rounded-xl shadow-lg shadow-amber-500/30
+                                   transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                        >
+                            <i class="ri-save-line text-lg"></i>
+                            <span>Guardar grado</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </form>
+    </div>
 </div>
 
 <script>

@@ -1,154 +1,217 @@
 @extends('layout.admin.plantilla')
 
-@section('titulo','Lista de Secciones')
+@section('titulo', 'Lista de Secciones')
 
 @section('contenido')
-<div class="w-full animate-fade-in">
-    @if (session('success') || session('error'))
+<div class="min-h-screen py-8 px-4">
+    {{-- Mensajes de sesión con SweetAlert --}}
+    @if(session('success') || session('error'))
         <script>
             Swal.fire({
                 icon: '{{ session('error') ? 'error' : 'success' }}',
                 title: @json(session('success') ?? session('error')),
                 showConfirmButton: false,
-                timer: 2000
+                timer: 2500,
+                timerProgressBar: true,
+                toast: true,
+                position: 'top-end'
             });
         </script>
     @endif
 
-    <div class="flex justify-between items-center mb-6">
-        <div class="flex items-center gap-4">
-            <h1 class="text-3xl font-extrabold text-gray-800 flex items-center gap-2">
-                <i class="ri-layout-grid-fill text-2xl text-[#0d9488]"></i>
-                Secciones registradas
-            </h1>
-            <select id="filtro-nivel" 
-                    class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium shadow-sm
-                           focus:outline-none focus:ring-2 focus:ring-[#14b8a6] focus:border-[#14b8a6] transition">
-                <option value="">Todos los niveles</option>
-                <option value="1">Primaria</option>
-                <option value="2">Secundaria</option>
-            </select>
-            <select id="filtro-grado" 
-                    class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium shadow-sm
-                           focus:outline-none focus:ring-2 focus:ring-[#14b8a6] focus:border-[#14b8a6] transition"
-                    disabled>
-                <option value="">Seleccione nivel primero</option>
-            </select>
+    <div class="max-w-7xl mx-auto">
+        {{-- Encabezado y botón de acción --}}
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+            <div class="flex items-center gap-3">
+                <div class="w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="ri-layout-grid-fill text-3xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Secciones</h1>
+                    <p class="text-sm text-gray-500 mt-1">Gestiona las secciones registradas en el sistema</p>
+                </div>
+            </div>
+            
+            <a href="{{ route('secciones.create') }}"
+               class="inline-flex items-center justify-center gap-2 px-6 py-3
+                      bg-gradient-to-r from-emerald-500 to-emerald-600 
+                      hover:from-emerald-600 hover:to-emerald-700
+                      text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/30
+                      transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]">
+                <i class="ri-add-line text-xl"></i>
+                <span>Nueva sección</span>
+            </a>
         </div>
-        <a href="{{ route('secciones.create') }}"
-           class="inline-flex items-center gap-2 bg-gradient-to-r from-[#0d9488] to-[#14b8a6]
-                  hover:from-[#14b8a6] hover:to-[#0d9488] text-white px-5 py-2 rounded-full
-                  shadow-md transform hover:-translate-y-0.5 transition">
-            <i class="ri-add-line text-lg"></i> Agregar sección
-        </a>
-    </div>
 
-    <div class="overflow-x-auto bg-white border border-gray-200 rounded-2xl shadow-lg">
-        <table class="min-w-full text-sm">
-            <thead class="bg-gradient-to-r from-[#c7f9f1] to-[#a2f5ec] text-[#065f46] uppercase text-xs tracking-wide">
-                <tr>
-                    <th class="px-6 py-3 text-left">Nivel</th>
-                    <th class="px-6 py-3 text-left">Grado</th>
-                    <th class="px-6 py-3 text-left">Sección</th>
-                    <th class="px-6 py-3 text-center">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                @forelse ($secciones as $seccion)
-                    <tr class="even:bg-gray-50 hover:bg-[#ecfeff] transition" 
-                        data-nivel="{{ $seccion->grado->nivel_educativo_id }}"
-                        data-grado="{{ $seccion->grado->id_grado }}">
-                        <td class="px-6 py-4">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                                {{ $seccion->grado->nivel_educativo_id == 1 ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800' }}">
-                                {{ $seccion->grado->nivelEducativo->nombre }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 font-medium text-gray-800">
-                            {{ $seccion->grado->nombre_completo ?? '—' }}
-                        </td>
-                        <td class="px-6 py-4 text-gray-700 font-semibold">
-                            {{ $seccion->seccion }}
-                        </td>
-                        <td class="px-6 py-4 text-center space-x-2">
-                            <a href="{{ route('secciones.edit', $seccion->id_seccion) }}"
-                               class="inline-flex items-center px-3 py-1 bg-blue-500 hover:bg-blue-600
-                                      text-white rounded-md text-sm font-medium transition shadow-sm">
-                                <i class="ri-pencil-line mr-1"></i> Editar
-                            </a>
-                            <form action="{{ route('secciones.destroy', $seccion->id_seccion) }}"
-                                  method="POST" class="inline" onsubmit="return confirm('¿Estas seguro de desactivar esta seccion?')">
-                                @csrf @method('DELETE')
-                                <button type="submit"
-                                        class="inline-flex items-center px-3 py-1 bg-red-500 hover:bg-red-600
-                                               text-white rounded-md text-sm font-medium transition shadow-sm">
-                                    <i class="ri-delete-bin-2-line mr-1"></i> Desactivar
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="px-6 py-6 text-center text-gray-500 italic">
-                            <i class="ri-emotion-sad-line text-2xl text-[#f43f5e]"></i><br>
-                            No hay secciones registradas.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+        {{-- Tarjeta de contenido --}}
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            {{-- Estadística rápida --}}
+            <div class="bg-gradient-to-r from-emerald-50 to-teal-50 px-8 py-4 border-b border-emerald-100">
+                <div class="flex items-center gap-2 text-emerald-800">
+                    <i class="ri-bar-chart-box-line text-lg"></i>
+                    <span class="text-sm font-semibold">Total de secciones registradas: 
+                        <span class="text-emerald-600">{{ $secciones->count() }}</span>
+                    </span>
+                </div>
+            </div>
+
+            {{-- Tabla responsive --}}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-graduation-cap-line text-sm"></i>
+                                    <span>Grado</span>
+                                </div>
+                            </th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-text text-sm"></i>
+                                    <span>Sección</span>
+                                </div>
+                            </th>
+                            <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center justify-center gap-2">
+                                    <i class="ri-settings-3-line text-sm"></i>
+                                    <span>Acciones</span>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse($secciones as $seccion)
+                            <tr class="hover:bg-emerald-50 transition-colors duration-150">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-100 to-yellow-100 flex items-center justify-center">
+                                            <i class="ri-book-2-line text-amber-600 text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-semibold text-gray-900">
+                                                {{ $seccion->grado->nombre_completo ?? '—' }}
+                                            </div>
+                                            <div class="text-xs text-gray-500">
+                                                ID Grado: {{ $seccion->id_grado }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-3">
+                                        <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white font-bold text-2xl shadow-lg">
+                                            {{ $seccion->seccion }}
+                                        </span>
+                                        <div>
+                                            <div class="text-xs text-gray-500">
+                                                Sección
+                                            </div>
+                                            <div class="text-xs text-gray-400">
+                                                ID: {{ $seccion->id_seccion }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <a href="{{ route('secciones.edit', $seccion->id_seccion) }}"
+                                           class="inline-flex items-center gap-1.5 px-4 py-2 
+                                                  bg-blue-500 hover:bg-blue-600 text-white 
+                                                  rounded-lg text-sm font-medium
+                                                  transition-all duration-200 transform hover:scale-105 active:scale-95
+                                                  shadow-sm hover:shadow-md"
+                                           title="Editar sección">
+                                            <i class="ri-edit-line"></i>
+                                            <span>Editar</span>
+                                        </a>
+                                        <form action="{{ route('secciones.destroy', $seccion->id_seccion) }}" 
+                                              method="POST" 
+                                              class="inline"
+                                              onsubmit="event.preventDefault(); confirmarEliminacion(this, '{{ $seccion->grado->nombre_completo ?? "Grado" }} - Sección {{ $seccion->seccion }}');">
+                                            @csrf 
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="inline-flex items-center gap-1.5 px-4 py-2 
+                                                           bg-red-500 hover:bg-red-600 text-white 
+                                                           rounded-lg text-sm font-medium
+                                                           transition-all duration-200 transform hover:scale-105 active:scale-95
+                                                           shadow-sm hover:shadow-md"
+                                                    title="Eliminar sección">
+                                                <i class="ri-delete-bin-2-line"></i>
+                                                <span>Eliminar</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="px-6 py-12">
+                                    <div class="flex flex-col items-center justify-center text-gray-400">
+                                        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                            <i class="ri-inbox-line text-4xl"></i>
+                                        </div>
+                                        <p class="text-lg font-medium text-gray-500 mb-1">No hay secciones registradas</p>
+                                        <p class="text-sm text-gray-400 mb-4">Comienza agregando tu primera sección</p>
+                                        <a href="{{ route('secciones.create') }}"
+                                           class="inline-flex items-center gap-2 px-5 py-2.5
+                                                  bg-emerald-500 hover:bg-emerald-600 text-white 
+                                                  rounded-lg text-sm font-medium
+                                                  transition-all duration-200 transform hover:scale-105">
+                                            <i class="ri-add-line"></i>
+                                            <span>Crear primera sección</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Footer de la tabla --}}
+            @if($secciones->count() > 0)
+                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between text-sm text-gray-600">
+                        <div class="flex items-center gap-2">
+                            <i class="ri-file-list-3-line"></i>
+                            <span>Mostrando <span class="font-semibold">{{ $secciones->count() }}</span> registro(s)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-400">Última actualización:</span>
+                            <span class="font-medium">{{ now()->format('d/m/Y H:i') }}</span>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
     </div>
 </div>
 
+{{-- Script para confirmación de eliminación mejorada --}}
 <script>
-    // Datos de grados agrupados por nivel
-    const gradosPorNivel = @json($secciones->groupBy('grado.nivel_educativo_id')->map(function($secciones) {
-        return $secciones->pluck('grado')->unique('id_grado')->map(function($grado) {
-            return [
-                'id' => $grado->id_grado,
-                'nombre' => $grado->nombre_completo
-            ];
-        })->values();
-    }));
-
-    const filtroNivel = document.getElementById('filtro-nivel');
-    const filtroGrado = document.getElementById('filtro-grado');
-
-    filtroNivel.addEventListener('change', function() {
-        const nivel = this.value;
-        
-        // Resetear filtro de grado
-        filtroGrado.innerHTML = '<option value="">Todos los grados</option>';
-        filtroGrado.disabled = !nivel;
-        
-        // Cargar grados según nivel seleccionado
-        if (nivel && gradosPorNivel[nivel]) {
-            gradosPorNivel[nivel].forEach(grado => {
-                const option = document.createElement('option');
-                option.value = grado.id;
-                option.textContent = grado.nombre;
-                filtroGrado.appendChild(option);
-            });
+function confirmarEliminacion(form, nombreSeccion) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        html: `Estás a punto de eliminar:<br><strong class="text-emerald-600">${nombreSeccion}</strong>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: '<i class="ri-delete-bin-line mr-1"></i> Sí, eliminar',
+        cancelButtonText: '<i class="ri-close-line mr-1"></i> Cancelar',
+        reverseButtons: true,
+        focusCancel: true,
+        customClass: {
+            confirmButton: 'px-5 py-2.5 rounded-lg font-semibold shadow-lg',
+            cancelButton: 'px-5 py-2.5 rounded-lg font-semibold shadow-lg'
         }
-        
-        aplicarFiltros();
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
     });
-
-    filtroGrado.addEventListener('change', aplicarFiltros);
-
-    function aplicarFiltros() {
-        const nivel = filtroNivel.value;
-        const grado = filtroGrado.value;
-        
-        document.querySelectorAll('tbody tr[data-nivel]').forEach(row => {
-            const rowNivel = row.dataset.nivel;
-            const rowGrado = row.dataset.grado;
-            
-            const cumpleNivel = !nivel || rowNivel === nivel;
-            const cumpleGrado = !grado || rowGrado === grado;
-            
-            row.style.display = cumpleNivel && cumpleGrado ? '' : 'none';
-        });
-    }
+}
 </script>
 @endsection

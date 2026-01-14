@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Docente extends Model
 {
     use HasFactory;
-    
+
     protected $primaryKey = 'codigo_docente';
     protected $table = 'docentes';
 
     protected $fillable = [
         'user_id',
+        'firma_docente',
+        'nivel_educativo_id',
         'firma_docente',
     ];
 
@@ -27,46 +29,45 @@ class Docente extends Model
     {
         return $this->belongsTo(NivelEducativo::class, 'nivel_educativo_id', 'id_nivel_educativo');
     }
-    
+
     // Relación con Asignaturas a través de asignaturas_docentes
     public function asignaturas()
     {
         return $this->belongsToMany(Asignatura::class, 'asignaturas_docentes', 'codigo_docente', 'codigo_asignatura')
-                    ->withPivot('fecha')
-                    ->withTimestamps();
+            ->withPivot('fecha');
     }
-    
+
     // Relación con Secciones (solo activas)
     public function secciones()
     {
         return $this->belongsToMany(Seccion::class, 'secciones_docentes', 'codigo_docente', 'id_seccion')
-                    ->withPivot('estado')
-                    ->withTimestamps()
-                    ->wherePivot('estado', 1);
+            ->withPivot('estado')
+            ->withTimestamps()
+            ->wherePivot('estado', 1);
     }
-    
+
     // Todas las secciones asignadas (activas e inactivas)
     public function todasLasSecciones()
     {
         return $this->belongsToMany(Seccion::class, 'secciones_docentes', 'codigo_docente', 'id_seccion')
-                    ->withPivot('estado')
-                    ->withTimestamps();
+            ->withPivot('estado')
+            ->withTimestamps();
     }
-    
+
     // Relación directa con tabla pivot secciones_docentes
     public function seccionesDocentes()
     {
         return $this->hasMany(SeccionDocente::class, 'codigo_docente', 'codigo_docente');
     }
-    
+
     // Obtener estudiantes matriculados en secciones del docente
     public function estudiantes()
     {
         $seccionIds = $this->secciones()->pluck('id_seccion');
-        
-        return Estudiante::whereHas('matriculas', function($query) use ($seccionIds) {
+
+        return Estudiante::whereHas('matriculas', function ($query) use ($seccionIds) {
             $query->whereIn('seccion_id', $seccionIds)
-                  ->where('estado', 'activo');
+                ->where('estado', 'activo');
         });
     }
 
@@ -74,6 +75,13 @@ class Docente extends Model
     public function matriculas()
     {
         return Matricula::whereIn('seccion_id', $this->secciones()->pluck('id_seccion'))
-                       ->where('estado', 'activo');
+            ->where('estado', 'activo');
+    }
+
+    public function especialidades()
+    {
+        return $this->belongsToMany(Especialidad::class, 'docente_especialidad', 'codigo_docente', 'id_especialidad')
+            ->wherePivot('estado', 'Activo')
+            ->withPivot('estado', 'codigo_docente', 'id_especialidad');
     }
 }

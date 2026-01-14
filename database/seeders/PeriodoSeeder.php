@@ -4,52 +4,106 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Periodo;
+use App\Models\AnioEscolar;
 use Carbon\Carbon;
 
 class PeriodoSeeder extends Seeder
 {
     public function run(): void
     {
-        $periodos = [
-            [
-                'nombre' => 'I',
-                'fecha_inicio' => '2025-03-05 00:00:00',
-                'fecha_fin' => '2025-05-05 00:00:00',
-                'estado' => 'Proceso',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'nombre' => 'II',
-                'fecha_inicio' => '2025-06-06 00:00:00',
+        $currentYear = date('Y');
+        $pastYear = $currentYear - 1;
 
-                'fecha_fin' => '2025-08-08 00:00:00',
+        // Buscar los años escolares creados
+        $anioPasado = AnioEscolar::where('anio', (string)$pastYear)->first();
+        $anioActual = AnioEscolar::where('anio', (string)$currentYear)->first();
 
-                'estado' => 'Proceso',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'nombre' => 'III',
-                'fecha_inicio' => '2025-08-05 00:00:00',
-                'fecha_fin' => '2025-10-05 00:00:00',
+        // Periodos para el año pasado (Finalizados)
+        if ($anioPasado) {
+            $periodosPasados = [
+                [
+                    'nombre' => 'I',
+                    'fecha_inicio' => "$pastYear-03-05 00:00:00",
+                    'fecha_fin' => "$pastYear-05-15 00:00:00",
+                    'estado' => 'Finalizado',
+                    'id_anio_escolar' => $anioPasado->id_anio_escolar
+                ],
+                [
+                    'nombre' => 'II',
+                    'fecha_inicio' => "$pastYear-05-20 00:00:00",
+                    'fecha_fin' => "$pastYear-07-25 00:00:00",
+                    'estado' => 'Finalizado',
+                    'id_anio_escolar' => $anioPasado->id_anio_escolar
+                ],
+                [
+                    'nombre' => 'III',
+                    'fecha_inicio' => "$pastYear-08-05 00:00:00",
+                    'fecha_fin' => "$pastYear-10-10 00:00:00",
+                    'estado' => 'Finalizado',
+                    'id_anio_escolar' => $anioPasado->id_anio_escolar
+                ],
+                [
+                    'nombre' => 'IV',
+                    'fecha_inicio' => "$pastYear-10-15 00:00:00",
+                    'fecha_fin' => "$pastYear-12-20 00:00:00",
+                    'estado' => 'Finalizado',
+                    'id_anio_escolar' => $anioPasado->id_anio_escolar
+                ]
+            ];
 
-                'estado' => 'Proceso',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'nombre' => 'IV',
-                'fecha_inicio' => '2025-10-05 00:00:00',
-                'fecha_fin' => '2025-12-20 00:00:00',
-                'estado' => 'Proceso',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]
-        ];
+            foreach ($periodosPasados as $periodo) {
+                Periodo::firstOrCreate(
+                    [
+                        'nombre' => $periodo['nombre'],
+                        'id_anio_escolar' => $periodo['id_anio_escolar']
+                    ],
+                    $periodo
+                );
+            }
+        }
 
-        foreach ($periodos as $periodo) {
-            Periodo::create($periodo);
+        // Periodos para el año actual
+        if ($anioActual) {
+            $periodosActuales = [
+                [
+                    'nombre' => 'I',
+                    'fecha_inicio' => "$currentYear-03-05 00:00:00",
+                    'fecha_fin' => "$currentYear-05-15 00:00:00",
+                    'estado' => 'Proceso', // O el estado que corresponda según la fecha actual
+                    'id_anio_escolar' => $anioActual->id_anio_escolar
+                ],
+                [
+                    'nombre' => 'II',
+                    'fecha_inicio' => "$currentYear-05-20 00:00:00",
+                    'fecha_fin' => "$currentYear-07-25 00:00:00",
+                    'estado' => 'Proceso',
+                    'id_anio_escolar' => $anioActual->id_anio_escolar
+                ],
+                [
+                    'nombre' => 'III',
+                    'fecha_inicio' => "$currentYear-08-05 00:00:00",
+                    'fecha_fin' => "$currentYear-10-10 00:00:00",
+                    'estado' => 'Proceso',
+                    'id_anio_escolar' => $anioActual->id_anio_escolar
+                ],
+                [
+                    'nombre' => 'IV',
+                    'fecha_inicio' => "$currentYear-10-15 00:00:00",
+                    'fecha_fin' => "$currentYear-12-20 00:00:00",
+                    'estado' => 'Proceso',
+                    'id_anio_escolar' => $anioActual->id_anio_escolar
+                ]
+            ];
+
+            foreach ($periodosActuales as $periodo) {
+                Periodo::firstOrCreate(
+                    [
+                        'nombre' => $periodo['nombre'],
+                        'id_anio_escolar' => $periodo['id_anio_escolar']
+                    ],
+                    $periodo
+                );
+            }
         }
     }
 }

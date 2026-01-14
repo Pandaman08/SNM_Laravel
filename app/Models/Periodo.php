@@ -14,8 +14,14 @@ class Periodo extends Model
     protected $fillable = [
         'nombre',
         'fecha_inicio',
-        'fecha_fin'
+        'fecha_fin',
+        'id_anio_escolar'
     ];
+
+    public function anioEscolar()
+    {
+        return $this->belongsTo(AnioEscolar::class, 'id_anio_escolar', 'id_anio_escolar');
+    }
 
 
 

@@ -11,10 +11,12 @@ class AsignaturaDocente extends Model
     protected $primaryKey = 'id_asignatura_docente';
     public $incrementing = true; // true por defecto, pero lo aclaramos por seguridad
     protected $keyType = 'int';
+    public $timestamps = false;
 
     protected $fillable = [
         'codigo_asignatura',
-        'codigo_docente'
+        'codigo_docente',
+        'fecha'
     ];
 
     public function asignatura(){

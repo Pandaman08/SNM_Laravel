@@ -7,8 +7,26 @@ use Illuminate\Validation\ValidationException;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use App\Models\AnioEscolar;
+use App\Models\Periodo;
+
 class AnioEscolarController extends Controller
 {
+    public function periodos($id)
+    {
+        $anio = AnioEscolar::findOrFail($id);
+
+        if ($anio->estado == 'Activo') {
+            return redirect()->route('periodos.index');
+        }
+
+        $periodos = Periodo::where('id_anio_escolar', $id)->get();
+
+        return view('pages.admin.anios_escolares.periodos', [
+            'anio' => $anio,
+            'periodos' => $periodos
+        ]);
+    }
+
   public function index(Request $request)
 {
     $searchTerm = $request->input('buscarpor');
