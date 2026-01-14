@@ -56,33 +56,30 @@
         .area-cell {
             font-weight: bold;
             background-color: #e6e6e6;
-            width: 11%;
+            width: 15%;
             word-wrap: break-word;
             vertical-align: middle;
         }
         .competencia-cell {
-            width: 18%;
+            width: 30%;
             word-wrap: break-word;
         }
         .nota-cell {
-            width: 3%;
+            width: 6%;
             text-align: center;
-            padding: 1px;
-        }
-        .conclusion-cell {
-            width: 5%;
-            word-wrap: break-word;
-            font-size: 7px;
+            padding: 2px;
         }
         .promedio-cell {
-            width: 3.5%;
+            width: 6%;
             text-align: center;
             font-weight: bold;
             background-color: #f0f0f0;
         }
         .final-cell {
-            width: 3.5%;
+            width: 6%;
             text-align: center;
+            font-weight: bold;
+            background-color: #e6e6e6;
         }
         .signature-section {
             margin-top: 15px;
@@ -139,15 +136,14 @@
                 <th rowspan="2" class="area-cell">Área curricular</th>
                 <th rowspan="2" class="competencia-cell">Competencias</th>
                 @foreach($periodos as $periodo)
-                <th colspan="2">PERÍODO {{ $loop->iteration }}</th>
+                <th class="nota-cell">PERÍODO {{ $loop->iteration }}</th>
                 @endforeach
-                <th rowspan="2" class="promedio-cell">NL Anual</th>
+                <th rowspan="2" class="promedio-cell">Promedio</th>
                 <th rowspan="2" class="final-cell">NL Final</th>
             </tr>
             <tr>
                 @foreach($periodos as $periodo)
                 <th class="nota-cell">NL</th>
-                <th class="conclusion-cell">Conclusión</th>
                 @endforeach
             </tr>
         </thead>
@@ -178,7 +174,6 @@
                             ($nota === 'C' ? 'color: #ba4a00;' : '')));
                 @endphp
                 <td class="nota-cell" style="{{ $color }}">{{ $nota }}</td>
-                <td class="conclusion-cell">{{ $reporte->observacion ?? '' }}</td>
                 @endforeach
                 
                 @php
@@ -203,6 +198,51 @@
             @endforeach
         </tbody>
     </table>
+
+    <!-- Tabla de escala de calificación -->
+    <div style="margin-top: 10px; margin-bottom: 10px;">
+        <div style="font-weight: bold; font-size: 9px; margin-bottom: 5px; text-align: center;">
+            ESCALA DE CALIFICACIÓN
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 7.5px;">
+            <thead>
+                <tr>
+                    <th style="border: 1px solid #000; padding: 3px; text-align: center; background-color: #f2f2f2; width: 8%;">Calificación</th>
+                    <th style="border: 1px solid #000; padding: 3px; text-align: center; background-color: #f2f2f2;">Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold;">AD</td>
+                    <td style="border: 1px solid #000; padding: 3px;">
+                        <strong>LOGRO DESTACADO</strong><br>
+                        Cuando el estudiante evidencia un nivel superior a lo esperado respecto a la competencia. Esto quiere decir que demuestra aprendizajes que van más allá del nivel esperado.
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold;">A</td>
+                    <td style="border: 1px solid #000; padding: 3px;">
+                        <strong>LOGRO ESPERADO</strong><br>
+                        Cuando el estudiante evidencia el nivel esperado respecto a la competencia, demostrando manejo satisfactorio en todas las tareas propuestas y en el tiempo programado.
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold;">B</td>
+                    <td style="border: 1px solid #000; padding: 3px;">
+                        <strong>EN PROCESO</strong><br>
+                        Cuando el estudiante está próximo o cerca al nivel esperado respecto a la competencia, para lo cual requiere acompañamiento durante un tiempo razonable para lograrlo.
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold;">C</td>
+                    <td style="border: 1px solid #000; padding: 3px;">
+                        <strong>EN INICIO</strong><br>
+                        Cuando el estudiante muestra progreso mínimo en una competencia de acuerdo al nivel esperado. Evidencia con frecuencia dificultades en el desarrollo de las tareas, por lo que necesita mayor tiempo de acompañamiento e intervención del docente.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <!-- Sección de firmas -->
     <div class="signature-section">
