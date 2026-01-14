@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-    // ASOCIAR EL id_competencias aqui dentro. Como lo hago?
+// ASOCIAR EL id_competencias aqui dentro. Como lo hago?
 
 class Asignatura extends Model
 {
@@ -26,13 +26,13 @@ class Asignatura extends Model
     }
 
     public function seccion()
-{
-    return $this->belongsTo(Seccion::class, 'seccion_id');
-}
+    {
+        return $this->belongsTo(Seccion::class, 'seccion_id');
+    }
     //
 
 
-     public function asignaturasDocente()
+    public function asignaturasDocente()
     {
         return $this->hasMany(AsignaturaDocente::class, 'codigo_asignatura', 'codigo_asignatura');
     }
@@ -46,10 +46,37 @@ class Asignatura extends Model
     public function docentes()
     {
         return $this->belongsToMany(Docente::class, 'asignaturas_docentes', 'codigo_asignatura', 'codigo_docente')
-                    ->withPivot('fecha');
+            ->withPivot('fecha'); // Solo especificar la columna fecha
     }
 
-    // public function asignaturaDocente(){
-    //     return $this->hasMany(AsignaturaDocente::class, 'codigo_asignatura','codigo_asignatura');
-    // }
+    // NUEVA RELACIÓN: Especialidades permitidas para esta asignatura
+    public function especialidadesPermitidas()
+    {
+        return $this->belongsToMany(
+            Especialidad::class,
+            'asignatura_especialidad',
+            'codigo_asignatura',
+            'id_especialidad'
+        )->withPivot('estado');
+    }
+
+    // Método para obtener docentes con especialidades compatibles
+    public function docentesCompatibles()
+    {
+        // Obtener especialidades requeridas para esta asignatura
+        $especialidadesRequeridas = $this->especialidadesPermitidas()
+            ->where('asignatura_especialidad.estado', 'Activo')
+            ->pluck('id_especialidad');
+
+        if ($especialidadesRequeridas->isEmpty()) {
+            return Docente::with(['user.persona', 'especialidades'])->get();
+        }
+
+        return Docente::with(['user.persona', 'especialidades'])
+            ->whereHas('especialidades', function ($query) use ($especialidadesRequeridas) {
+                $query->whereIn('especialidades.id_especialidad', $especialidadesRequeridas)
+                    ->where('docente_especialidad.estado', 'Activo');
+            })
+            ->get();
+    }
 }

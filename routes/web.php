@@ -85,6 +85,7 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('asignaturas.asignar.docentes');
     })->name('ruta.cancelar');
     Route::get('/asignaturas/{codigoAsignatura}/docentes-activos', [AsignaturaController::class, 'getDocentesActivos'])->name('asignaturas.docentesActivos');
+    Route::get('/asignaturas/{codigoAsignatura}/docentes-disponibles', [AsignaturaController::class, 'getDocentesDisponibles'])->name('asignaturas.docentesDisponibles');
     Route::get('/asignaturas/{codigoAsignatura}/seccion/{idSeccion}/docentes-activos', [AsignaturaController::class, 'getDocentesActivosEnSeccion'])->name('asignaturas.docentesActivosEnSeccion');
     Route::get('/asignaturas-asignadas', [DocenteController::class, 'index_asignaturas'])->name('docentes.asignaturas');
     Route::get('/estudiantes-matriculado/{id_asignatura}/asignatura', [DocenteController::class, 'index_estudiantes'])->name('docentes.estudiantes');

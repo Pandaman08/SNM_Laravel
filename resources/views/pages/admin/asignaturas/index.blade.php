@@ -1,167 +1,223 @@
 @extends('layout.admin.plantilla')
 
-@section('titulo','Lista de Asignaturas')
+@section('titulo', 'Lista de asignaturas')
 
 @section('contenido')
-<div class="w-full animate-fade-in">
-    {{-- Mensajes de éxito o error --}}
-    @if (session('success') || session('error'))
+<div class="min-h-screen py-8 px-4">
+    {{-- Mensajes de sesión con SweetAlert --}}
+    @if(session('success') || session('error'))
         <script>
             Swal.fire({
                 icon: '{{ session('error') ? 'error' : 'success' }}',
                 title: @json(session('success') ?? session('error')),
                 showConfirmButton: false,
-                timer: 2000
+                timer: 2500,
+                timerProgressBar: true,
+                toast: true,
+                position: 'top-end'
             });
         </script>
     @endif
 
-    {{-- Título y filtros --}}
-    <div class="flex justify-between items-center mb-6">
-        <div class="flex items-center gap-4">
-            <h1 class="text-3xl font-extrabold text-gray-800 flex items-center gap-2">
-                <i class="ri-book-mark-line text-2xl text-[#38b2ac]"></i>
-                Asignaturas registradas
-            </h1>
-
-            {{-- Filtro Nivel --}}
-            <select id="filtro-nivel"
-                    class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium shadow-sm
-                           focus:outline-none focus:ring-2 focus:ring-[#38b2ac] focus:border-[#38b2ac] transition">
-                <option value="">Todos los niveles</option>
-                <option value="1">Primaria</option>
-                <option value="2">Secundaria</option>
-            </select>
-
-            {{-- Filtro Grado --}}
-            <select id="filtro-grado"
-                    class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium shadow-sm
-                           focus:outline-none focus:ring-2 focus:ring-[#38b2ac] focus:border-[#38b2ac] transition"
-                    disabled>
-                <option value="">Seleccione nivel primero</option>
-            </select>
+    <div class="max-w-7xl mx-auto">
+        {{-- Encabezado y botón de acción --}}
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+            <div class="flex items-center gap-3">
+                <div class="w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="ri-book-mark-line text-3xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Asignaturas</h1>
+                    <p class="text-sm text-gray-500 mt-1">Gestiona las asignaturas registradas en el sistema</p>
+                </div>
+            </div>
+            
+            <a href="{{ route('asignaturas.create') }}"
+               class="inline-flex items-center justify-center gap-2 px-6 py-3
+                      bg-gradient-to-r from-teal-500 to-teal-600 
+                      hover:from-teal-600 hover:to-teal-700
+                      text-white font-semibold rounded-xl shadow-lg shadow-teal-500/30
+                      transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]">
+                <i class="ri-add-line text-xl"></i>
+                <span>Nueva asignatura</span>
+            </a>
         </div>
 
-        {{-- Botón Nueva Asignatura --}}
-        <a href="{{ route('asignaturas.create') }}"
-           class="inline-flex items-center gap-2 bg-gradient-to-r from-[#38b2ac] to-[#2c7a7b]
-                  hover:from-[#2c7a7b] hover:to-[#285e61] text-white px-5 py-2 rounded-full
-                  shadow-md transform hover:-translate-y-0.5 transition">
-            <i class="ri-add-line text-lg"></i> Agregar asignatura
-        </a>
-    </div>
+        {{-- Tarjeta de contenido --}}
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            {{-- Estadística rápida --}}
+            <div class="bg-gradient-to-r from-teal-50 to-cyan-50 px-8 py-4 border-b border-teal-100">
+                <div class="flex items-center gap-2 text-teal-800">
+                    <i class="ri-bar-chart-box-line text-lg"></i>
+                    <span class="text-sm font-semibold">Total de asignaturas registradas: 
+                        <span class="text-teal-600">{{ $asignaturas->count() }}</span>
+                    </span>
+                </div>
+            </div>
 
-    {{-- Tabla de Asignaturas --}}
-    <div class="overflow-x-auto bg-white border border-gray-200 rounded-2xl shadow-lg">
-        <table class="min-w-full text-sm">
-            <thead class="bg-gradient-to-r from-[#81e6d9] to-[#38b2ac] text-white uppercase text-xs tracking-wide">
-                <tr>
-                    <th class="px-6 py-3 text-left">Código</th>
-                    <th class="px-6 py-3 text-left">Nivel</th>
-                    <th class="px-6 py-3 text-left">Grado</th>
-                    <th class="px-6 py-3 text-left">Asignatura</th>
-                    <th class="px-6 py-3 text-center">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                @forelse ($asignaturas as $a)
-                    <tr class="even:bg-gray-50 hover:bg-[#ecfeff] transition"
-                        data-nivel="{{ $a->grado->nivel_educativo_id }}"
-                        data-grado="{{ $a->grado->id_grado }}">
-                        <td class="px-6 py-4 font-medium text-gray-800">{{ $a->codigo_asignatura }}</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                                {{ $a->grado->nivel_educativo_id == 1 ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800' }}">
-                                {{ $a->grado->nivelEducativo->nombre }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 font-medium text-gray-700">
-                            {{ $a->grado->nombre_completo ?? '—' }}
-                        </td>
-                        <td class="px-6 py-4 text-gray-800 font-semibold">
-                            {{ $a->nombre }}
-                        </td>
-                        <td class="px-6 py-4 text-center space-x-2">
-                            <a href="{{ route('asignaturas.edit', $a->codigo_asignatura) }}"
-                               class="inline-flex items-center px-3 py-1 bg-green-500 hover:bg-green-600
-                                      text-white rounded-md text-sm font-medium transition shadow-sm">
-                                <i class="ri-pencil-line mr-1"></i> Editar
-                            </a>
-                            <form action="{{ route('asignaturas.destroy', $a->codigo_asignatura) }}"
-                                  method="POST" class="inline"
-                                  onsubmit="return confirm('¿Estas seguro de desactivar esta asignatura?')">
-                                @csrf @method('DELETE')
-                                <button type="submit"
-                                        class="inline-flex items-center px-3 py-1 bg-red-500 hover:bg-red-600
-                                               text-white rounded-md text-sm font-medium transition shadow-sm">
-                                    <i class="ri-delete-bin-2-line mr-1"></i> Desactivar
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="px-6 py-6 text-center text-gray-500 italic">
-                            <i class="ri-emotion-sad-line text-2xl text-[#f43f5e]"></i><br>
-                            No hay asignaturas registradas.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+            {{-- Tabla responsive --}}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-hashtag text-sm"></i>
+                                    <span>Código</span>
+                                </div>
+                            </th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-book-line text-sm"></i>
+                                    <span>Nombre</span>
+                                </div>
+                            </th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-graduation-cap-line text-sm"></i>
+                                    <span>Grado</span>
+                                </div>
+                            </th>
+                            <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center justify-center gap-2">
+                                    <i class="ri-settings-3-line text-sm"></i>
+                                    <span>Acciones</span>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse($asignaturas as $a)
+                            <tr class="hover:bg-teal-50 transition-colors duration-150">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-lg bg-teal-100 text-teal-700 font-bold text-sm">
+                                            {{ $a->codigo_asignatura }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-100 to-cyan-100 flex items-center justify-center flex-shrink-0">
+                                            <i class="ri-book-open-line text-teal-600 text-lg"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="text-sm font-semibold text-gray-900 truncate">
+                                                {{ $a->nombre }}
+                                            </div>
+                                            <div class="text-xs text-gray-500">
+                                                Asignatura
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-2">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                                            <i class="ri-medal-line mr-1"></i>
+                                            {{ $a->grado->nombre_completo }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <a href="{{ route('asignaturas.edit', $a->codigo_asignatura) }}"
+                                           class="inline-flex items-center gap-1.5 px-4 py-2 
+                                                  bg-blue-500 hover:bg-blue-600 text-white 
+                                                  rounded-lg text-sm font-medium
+                                                  transition-all duration-200 transform hover:scale-105 active:scale-95
+                                                  shadow-sm hover:shadow-md"
+                                           title="Editar asignatura">
+                                            <i class="ri-edit-line"></i>
+                                            <span>Editar</span>
+                                        </a>
+                                        <form action="{{ route('asignaturas.destroy', $a->codigo_asignatura) }}" 
+                                              method="POST" 
+                                              class="inline"
+                                              onsubmit="event.preventDefault(); confirmarEliminacion(this, '{{ $a->nombre }}');">
+                                            @csrf 
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="inline-flex items-center gap-1.5 px-4 py-2 
+                                                           bg-red-500 hover:bg-red-600 text-white 
+                                                           rounded-lg text-sm font-medium
+                                                           transition-all duration-200 transform hover:scale-105 active:scale-95
+                                                           shadow-sm hover:shadow-md"
+                                                    title="Eliminar asignatura">
+                                                <i class="ri-delete-bin-2-line"></i>
+                                                <span>Eliminar</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-12">
+                                    <div class="flex flex-col items-center justify-center text-gray-400">
+                                        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                            <i class="ri-inbox-line text-4xl"></i>
+                                        </div>
+                                        <p class="text-lg font-medium text-gray-500 mb-1">No hay asignaturas registradas</p>
+                                        <p class="text-sm text-gray-400 mb-4">Comienza agregando tu primera asignatura</p>
+                                        <a href="{{ route('asignaturas.create') }}"
+                                           class="inline-flex items-center gap-2 px-5 py-2.5
+                                                  bg-teal-500 hover:bg-teal-600 text-white 
+                                                  rounded-lg text-sm font-medium
+                                                  transition-all duration-200 transform hover:scale-105">
+                                            <i class="ri-add-line"></i>
+                                            <span>Crear primera asignatura</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Footer de la tabla --}}
+            @if($asignaturas->count() > 0)
+                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between text-sm text-gray-600">
+                        <div class="flex items-center gap-2">
+                            <i class="ri-file-list-3-line"></i>
+                            <span>Mostrando <span class="font-semibold">{{ $asignaturas->count() }}</span> registro(s)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-400">Última actualización:</span>
+                            <span class="font-medium">{{ now()->format('d/m/Y H:i') }}</span>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
     </div>
 </div>
 
-{{-- Script de filtros dinámicos --}}
+{{-- Script para confirmación de eliminación mejorada --}}
 <script>
-    // Agrupar grados por nivel
-    const gradosPorNivel = @json($asignaturas->groupBy('grado.nivel_educativo_id')->map(function($asignaturas) {
-        return $asignaturas->pluck('grado')->unique('id_grado')->map(function($grado) {
-            return [
-                'id' => $grado->id_grado,
-                'nombre' => $grado->nombre_completo
-            ];
-        })->values();
-    }));
-
-    const filtroNivel = document.getElementById('filtro-nivel');
-    const filtroGrado = document.getElementById('filtro-grado');
-
-    filtroNivel.addEventListener('change', function() {
-        const nivel = this.value;
-
-        // Resetear filtro de grado
-        filtroGrado.innerHTML = '<option value="">Todos los grados</option>';
-        filtroGrado.disabled = !nivel;
-
-        // Cargar grados según el nivel seleccionado
-        if (nivel && gradosPorNivel[nivel]) {
-            gradosPorNivel[nivel].forEach(grado => {
-                const option = document.createElement('option');
-                option.value = grado.id;
-                option.textContent = grado.nombre;
-                filtroGrado.appendChild(option);
-            });
+function confirmarEliminacion(form, nombreAsignatura) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        html: `Estás a punto de eliminar la asignatura:<br><strong class="text-teal-600">${nombreAsignatura}</strong>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: '<i class="ri-delete-bin-line mr-1"></i> Sí, eliminar',
+        cancelButtonText: '<i class="ri-close-line mr-1"></i> Cancelar',
+        reverseButtons: true,
+        focusCancel: true,
+        customClass: {
+            confirmButton: 'px-5 py-2.5 rounded-lg font-semibold shadow-lg',
+            cancelButton: 'px-5 py-2.5 rounded-lg font-semibold shadow-lg'
         }
-
-        aplicarFiltros();
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
     });
-
-    filtroGrado.addEventListener('change', aplicarFiltros);
-
-    function aplicarFiltros() {
-        const nivel = filtroNivel.value;
-        const grado = filtroGrado.value;
-
-        document.querySelectorAll('tbody tr[data-nivel]').forEach(row => {
-            const rowNivel = row.dataset.nivel;
-            const rowGrado = row.dataset.grado;
-
-            const cumpleNivel = !nivel || rowNivel === nivel;
-            const cumpleGrado = !grado || rowGrado === grado;
-
-            row.style.display = cumpleNivel && cumpleGrado ? '' : 'none';
-        });
-    }
+}
 </script>
 @endsection

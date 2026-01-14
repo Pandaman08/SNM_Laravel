@@ -1,89 +1,209 @@
 @extends('layout.admin.plantilla')
 
-@section('titulo','Lista de grados')
+@section('titulo', 'Lista de grados')
 
 @section('contenido')
-<div class="w-full animate-fade-in">
+<div class="min-h-screen py-8 px-4">
+    {{-- Mensajes de sesión con SweetAlert --}}
     @if(session('success') || session('error'))
         <script>
             Swal.fire({
                 icon: '{{ session('error') ? 'error' : 'success' }}',
                 title: @json(session('success') ?? session('error')),
                 showConfirmButton: false,
-                timer: 2000
+                timer: 2500,
+                timerProgressBar: true,
+                toast: true,
+                position: 'top-end'
             });
         </script>
     @endif
 
-    <div class="flex justify-between items-center mb-6">
-        <div class="flex items-center gap-4">
-            <h1 class="text-3xl font-extrabold text-gray-800 flex items-center gap-2">
-                <i class="ri-graduation-cap-fill text-2xl text-[#d97706]"></i> Grados registrados
-            </h1>
-            <select id="filtro-nivel" 
-                    class="rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#fbbf24]">
-                <option value="">Todos</option>
-                <option value="1">Primaria</option>
-                <option value="2">Secundaria</option>
-            </select>
+    <div class="max-w-7xl mx-auto">
+        {{-- Encabezado y botón de acción --}}
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+            <div class="flex items-center gap-3">
+                <div class="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="ri-graduation-cap-fill text-3xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Grados Académicos</h1>
+                    <p class="text-sm text-gray-500 mt-1">Gestiona los grados registrados en el sistema</p>
+                </div>
+            </div>
+            
+            <a href="{{ route('grados.create') }}"
+               class="inline-flex items-center justify-center gap-2 px-6 py-3
+                      bg-gradient-to-r from-amber-500 to-amber-600 
+                      hover:from-amber-600 hover:to-amber-700
+                      text-white font-semibold rounded-xl shadow-lg shadow-amber-500/30
+                      transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]">
+                <i class="ri-add-line text-xl"></i>
+                <span>Nuevo grado</span>
+            </a>
         </div>
-        <a href="{{ route('grados.create') }}"
-           class="inline-flex items-center gap-2 bg-gradient-to-r from-[#d97706] to-[#fbbf24]
-                  hover:from-[#f59e0b] hover:to-[#d97706] text-white px-5 py-2 rounded-full
-                  shadow-md transform hover:-translate-y-0.5 transition">
-            <i class="ri-add-line text-lg"></i> Agregar grado
-        </a>
-    </div>
 
-    <div class="overflow-x-auto bg-white border border-gray-200 rounded-2xl shadow-lg">
-        <table class="min-w-full text-sm">
-            <thead class="bg-gradient-to-r from-[#fde68a] to-[#fcd34d] text-gray-900 uppercase text-xs tracking-wide">
-                <tr>
-                    <th class="px-6 py-3 text-left">Nivel</th>
-                    <th class="px-6 py-3 text-left">Grado</th>
-                    <th class="px-6 py-3 text-center">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                @forelse($grados as $grado)
-                    <tr class="even:bg-gray-50 hover:bg-[#fffbeb] transition" data-nivel="{{ $grado->nivel_educativo_id }}">
-                        <td class="px-6 py-4">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                                {{ $grado->nivel_educativo_id == 1 ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800' }}">
-                                {{ $grado->nivelEducativo->nombre }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-gray-700 font-medium">{{ $grado->nombre_completo }}</td>
-                        <td class="px-6 py-4 text-center space-x-2">
-                            <a href="{{ route('grados.edit', $grado->id_grado) }}"
-                               class="inline-flex items-center px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm transition shadow-sm">
-                                <i class="ri-edit-line mr-1"></i> Editar
-                            </a>
-                            <form action="{{ route('grados.destroy', $grado->id_grado) }}" method="POST" class="inline"
-                                  onsubmit="return confirm('¿Estas Seguro de desactivar este grado?');">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="inline-flex items-center px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm transition shadow-sm">
-                                    <i class="ri-delete-bin-2-line mr-1"></i> Desactivar
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="3" class="px-6 py-6 text-center text-gray-500 italic">No hay grados registrados.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+        {{-- Tarjeta de contenido --}}
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            {{-- Estadística rápida --}}
+            <div class="bg-gradient-to-r from-amber-50 to-yellow-50 px-8 py-4 border-b border-amber-100">
+                <div class="flex items-center gap-2 text-amber-800">
+                    <i class="ri-bar-chart-box-line text-lg"></i>
+                    <span class="text-sm font-semibold">Total de grados registrados: 
+                        <span class="text-amber-600">{{ $grados->count() }}</span>
+                    </span>
+                </div>
+            </div>
+
+            {{-- Tabla responsive --}}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-hashtag text-sm"></i>
+                                    <span>ID</span>
+                                </div>
+                            </th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-book-2-line text-sm"></i>
+                                    <span>Nombre del grado</span>
+                                </div>
+                            </th>
+                            <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                <div class="flex items-center justify-center gap-2">
+                                    <i class="ri-settings-3-line text-sm"></i>
+                                    <span>Acciones</span>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse($grados as $grado)
+                            <tr class="hover:bg-amber-50 transition-colors duration-150">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-100 text-amber-700 font-bold text-sm">
+                                            {{ $grado->id_grado }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-100 to-yellow-100 flex items-center justify-center">
+                                            <i class="ri-medal-line text-amber-600 text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-semibold text-gray-900">
+                                                {{ $grado->nombre_completo }}
+                                            </div>
+                                            <div class="text-xs text-gray-500">
+                                                Código: GRD-{{ str_pad($grado->id_grado, 3, '0', STR_PAD_LEFT) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <a href="{{ route('grados.edit', $grado->id_grado) }}"
+                                           class="inline-flex items-center gap-1.5 px-4 py-2 
+                                                  bg-blue-500 hover:bg-blue-600 text-white 
+                                                  rounded-lg text-sm font-medium
+                                                  transition-all duration-200 transform hover:scale-105 active:scale-95
+                                                  shadow-sm hover:shadow-md"
+                                           title="Editar grado">
+                                            <i class="ri-edit-line"></i>
+                                            <span>Editar</span>
+                                        </a>
+                                        <form action="{{ route('grados.destroy', $grado->id_grado) }}" 
+                                              method="POST" 
+                                              class="inline"
+                                              onsubmit="event.preventDefault(); confirmarEliminacion(this, '{{ $grado->nombre_completo }}');">
+                                            @csrf 
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="inline-flex items-center gap-1.5 px-4 py-2 
+                                                           bg-red-500 hover:bg-red-600 text-white 
+                                                           rounded-lg text-sm font-medium
+                                                           transition-all duration-200 transform hover:scale-105 active:scale-95
+                                                           shadow-sm hover:shadow-md"
+                                                    title="Eliminar grado">
+                                                <i class="ri-delete-bin-2-line"></i>
+                                                <span>Eliminar</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="px-6 py-12">
+                                    <div class="flex flex-col items-center justify-center text-gray-400">
+                                        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                            <i class="ri-inbox-line text-4xl"></i>
+                                        </div>
+                                        <p class="text-lg font-medium text-gray-500 mb-1">No hay grados registrados</p>
+                                        <p class="text-sm text-gray-400 mb-4">Comienza agregando tu primer grado académico</p>
+                                        <a href="{{ route('grados.create') }}"
+                                           class="inline-flex items-center gap-2 px-5 py-2.5
+                                                  bg-amber-500 hover:bg-amber-600 text-white 
+                                                  rounded-lg text-sm font-medium
+                                                  transition-all duration-200 transform hover:scale-105">
+                                            <i class="ri-add-line"></i>
+                                            <span>Crear primer grado</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Footer de la tabla --}}
+            @if($grados->count() > 0)
+                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between text-sm text-gray-600">
+                        <div class="flex items-center gap-2">
+                            <i class="ri-file-list-3-line"></i>
+                            <span>Mostrando <span class="font-semibold">{{ $grados->count() }}</span> registro(s)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-400">Última actualización:</span>
+                            <span class="font-medium">{{ now()->format('d/m/Y H:i') }}</span>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
     </div>
 </div>
 
+{{-- Script para confirmación de eliminación mejorada --}}
 <script>
-    document.getElementById('filtro-nivel').addEventListener('change', function() {
-        const nivel = this.value;
-        document.querySelectorAll('tbody tr[data-nivel]').forEach(row => {
-            row.style.display = !nivel || row.dataset.nivel === nivel ? '' : 'none';
-        });
+function confirmarEliminacion(form, nombreGrado) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        html: `Estás a punto de eliminar el grado:<br><strong class="text-amber-600">${nombreGrado}</strong>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: '<i class="ri-delete-bin-line mr-1"></i> Sí, eliminar',
+        cancelButtonText: '<i class="ri-close-line mr-1"></i> Cancelar',
+        reverseButtons: true,
+        focusCancel: true,
+        customClass: {
+            confirmButton: 'px-5 py-2.5 rounded-lg font-semibold shadow-lg',
+            cancelButton: 'px-5 py-2.5 rounded-lg font-semibold shadow-lg'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
     });
+}
 </script>
 @endsection
