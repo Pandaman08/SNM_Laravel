@@ -71,60 +71,6 @@
                     <span>Buscar</span>
                 </button>
             </form>
-        <div class="overflow-x-auto bg-white rounded-lg shadow">
-            <table class="min-w-full text-sm text-left text-gray-600">
-                <thead class="bg-gray-200 text-gray-700 uppercase">
-                    <tr>
-                        <th class="px-4 py-3">Año Escolar</th>
-                        <th class="px-4 py-3">Descripción</th>
-                        <th class="px-4 py-3">Fecha Inicio</th>
-                        <th class="px-4 py-3">Fecha Fin</th>
-                        <th class="px-4 py-3">Estado</th>
-                        <th class="px-4 py-3">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($anios as $anio)
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="px-4 py-3">{{ $anio->anio }}</td>
-                            <td class="px-4 py-3">{{ $anio->descripcion ?: 'N/A' }}</td>
-                            <td class="px-4 py-3">{{ $anio->fecha_inicio }}</td>
-                            <td class="px-4 py-3">{{ $anio->fecha_fin }}</td>
-                            <td class="px-4 py-3">
-                                <span class="px-2 py-1 text-xs rounded-full 
-                                    {{ $anio->estado == 'Activo' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                    {{ $anio->estado }}
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 flex items-center justify-center space-x-4">
-                                <a href="{{route('anios-escolares.periodos', $anio->id_anio_escolar)}}" 
-                                   class="text-blue-500 hover:text-blue-700 flex items-center justify-center" 
-                                   title="Ver Periodos">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                </a>
-
-                                <a href="{{route('anios-escolares.edit', $anio->id_anio_escolar)}}"
-                                    class="text-yellow-500 hover:text-yellow-700 flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                </a>
-
-                                <button onclick="openDeleteModal({{ $anio->id_anio_escolar }}, '{{ $anio->anio }}')"
-                                    class="text-red-500 hover:text-red-700 flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
         {{-- Tarjeta de contenido --}}
         <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
             {{-- Estadística rápida --}}

@@ -119,13 +119,6 @@
                                     <i class="ri-settings-3-line text-sm"></i>
                                     <span>Acciones</span>
                                 </div>
-                            </th>
-                            <th class="px-6 py-3 text-left font-medium">Nombre</th>
-                            <th class="px-6 py-3 text-left font-medium">Año Escolar</th>
-                            <th class="px-6 py-3 text-left font-medium">Fecha Inicio</th>
-                            <th class="px-6 py-3 text-left font-medium">Fecha Fin</th>
-                            <th class="px-6 py-3 text-center font-medium">Estado</th>
-                            <th class="px-6 py-3 text-center font-medium">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -177,14 +170,6 @@
                                         <span>{{ \Carbon\Carbon::parse($periodo->fecha_fin)->format('d/m/Y') }}</span>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium {{ $statusColor }}">
-                                        <i class="{{ $statusIcon }}"></i>
-                                <td class="px-6 py-4 text-gray-700">
-                                    {{ $periodo->anioEscolar ? $periodo->anioEscolar->anio : 'N/A' }}
-                                </td>
-                                <td class="px-6 py-4">{{ \Carbon\Carbon::parse($periodo->fecha_inicio)->format('d/m/Y') }}</td>
-                                <td class="px-6 py-4">{{ \Carbon\Carbon::parse($periodo->fecha_fin)->format('d/m/Y') }}</td>
                                 <td class="px-6 py-4 text-center">
                                     @php
                                         $now = now();
