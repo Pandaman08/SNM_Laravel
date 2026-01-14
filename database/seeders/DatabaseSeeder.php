@@ -107,7 +107,10 @@ class DatabaseSeeder extends Seeder
             AsignaturaSeeder::class,
             SeccionDocenteSeeder::class,
             CompetenciaSeeder::class,
-          
+
+            EspecialidadSeeder::class,
+            DocenteEspecialidadSeeder::class,
+            AsignaturaEspecialidadSeeder::class,
         ]);
     }
 }
