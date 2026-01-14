@@ -115,10 +115,10 @@
                                             ->first();
                                     @endphp
 
-                                    @foreach (range(1, 4) as $periodo)
+                                    @foreach ($periodos as $periodo)
                                         @php
                                             $reporte = $detalle
-                                                ? $detalle->reportesNotas->where('id_periodo', $periodo)->first()
+                                                ? $detalle->reportesNotas->where('id_periodo', $periodo->id_periodo)->first()
                                                 : null;
                                             $nota = $reporte->calificacion ?? null;
                                             $color = match ($nota) {
@@ -141,7 +141,7 @@
                                             @endif
                                         </td>
                                         <td
-                                            class="px-4 py-4 text-center text-sm text-gray-600 @if ($periodo < 6) border-r border-gray-200 @endif">
+                                            class="px-4 py-4 text-center text-sm text-gray-600 @if (!$loop->last) border-r border-gray-200 @endif">
                                             {{ $reporte->observacion ?? '-' }}
                                         </td>
                                     @endforeach

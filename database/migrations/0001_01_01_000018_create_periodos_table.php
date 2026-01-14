@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('periodos', function (Blueprint $table) {
             $table->id('id_periodo');
+            $table->unsignedBigInteger('id_anio_escolar');
+            $table->foreign('id_anio_escolar')->references('id_anio_escolar')->on('anios_escolares')->onDelete('cascade');
             $table->string('nombre', 45)->nullable();
             $table->dateTime('fecha_inicio');
             $table->dateTime('fecha_fin');

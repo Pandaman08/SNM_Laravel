@@ -50,6 +50,14 @@
                                 </span>
                             </td>
                             <td class="px-4 py-3 flex items-center justify-center space-x-4">
+                                <a href="{{route('anios-escolares.periodos', $anio->id_anio_escolar)}}" 
+                                   class="text-blue-500 hover:text-blue-700 flex items-center justify-center" 
+                                   title="Ver Periodos">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </a>
+
                                 <a href="{{route('anios-escolares.edit', $anio->id_anio_escolar)}}"
                                     class="text-yellow-500 hover:text-yellow-700 flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

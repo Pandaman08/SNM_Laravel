@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Periodo;
+use App\Models\AnioEscolar;
 use Illuminate\Validation\ValidationException;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -15,17 +16,30 @@ class PeriodoController extends Controller
     public function index(Request $request)
     {
         $searchTerm = $request->input('buscarpor');
+        
+        // Obtener el año escolar activo
+        $anioActivo = AnioEscolar::where('estado', 'Activo')->first();
 
-        $periodos = Periodo::query()
-            ->when($searchTerm, function ($query) use ($searchTerm) {
-                $query->Where('nombre', 'like', '%' . $searchTerm . '%');
+        // Si hay año activo, filtrar periodos de ese año
+        $query = Periodo::with('anioEscolar');
+
+        if ($anioActivo) {
+            $query->where('id_anio_escolar', $anioActivo->id_anio_escolar);
+        } else {
+            // Si no hay año activo, no mostrar periodos (o mostrar mensaje en vista)
+            $query->whereRaw('1 = 0');
+        }
+
+        $periodos = $query->when($searchTerm, function ($query) use ($searchTerm) {
+                $query->where('nombre', 'like', '%' . $searchTerm . '%');
             })
             ->paginate(10)
             ->withQueryString();
 
         return view('pages.admin.periodos.index', [
             'periodos' => $periodos,
-            'buscarpor' => $searchTerm
+            'buscarpor' => $searchTerm,
+            'anioActivo' => $anioActivo
         ]);
     }
 
@@ -48,12 +62,14 @@ class PeriodoController extends Controller
                 'nombre' => 'required|string|max:100',
                 'fecha_inicio' => 'required|date',
                 'fecha_fin' => 'required|date|after:fecha_inicio',
+                'id_anio_escolar' => 'required|exists:anios_escolares,id_anio_escolar',
             ], $messages);
 
             Periodo::create([
                 'nombre' => $validatedData['nombre'],
                 'fecha_inicio' => $validatedData['fecha_inicio'],
                 'fecha_fin' => $validatedData['fecha_fin'],
+                'id_anio_escolar' => $validatedData['id_anio_escolar'],
             ]);
 
             return redirect()->route('periodos.index')->with('success', 'Período creado con éxito');
@@ -126,7 +142,8 @@ class PeriodoController extends Controller
     }
     public function create()
     {
-        return view('pages.admin.periodos.create');
+        $anioActual = AnioEscolar::where('estado', 'Activo')->first();
+        return view('pages.admin.periodos.create', compact('anioActual'));
     }
 
     public function edit($id)

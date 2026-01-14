@@ -6,9 +6,15 @@
     <div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md">
         <h1 class="text-2xl font-bold mb-6 text-gray-800">Registrar Nuevo Periodo</h1>
 
+        @if(isset($anioActual))
+        <div class="mb-4 p-4 bg-blue-50 text-blue-700 rounded-md">
+            <span class="font-semibold">Año Escolar Activo:</span> {{ $anioActual->anio }}
+        </div>
+
         <form action="{{ route('periodos.store') }}" method="POST" class="space-y-5">
             @csrf
-
+            <input type="hidden" name="id_anio_escolar" value="{{ $anioActual->id_anio_escolar }}">
+            
             <div>
                 <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Periodo</label>
                 <input id="nombre" name="nombre" value="{{ old('nombre') }}"

@@ -10,6 +10,12 @@
             @csrf
             @method('PUT')
 
+            @if($periodo->anioEscolar)
+            <div class="mb-4 p-4 bg-gray-50 text-gray-700 rounded-md border border-gray-200">
+                <span class="font-semibold">Año Escolar:</span> {{ $periodo->anioEscolar->anio }}
+            </div>
+            @endif
+
             <div>
                 <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Periodo</label>
                 <input id="nombre" name="nombre" value="{{ old('nombre', $periodo->nombre) }}"

@@ -46,6 +46,7 @@
                     <thead class="bg-[#2e5382] text-white">
                         <tr>
                             <th class="px-6 py-3 text-left font-medium">Nombre</th>
+                            <th class="px-6 py-3 text-left font-medium">Año Escolar</th>
                             <th class="px-6 py-3 text-left font-medium">Fecha Inicio</th>
                             <th class="px-6 py-3 text-left font-medium">Fecha Fin</th>
                             <th class="px-6 py-3 text-center font-medium">Estado</th>
@@ -62,6 +63,9 @@
                                         </svg>
                                         {{ $periodo->nombre }}
                                     </div>
+                                </td>
+                                <td class="px-6 py-4 text-gray-700">
+                                    {{ $periodo->anioEscolar ? $periodo->anioEscolar->anio : 'N/A' }}
                                 </td>
                                 <td class="px-6 py-4">{{ \Carbon\Carbon::parse($periodo->fecha_inicio)->format('d/m/Y') }}</td>
                                 <td class="px-6 py-4">{{ \Carbon\Carbon::parse($periodo->fecha_fin)->format('d/m/Y') }}</td>

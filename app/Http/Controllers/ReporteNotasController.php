@@ -8,6 +8,7 @@ use App\Models\Competencia;
 use Illuminate\Http\Request;
 use App\Models\ReporteNota;
 use App\Models\DetalleAsignatura;
+use App\Models\AnioEscolar;
 use App\Models\Periodo;
 use App\Models\Matricula;
 use App\Models\EstudianteTutor;
@@ -17,9 +18,15 @@ use Carbon\Carbon;
 
 class ReporteNotasController extends Controller
 {
+    public function index()
+    {
+        // Redirigir a asignaturas asignadas del docente
+        return redirect()->route('docentes.asignaturas');
+    }
+
     public function showAsignaturas(Matricula $matricula)
     {
-        $periodos = Periodo::orderBy('numero_periodo')->get();
+        $periodos = Periodo::orderBy('id_periodo')->get();
         $periodoActual = Periodo::where('estado', 'Proceso')->first();
 
         $detalles = $this->getDetallesAsignaturas($matricula, $periodoActual?->id_periodo);
@@ -42,7 +49,7 @@ class ReporteNotasController extends Controller
 
         return view('asignaturas.index', [
             'matricula' => $matricula,
-            'periodos' => Periodo::orderBy('numero_periodo')->get(),
+            'periodos' => Periodo::orderBy('id_periodo')->get(),
             'periodoSeleccionado' => Periodo::find($request->periodo_id),
             'detalles' => $detalles
         ]);
@@ -78,8 +85,6 @@ class ReporteNotasController extends Controller
                 ->where('codigo_matricula', $codigo_matricula)
                 ->get();
         });
-
-        \Log::info('detalle', $detalles_asignatura->toArray());
 
         return view('pages.admin.reporte_notas.create', compact('matricula', 'detalles_asignatura', 'periodos', 'id_asignatura'));
     }
@@ -239,23 +244,25 @@ class ReporteNotasController extends Controller
         $asignatura = Asignatura::findOrFail($id_asignatura);
 
         $competencias = Competencia::where('codigo_asignatura', $id_asignatura)->get();
-
-        \Log::info('compes', $competencias->toArray());
-
         $competenciaIds = $competencias->pluck('id_competencias');
-        \Log::info('compes', $competenciaIds->toArray());
 
         $detalles = DetalleAsignatura::whereIn('id_competencias', $competenciaIds)
             ->where('codigo_matricula', $codigo_matricula)
             ->get();
-        \Log::info('DEATLLE', $detalles->toArray());
-
         $detalleIds = $detalles->pluck('id_detalle_asignatura');
 
-        // Obtener periodos dinámicamente (todos los periodos registrados)
-        $periodos = Periodo::orderBy('id_periodo')->get();
+        // Obtener el año académico de la matrícula
+        $anioEscolarMatricula = $matricula->id_anio_escolar 
+            ? AnioEscolar::find($matricula->id_anio_escolar)
+            : AnioEscolar::where('estado', 'Activo')->first();
+        
+        // Obtener solo los periodos del año académico de la matrícula
+        $periodos = $anioEscolarMatricula
+            ? Periodo::where('id_anio_escolar', $anioEscolarMatricula->id_anio_escolar)->orderBy('id_periodo')->get()
+            : collect();
+        
         $periodoIds = $periodos->pluck('id_periodo')->toArray();
-
+        
         $hoy = now();
         $periodoActual = null;
 
@@ -266,28 +273,35 @@ class ReporteNotasController extends Controller
             }
         }
 
-        // Obtener todas las notas reportadas para estos detalles y periodos
+        // Obtener todas las notas reportadas para estos detalles (de los periodos del año académico)
         $reportes = ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
             ->whereIn('id_periodo', $periodoIds)
             ->with(['periodo'])
             ->get()
             ->groupBy('id_detalle_asignatura');
 
+        // Obtener el último período
+        $ultimoPeriodo = $periodos->last();
+
         // Organizar los datos para la vista
-        $competencias->each(function ($competencia) use ($detalles, $reportes, $periodoIds) {
-            $competencia->detallesAsignatura = $detalles->where('id_competencias', $competencia->id_competencias);
+        $competencias->each(function ($competencia) use ($detalles, $reportes, $periodos, $ultimoPeriodo) {
+            $competencia->detallesAsignatura = $detalles->where('id_competencias', $competencia->id_competencias)->values();
 
-            $competencia->detallesAsignatura->each(function ($detalle) use ($reportes, $periodoIds) {
+            $competencia->detallesAsignatura->each(function ($detalle) use ($reportes, $periodos, $ultimoPeriodo) {
                 // Asignar reportes a cada detalle
-                $detalle->reportesNotas = $reportes->get($detalle->id_detalle_asignatura, collect());
+                $notasDelDetalle = $reportes->get($detalle->id_detalle_asignatura, collect());
+                $detalle->reportesNotas = $notasDelDetalle;
 
-                    // Calcular promedio sólo si hay reportes para todos los periodos registrados
-                    $periodosCount = count($periodoIds);
-                    if ($detalle->reportesNotas && $detalle->reportesNotas->count() === $periodosCount && $periodosCount > 0) {
+                // Mostrar notas aunque sea parcial. Calcular promedio SOLO si están todos los periodos
+                $totalPeriodos = $periodos->count();
+                
+                if ($notasDelDetalle->count() > 0) {
+                    // Si tiene notas de TODOS los periodos, calcular promedio
+                    if ($notasDelDetalle->count() === $totalPeriodos && $totalPeriodos > 0) {
                         $suma = 0;
                         $valido = true;
 
-                        foreach ($detalle->reportesNotas as $reporte) {
+                        foreach ($notasDelDetalle as $reporte) {
                             $valor = $this->convertirNotaANumero($reporte->calificacion);
                             if ($valor === null) {
                                 $valido = false;
@@ -296,10 +310,12 @@ class ReporteNotasController extends Controller
                             $suma += $valor;
                         }
 
-                        $detalle->promedio = $valido ? $this->convertirNumeroANota($suma / $periodosCount) : null;
+                        $detalle->promedio = $valido ? $this->convertirNumeroANota($suma / $totalPeriodos) : null;
                     } else {
-                        $detalle->promedio = $detalle->calificacion_anual ?? null;
+                        // Si no tiene todos los periodos, no mostrar promedio
+                        $detalle->promedio = null;
                     }
+                }
             });
         });
 
@@ -372,6 +388,16 @@ class ReporteNotasController extends Controller
         $matricula = Matricula::with(['estudiante.persona', 'seccion.grado'])
             ->findOrFail($codigo_matricula);
 
+        // Obtener el año académico de la matrícula
+        $anioEscolarMatricula = $matricula->id_anio_escolar 
+            ? AnioEscolar::find($matricula->id_anio_escolar)
+            : AnioEscolar::where('estado', 'Activo')->first();
+        
+        // Obtener solo los periodos del año académico de la matrícula
+        $periodos = $anioEscolarMatricula
+            ? Periodo::where('id_anio_escolar', $anioEscolarMatricula->id_anio_escolar)->orderBy('id_periodo')->get()
+            : collect();
+
         // Obtener todas las asignaturas del grado
         $asignaturas = Asignatura::where('id_grado', $matricula->seccion->grado->id_grado)
             ->orderBy('nombre')
@@ -390,8 +416,7 @@ class ReporteNotasController extends Controller
             ->get();
         $detalleIds = $detalles->pluck('id_detalle_asignatura');
 
-        // Obtener periodos dinámicamente y los reportes correspondientes
-        $periodos = Periodo::orderBy('id_periodo')->get();
+        // Obtener periodos ids del año académico
         $periodoIds = $periodos->pluck('id_periodo')->toArray();
 
         $reportes = ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
@@ -400,36 +425,40 @@ class ReporteNotasController extends Controller
             ->get()
             ->groupBy('id_detalle_asignatura');
 
-        $asignaturas->each(function ($asignatura) use ($competencias, $detalles, $reportes, $periodoIds) {
+        $asignaturas->each(function ($asignatura) use ($competencias, $detalles, $reportes, $periodoIds, $periodos) {
             $asignatura->competencias = $competencias->where('codigo_asignatura', $asignatura->codigo_asignatura);
 
-            $asignatura->competencias->each(function ($competencia) use ($detalles, $reportes, $periodoIds) {
+            $asignatura->competencias->each(function ($competencia) use ($detalles, $reportes, $periodoIds, $periodos) {
                 $competencia->detallesAsignatura = $detalles->where('id_competencias', $competencia->id_competencias);
 
-                $competencia->detallesAsignatura->each(function ($detalle) use ($reportes, $periodoIds) {
+                $competencia->detallesAsignatura->each(function ($detalle) use ($reportes, $periodoIds, $periodos) {
                     $detalle->reportesNotas = $reportes->get($detalle->id_detalle_asignatura, collect());
 
-                    $periodosCount = count($periodoIds);
-                    if ($detalle->reportesNotas->count() === $periodosCount && $periodosCount > 0) {
-                        $suma = 0;
-                        $valido = true;
+                    $totalPeriodos = count($periodoIds);
+                    // Mostrar notas aunque sea parcial. Calcular promedio SOLO si están todos los periodos
+                    if ($detalle->reportesNotas->count() > 0) {
+                        // Si tiene notas de TODOS los periodos, calcular promedio
+                        if ($detalle->reportesNotas->count() === $totalPeriodos && $totalPeriodos > 0) {
+                            $suma = 0;
+                            $valido = true;
 
-                        foreach ($detalle->reportesNotas as $reporte) {
-                            $valor = $this->convertirNotaANumero($reporte->calificacion ?? '');
-                            if ($valor === null) {
-                                $valido = false;
-                                break;
+                            foreach ($detalle->reportesNotas as $reporte) {
+                                $valor = $this->convertirNotaANumero($reporte->calificacion ?? '');
+                                if ($valor === null) {
+                                    $valido = false;
+                                    break;
+                                }
+                                $suma += $valor;
                             }
-                            $suma += $valor;
-                        }
 
-                        $detalle->promedio = $valido ? $this->convertirNumeroANota($suma / $periodosCount) : null;
-                    } else {
-                        $detalle->promedio = $detalle->calificacion_anual ?? null;
+                            $detalle->promedio = $valido ? $this->convertirNumeroANota($suma / $totalPeriodos) : null;
+                        } else {
+                            // Si no tiene todos los periodos, no mostrar promedio
+                            $detalle->promedio = null;
+                        }
                     }
                 });
             });
-            // Attach calificacion_final later outside closure
         });
 
         // Adjuntar calificaciones finales por asignatura
@@ -441,7 +470,8 @@ class ReporteNotasController extends Controller
 
         return view('pages.admin.reporte_notas.tutor-estudiantes', [
             'matricula' => $matricula,
-            'asignaturas' => $asignaturas
+            'asignaturas' => $asignaturas,
+            'periodos' => $periodos
         ]);
     }
 
@@ -514,8 +544,16 @@ class ReporteNotasController extends Controller
             ->get();
         $detalleIds = $detalles->pluck('id_detalle_asignatura');
 
-        // Obtener periodos dinámicos y reportes correspondientes
-        $periodos = Periodo::orderBy('id_periodo')->get();
+        // Obtener el año académico de la matrícula
+        $anioEscolarMatricula = $matricula->id_anio_escolar 
+            ? AnioEscolar::find($matricula->id_anio_escolar)
+            : AnioEscolar::where('estado', 'Activo')->first();
+        
+        // Obtener solo los periodos del año académico de la matrícula
+        $periodos = $anioEscolarMatricula
+            ? Periodo::where('id_anio_escolar', $anioEscolarMatricula->id_anio_escolar)->orderBy('id_periodo')->get()
+            : collect();
+        
         $periodoIds = $periodos->pluck('id_periodo')->toArray();
 
         $reportes = ReporteNota::whereIn('id_detalle_asignatura', $detalleIds)
@@ -629,57 +667,197 @@ class ReporteNotasController extends Controller
      * Cargar vista masiva de calificaciones para una asignatura
      * Solo muestra el período activo
      */
+    /**
+ * Mostrar vista de calificaciones masivas por competencia
+ */
     public function calificacionesMasivas($id_asignatura)
     {
+        $asignatura = Asignatura::with(['grado', 'competencias'])->findOrFail($id_asignatura);
+        $anioEscolar = AnioEscolar::where('estado', 'Activo')->first();
+        // Obtener todos los periodos
+        $periodos = Periodo::where('id_anio_escolar', $anioEscolar->id_anio_escolar)
+            ->orderBy('nombre')
+            ->get();
+        
+        // Obtener las competencias de la asignatura
+        $competencias = $asignatura->competencias;
+
+        return view('pages.admin.reporte_notas.calificaciones-masivas', [
+            'asignatura' => $asignatura,
+            'periodos' => $periodos,
+            'competencias' => $competencias
+        ]);
+    }
+
+
+    /**
+     * API: Obtener estudiantes y notas de una competencia específica
+     */
+    public function obtenerNotasCompetencia($id_asignatura, $id_competencia)
+    {
         $asignatura = Asignatura::with('grado')->findOrFail($id_asignatura);
+        $competencia = Competencia::findOrFail($id_competencia);
 
-        // Obtener período activo
-        $periodoActual = Periodo::where('estado', 'Proceso')->first();
-
-        if (!$periodoActual) {
-            return back()->with('error', 'No hay período activo en este momento');
+        // Validar que la competencia pertenece a la asignatura
+        if ($competencia->codigo_asignatura != $id_asignatura) {
+            return response()->json(['error' => 'Competencia no pertenece a esta asignatura'], 400);
         }
 
-        // Obtener todas las matrículas activas para esta asignatura (por sus secciones)
+        // Obtener todas las matrículas activas para esta asignatura
         $secciones = $asignatura->grado->secciones;
         $seccionIds = $secciones->pluck('id_seccion')->toArray();
 
         $matriculas = Matricula::with(['estudiante.persona'])
             ->whereIn('seccion_id', $seccionIds)
             ->where('estado', 'activo')
-            ->orderBy('codigo_matricula')
-            ->get();
-
-        // Obtener competencias de la asignatura
-        $competencias = Competencia::where('codigo_asignatura', $id_asignatura)
-            ->get();
-
-        // Para cada matrícula, obtener los detalles y reportes de notas
-        $competenciaIds = $competencias->pluck('id_competencias')->toArray();
-
-        $detalles = DetalleAsignatura::whereIn('id_competencias', $competenciaIds)
-            ->with([
-                'reportesNotas' => function ($query) use ($periodoActual) {
-                    $query->where('id_periodo', $periodoActual->id_periodo);
-                }
-            ])
             ->get()
-            ->groupBy('codigo_matricula');
+            ->sortBy(function($matricula) {
+                return $matricula->estudiante->persona->lastname . ' ' . $matricula->estudiante->persona->name;
+            })
+            ->values(); // Reset keys after sorting
 
-        // Verificar si ya existen notas registradas para este período
-        $notasRegistradas = ReporteNota::whereIn('id_periodo', [$periodoActual->id_periodo])
-            ->whereIn('id_detalle_asignatura', $detalles->flatten()->pluck('id_detalle_asignatura'))
-            ->exists();
+        // Obtener todos los periodos
+        $periodos = Periodo::orderBy('nombre')->get();
+        $periodoIds = $periodos->pluck('id_periodo')->toArray();
 
-        return view('pages.admin.reporte_notas.calificaciones-masivas', [
-            'asignatura' => $asignatura,
-            'periodoActual' => $periodoActual,
-            'matriculas' => $matriculas,
-            'competencias' => $competencias,
-            'detalles' => $detalles,
-            'notasRegistradas' => $notasRegistradas
+        // Obtener detalles para esta competencia específica
+        $detalles = DetalleAsignatura::where('id_competencias', $id_competencia)
+            ->whereIn('codigo_matricula', $matriculas->pluck('codigo_matricula'))
+            ->with(['reportesNotas' => function($query) use ($periodoIds) {
+                $query->whereIn('id_periodo', $periodoIds);
+            }])
+            ->get()
+            ->keyBy('codigo_matricula');
+
+        // Construir respuesta
+        $data = [];
+        foreach ($matriculas as $matricula) {
+            $detalle = $detalles->get($matricula->codigo_matricula);
+            $notas = [];
+            
+            if ($detalle && $detalle->reportesNotas) {
+                foreach ($detalle->reportesNotas as $reporte) {
+                    $notas[$reporte->id_periodo] = $reporte->calificacion;
+                }
+            }
+
+            $data[] = [
+                'codigo_matricula' => $matricula->codigo_matricula,
+                'estudiante_nombre' => $matricula->estudiante->persona->lastname . ' ' . $matricula->estudiante->persona->name,
+                'id_detalle_asignatura' => $detalle ? $detalle->id_detalle_asignatura : null,
+                'notas' => $notas // Ahora será un objeto asociativo: {1: "A", 2: "B", 3: "AD"}
+            ];
+        }
+        logger()->info('Notas por competencia:', $data);
+        return response()->json([
+            'success' => true,
+            'estudiantes' => $data,
+            'periodos' => $periodos->map(function($p) {
+                return [
+                    'id_periodo' => $p->id_periodo,
+                    'nombre' => $p->nombre,
+                    'estado' => $p->estado,
+                    'fecha_inicio' => $p->fecha_inicio, 
+                    'fecha_fin' => $p->fecha_fin        
+                ];
+            })
         ]);
     }
+    
+    /**
+     * Guardar notas masivas para una competencia
+     */
+    public function guardarNotasPorCompetencia(Request $request)
+    {
+        $id_asignatura = $request->input('id_asignatura');
+        $id_competencia = $request->input('id_competencia');
+        $notas = $request->input('notas', []); // notas[codigo_matricula][periodo_id] = calificacion
+
+        if (!$id_competencia) {
+            return response()->json(['success' => false, 'message' => 'No se especificó la competencia'], 400);
+        }
+
+        // Obtener periodos activos
+        $periodosActivos = Periodo::where('estado', 'Proceso')->pluck('id_periodo')->toArray();
+
+        \DB::beginTransaction();
+        try {
+            foreach ($notas as $codigo_matricula => $periodosNotas) {
+                // Buscar o crear DetalleAsignatura
+                $detalle = DetalleAsignatura::firstOrCreate(
+                    [
+                        'codigo_matricula' => $codigo_matricula,
+                        'id_competencias' => $id_competencia
+                    ],
+                    ['calificacion_anual' => null]
+                );
+
+                foreach ($periodosNotas as $periodo_id => $calificacion) {
+                    // Solo procesar periodos activos
+                    if (!in_array($periodo_id, $periodosActivos)) {
+                        continue;
+                    }
+
+                    if (empty($calificacion) || !in_array($calificacion, ['AD', 'A', 'B', 'C'])) {
+                        continue;
+                    }
+
+                    ReporteNota::updateOrCreate(
+                        [
+                            'id_detalle_asignatura' => $detalle->id_detalle_asignatura,
+                            'id_periodo' => $periodo_id
+                        ],
+                        [
+                            'calificacion' => $calificacion,
+                            'fecha_registro' => now()->toDateString()
+                        ]
+                    );
+                }
+                
+                // Recalcular promedio anual
+                $this->actualizarPromedioAnual($detalle->id_detalle_asignatura);
+            }
+            
+            \DB::commit();
+            return response()->json(['success' => true, 'message' => 'Notas guardadas correctamente']);
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('Error al guardar notas: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error al guardar: ' . $e->getMessage()], 500);
+        }
+    }
+
+    private function actualizarPromedioAnual($id_detalle_asignatura) {
+        $periodos = Periodo::orderBy('id_periodo')->get();
+        $periodoIds = $periodos->pluck('id_periodo')->toArray();
+        $totalPeriodos = count($periodoIds);
+
+        $reportes = ReporteNota::where('id_detalle_asignatura', $id_detalle_asignatura)
+            ->whereIn('id_periodo', $periodoIds)
+            ->get();
+
+        if ($reportes->count() === $totalPeriodos && $totalPeriodos > 0) {
+            $suma = 0; 
+            $valido = true;
+            foreach ($reportes as $r) {
+                $valor = $this->convertirNotaANumero($r->calificacion);
+                if ($valor === null) { $valido = false; break; }
+                $suma += $valor;
+            }
+
+            if ($valido) {
+                $promedioLetra = $this->convertirNumeroANota($suma / $totalPeriodos);
+                $detalle = DetalleAsignatura::find($id_detalle_asignatura);
+                $detalle->update(['calificacion_anual' => $promedioLetra]);
+
+                // Recalcular final asignatura
+                if ($detalle->asignatura) {
+                    $this->recomputeCalificacionFinal($detalle->codigo_matricula, $detalle->asignatura->codigo_asignatura);
+                }
+            }
+        }
+    }
+
 
     /**
      * Vista de prueba: permitir al docente calificar todos los periodos para una asignatura
@@ -913,5 +1091,13 @@ class ReporteNotasController extends Controller
                 'redirect_to' => route('docentes.asignaturas')
             ]);
         }
+    }
+
+    public function export($id_asignatura)
+    {
+        $asignatura = Asignatura::findOrFail($id_asignatura);
+        
+        return (new ReportesExport($id_asignatura))
+            ->download('reporte_notas_' . $asignatura->nombre . '.xlsx');
     }
 }
