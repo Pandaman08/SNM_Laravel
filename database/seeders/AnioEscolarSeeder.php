@@ -9,25 +9,31 @@ class AnioEscolarSeeder extends Seeder
 {
     public function run(): void
     {
+        $currentYear = date('Y');
+        $pastYear = $currentYear - 1;
+
         $anios = [
             [
-                'anio' => 2024,
-                'descripcion' => 'Año Escolar 2024',
-                'fecha_inicio' => '2024-03-01',
-                'fecha_fin' => '2024-12-20',
-                'estado' => 'Activo'
+                'anio' => (string)$pastYear,
+                'descripcion' => "Año Escolar $pastYear",
+                'fecha_inicio' => "$pastYear-03-01",
+                'fecha_fin' => "$pastYear-12-20",
+                'estado' => 'Finalizado'
             ],
             [
-                'anio' => 2025,
-                'descripcion' => 'Año Escolar 2025',
-                'fecha_inicio' => '2025-03-01',
-                'fecha_fin' => '2025-12-20',
+                'anio' => (string)$currentYear,
+                'descripcion' => "Año Escolar $currentYear",
+                'fecha_inicio' => "$currentYear-03-01",
+                'fecha_fin' => "$currentYear-12-20",
                 'estado' => 'Activo'
             ]
         ];
 
         foreach ($anios as $anio) {
-            AnioEscolar::create($anio);
+            AnioEscolar::firstOrCreate(
+                ['anio' => $anio['anio']], 
+                $anio
+            );
         }
     }
 }

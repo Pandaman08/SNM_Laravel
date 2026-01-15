@@ -81,11 +81,18 @@ class MarcarAusenciasAutomaticas extends Command
             $estudiante = $matricula->estudiante;
             $seccion = $matricula->seccion;
             
+            // ✅ DEBUG: Mostrar qué estudiante se está procesando
+            $this->newLine();
+            $this->info("👤 Procesando: {$estudiante->persona->name} {$estudiante->persona->lastname}");
+            
             if (!$seccion || !$seccion->hora_entrada) {
+                $this->warn("   ⚠️  Sin sección o sin hora de entrada configurada");
                 $sinSeccion++;
                 $bar->advance();
                 continue;
             }
+            
+            $this->info("   📍 Sección: {$seccion->seccion} | Entrada: {$seccion->hora_entrada}");
             
             // Verificar si ya tiene asistencia registrada hoy
             $asistenciaExistente = Asistencia::where('codigo_estudiante', $estudiante->codigo_estudiante)
@@ -94,37 +101,44 @@ class MarcarAusenciasAutomaticas extends Command
                 ->first();
             
             if ($asistenciaExistente) {
+                $this->info("   ✅ Ya tiene registro hoy: {$asistenciaExistente->estado->value}");
                 $yaConRegistro++;
                 $bar->advance();
-                continue; // Ya tiene registro, saltar
+                continue;
             }
             
-            // Calcular si ya pasaron más de 2 horas desde la hora de entrada
-            $horaEntradaSeccion = \DateTime::createFromFormat('H:i:s', $seccion->hora_entrada);
-            $horaLimite = clone $horaEntradaSeccion;
-            $horaLimite->modify('+2 hours');
+            // ✅ CORRECCIÓN: Comparar fechas completas del mismo día
+            // Crear DateTime con fecha completa para comparación correcta
+            $fechaHoraEntrada = \DateTime::createFromFormat('Y-m-d H:i:s', $fechaHoy . ' ' . $seccion->hora_entrada, new \DateTimeZone('America/Lima'));
+            $fechaHoraLimite = clone $fechaHoraEntrada;
+            $fechaHoraLimite->modify('+2 hours');
             
-            $horaActualObj = \DateTime::createFromFormat('H:i:s', $horaActual);
+            $fechaHoraActual = \DateTime::createFromFormat('Y-m-d H:i:s', $fechaHoy . ' ' . $horaActual, new \DateTimeZone('America/Lima'));
+            
+            $this->info("   🕐 Límite entrada + 2h: {$fechaHoraLimite->format('Y-m-d H:i:s')}");
+            $this->info("   ⏰ Hora actual: {$fechaHoraActual->format('Y-m-d H:i:s')}");
             
             // Si ya pasaron más de 2 horas desde la entrada esperada
-            if ($horaActualObj >= $horaLimite) {
+            if ($fechaHoraActual >= $fechaHoraLimite) {
+                $this->info("   ✅ SÍ pasó el límite - Marcando ausencia...");
                 try {
-                    // Crear registro de ausencia
+                    // ✅ CORRECCIÓN: tipo_registro = 'entrada' (valor válido en la BD)
                     Asistencia::create([
                         'codigo_estudiante' => $estudiante->codigo_estudiante,
                         'id_periodo' => $periodoActual->id_periodo,
                         'fecha' => $fechaHoy,
                         'estado' => AsistenciaEstado::AUSENTE,
                         'observacion' => 'Ausencia automática: No registró entrada',
-                        'tipo_registro' => null,
+                        'tipo_registro' => 'entrada', // ✅ Usar 'entrada' en lugar de 'automatico'
                         'hora_entrada' => null,
                         'hora_salida' => null
                     ]);
                     
+                    $this->info("   ✔️  Ausencia creada exitosamente");
                     $ausenciasCreadas++;
                     
                 } catch (\Exception $e) {
-                    $this->error("\n❌ Error al crear ausencia para: {$estudiante->persona->name}");
+                    $this->error("   ❌ Error al crear ausencia: {$e->getMessage()}");
                     
                     Log::error('Error al marcar ausencia automática', [
                         'codigo_estudiante' => $estudiante->codigo_estudiante,
@@ -132,6 +146,7 @@ class MarcarAusenciasAutomaticas extends Command
                     ]);
                 }
             } else {
+                $this->info("   ⏳ Aún no alcanza el límite de 2h");
                 $noAlcanzaronLimite++;
             }
             

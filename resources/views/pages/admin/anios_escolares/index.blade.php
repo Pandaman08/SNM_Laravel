@@ -71,8 +71,6 @@
                     <span>Buscar</span>
                 </button>
             </form>
-        </div>
-
         {{-- Tarjeta de contenido --}}
         <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
             {{-- Estadística rápida --}}

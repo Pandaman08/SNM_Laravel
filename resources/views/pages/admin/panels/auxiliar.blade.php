@@ -32,11 +32,47 @@
             </div>
         </div>
 
-        <!-- Agregar después del header -->
+        <!-- Mensajes de éxito/error -->
+        @if(session('success'))
+        <div class="mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg shadow-sm" role="alert">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <p class="font-medium">{{ session('success') }}</p>
+            </div>
+        </div>
+        @endif
+
+        @if(session('error'))
+        <div class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-sm" role="alert">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                <p class="font-medium">{{ session('error') }}</p>
+            </div>
+        </div>
+        @endif
+
+        @if(session('warning'))
+        <div class="mb-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg shadow-sm" role="alert">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+                <p class="font-medium">{{ session('warning') }}</p>
+            </div>
+        </div>
+        @endif
+
+        <!-- Botón para marcar ausencias -->
         <div class="mb-6">
-            <form action="{{ route('auxiliar.marcar-ausencias') }}" method="POST">
+            <form action="{{ route('auxiliar.marcar-ausencias') }}" method="POST" id="formMarcarAusencias">
                 @csrf
-                <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg flex items-center gap-2">
+                <button type="submit" 
+                        class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg flex items-center gap-2 hover:scale-105"
+                        onclick="return confirmarMarcarAusencias()">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
@@ -160,7 +196,7 @@
                     </div>
                 </div>
             </div>
-        </div> 
+        </div>
 
         <!-- Botones principales para escanear -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -211,9 +247,23 @@
         <div class="mb-8">
             <a href="{{ route('auxiliar.justificaciones') }}" class="block bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white hover:shadow-xl transition-all duration-300">
                 <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-xl font-bold mb-2">Justificaciones Pendientes</h3>
-                        <p class="text-purple-100">Revisar solicitudes de justificación de ausencias</p>
+                    <div class="flex items-center gap-4">
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Justificaciones Pendientes</h3>
+                            <p class="text-purple-100">Revisar solicitudes de justificación de ausencias</p>
+                        </div>
+                        @if(isset($justificacionesPendientesCount) && $justificacionesPendientesCount > 0)
+                        <div class="relative">
+                            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
+                                {{ $justificacionesPendientesCount }}
+                            </span>
+                            <div class="bg-yellow-400 text-yellow-900 p-2 rounded-lg">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                     <div class="p-4 bg-white/20 rounded-2xl">
                         <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -321,4 +371,10 @@
         </div>
     </div>
 </div>
+
+<script>
+function confirmarMarcarAusencias() {
+    return confirm('¿Está seguro de marcar como ausentes a los estudiantes que no han registrado entrada después de 2 horas?\n\nEsta acción no se puede deshacer.');
+}
+</script>
 @endsection
