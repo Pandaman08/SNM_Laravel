@@ -21,7 +21,7 @@ class AuxiliarController extends Controller
      */
     public function panel_auxiliar()
     {
-        $user = Auth::user(); // ✅ Variable que necesita la vista
+        $user = Auth::user();
         Carbon::setLocale('es');
         $hoy = Carbon::now('America/Lima')->startOfDay();
         
@@ -32,7 +32,6 @@ class AuxiliarController extends Controller
         $totalEstudiantes = Matricula::where('estado', 'activo')->count();
         $asistenciasHoy = Asistencia::whereDate('fecha', $hoy)->count();
         
-        // Estadísticas del día con nombres que espera la vista
         $estudiantesPresentes = Asistencia::whereDate('fecha', $hoy)
             ->where('estado', AsistenciaEstado::PRESENTE)
             ->count();
@@ -50,12 +49,33 @@ class AuxiliarController extends Controller
             ->take(10)
             ->get();
         
+        // ✅ Contar justificaciones pendientes
+        $justificacionesPendientesCount = Asistencia::where('estado', AsistenciaEstado::AUSENTE)
+            ->whereNotNull('justificacion')
+            ->where('estado_justificacion', 'pendiente')
+            ->count();
+        
+        // ✅ Últimas 5 justificaciones revisadas por este auxiliar
+        $ultimasJustificaciones = Asistencia::with(['estudiante.persona'])
+            ->whereIn('estado_justificacion', ['aprobada', 'rechazada'])
+            ->where('revisado_por', $user->user_id)
+            ->orderBy('fecha_revision_justificacion', 'desc')
+            ->take(5)
+            ->get();
+        
         $horarioPromedio = DB::table('secciones')
             ->selectRaw('
                 SEC_TO_TIME(ROUND(AVG(TIME_TO_SEC(hora_entrada)))) as hora_entrada_promedio,
                 SEC_TO_TIME(ROUND(AVG(TIME_TO_SEC(hora_salida)))) as hora_salida_promedio
             ')
             ->first();
+        
+        // ✅ Debug: Ver si hay datos
+        Log::info('Justificaciones del auxiliar', [
+            'user_id' => $user->user_id,
+            'pendientes' => $justificacionesPendientesCount,
+            'revisadas' => $ultimasJustificaciones->count()
+        ]);
         
         return view('pages.admin.panels.auxiliar', compact(
             'user',
@@ -67,7 +87,9 @@ class AuxiliarController extends Controller
             'estudiantesSinRegistro',
             'ultimasAsistencias',
             'periodoActual',
-            'horarioPromedio'
+            'horarioPromedio',
+            'justificacionesPendientesCount',
+            'ultimasJustificaciones'
         ));
     }
 
